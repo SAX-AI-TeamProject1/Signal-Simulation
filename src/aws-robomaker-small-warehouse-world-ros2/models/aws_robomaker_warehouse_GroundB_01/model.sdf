@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="aws_robomaker_warehouse_GroundB_01">
+    <link name="link">
+      <inertial>
+        <mass>1000</mass>
+	<inertia>
+	    <ixx>  3.6425120714e+01 </ixx>
+	    <ixy>  1.2232319789e-13 </ixy>
+	    <ixz> -3.9185364676e-07 </ixz>
+	    <iyy>  5.2711602666e+01 </iyy>
+	    <iyz>  4.7954525201e-06 </iyz>
+	    <izz>  1.6289058971e+01 </izz>
+	  </inertia>
+	</inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://aws_robomaker_warehouse_GroundB_01/meshes/aws_robomaker_warehouse_GroundB_01_collision.DAE</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.3</mu>
+              <mu2>0.3</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+	    <geometry>
+          <mesh>
+            <uri>model://aws_robomaker_warehouse_GroundB_01/meshes/aws_robomaker_warehouse_GroundB_01_visual.DAE</uri>
+          </mesh>
+        </geometry>
+      <meta> <layer> 1 </layer></meta>
+</visual>
+    </link>
+<static>1</static>
+  </model>
+</sdf>

@@ -220,3 +220,6 @@ __marimo__/
 #AI
 .claude/local/
 .claude/settings.local.json
+
+# macOS
+.DS_Store
