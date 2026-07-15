@@ -1,3 +1,8 @@
+# colcon (ROS 2 워크스페이스 빌드 산출물 — src/ 형제로 생성됨)
+/build/
+/install/
+/log/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

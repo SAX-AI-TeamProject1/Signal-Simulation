@@ -62,13 +62,19 @@ Camera-based image processing is developed in a **separate repository**, not her
 
 <!-- 현재 상태 설명 -->
 
-As of now this repository is empty scaffolding: only `README.md`, `LICENSE`, and `.gitignore` exist (the `.gitignore` is a generic Python template). There is no ROS 2 package, Gazebo world/model, launch file, or test suite yet — building these is the active, near-term work for this repo, not a hypothetical future step.
-<!--
-현재 리포지토리는 빈 뼈대 상태: README.md, LICENSE, .gitignore만 존재
-(.gitignore는 일반적인 Python 템플릿). 아직 ROS 2 패키지, Gazebo 월드/모델,
-launch 파일, 테스트 슈트가 없음 — 이를 구축하는 것이 이 리포지토리의
-당장 해야 할 작업이며, 먼 미래의 가상 단계가 아님.
--->
+Two ROS 2 packages exist under `src/` (colcon workspace, build with `colcon build` at the repo root, then `source install/setup.bash`):
+<!-- src/ 아래에 ROS 2 패키지 두 개가 있음 (colcon 워크스페이스, 리포지토리 루트에서 colcon build 후 source install/setup.bash). -->
+
+- `aws-robomaker-small-warehouse-world-ros2` — vendored warehouse world/models (environment only, ported toward gz-sim; the included `launch/*.launch.py` still target classic Gazebo (`gazebo_ros`, `gzserver`/`gzclient`) and need porting to `ros_gz_sim`/`gz sim` before they'll work under Gazebo Harmonic).
+  <!-- aws-robomaker-small-warehouse-world-ros2 — 벤더링한 창고 월드/모델(환경만, gz-sim 쪽으로 포팅 중). 포함된 launch/*.launch.py는 아직 구버전 Gazebo(gazebo_ros, gzserver/gzclient) 방식이라 Gazebo Harmonic에서 쓰려면 ros_gz_sim/gz sim으로 다시 포팅해야 함. -->
+- `signal_tracker_robot` — a separate, simple fixed-base upper-body-only robot (torso + 2 arms + 5 fingers per hand, 18 revolute joints, `ros2_control`/`gz_ros2_control` position control) for real-time motion tracking, **not** the Phase 1 mobility robot. It subscribes to Signal-Vision's `/upper_body_pose` topic (rosbridge-relayed `std_msgs/String` JSON: 8 arm joints + up to 2 hands × 21 landmarks) and retargets it to joint positions via simple vector-angle heuristics (not real IK) in `motion_retarget_node.py`. Package layout: `urdf/tracker_robot.urdf`, `config/controllers.yaml`, `launch/spawn_tracker_robot.launch.py`, `signal_tracker_robot/motion_retarget_node.py`. Run: `ros2 launch signal_tracker_robot spawn_tracker_robot.launch.py`, then `ros2 run signal_tracker_robot motion_retarget_node` once Signal-Vision is publishing.
+  <!-- signal_tracker_robot — 별도의 간단한 고정 받침대형 상반신 전용 로봇(몸통 + 팔 2개 + 손가락 5개씩, 회전 관절 18개, ros2_control/gz_ros2_control 위치 제어), 실시간 모션 트래킹용이며 Phase 1의 이동 로봇이 아님. Signal-Vision의 /upper_body_pose 토픽(rosbridge로 중계되는 std_msgs/String JSON: 팔 관절 8개 + 손 최대 2개 × 21랜드마크)을 구독해 motion_retarget_node.py에서 단순 벡터 각도 근사(정식 IK 아님)로 관절 위치로 변환한다. 패키지 구성: urdf/tracker_robot.urdf, config/controllers.yaml, launch/spawn_tracker_robot.launch.py, signal_tracker_robot/motion_retarget_node.py. 실행: ros2 launch signal_tracker_robot spawn_tracker_robot.launch.py, 이후 Signal-Vision이 발행 중이면 ros2 run signal_tracker_robot motion_retarget_node. -->
+
+**Caveat: none of this has been build- or run-tested** — it was authored from a macOS session with no ROS 2/Gazebo installed and no access to the Linux VM where this actually runs. Treat it as a best-effort first draft; `colcon build` will likely surface issues (missing deps, plugin name/version mismatches for the installed `gz_ros2_control`, world/launch API drift) that need fixing on the real machine.
+<!-- 주의: 이 내용은 빌드·실행 검증을 하나도 못 했음 — ROS 2/Gazebo가 없고 실제로 돌아가는 리눅스 VM에도 접근 못 하는 macOS 세션에서 작성함. 처음 시도한 초안으로 보고, colcon build 시 실제 문제(의존성 누락, 설치된 gz_ros2_control과의 플러그인 이름/버전 불일치, 월드·launch API 변경 등)가 나오면 실제 기기에서 고쳐야 함. -->
+
+The `no_roof_small_warehouse.launch.py`/`small_warehouse.launch.py` porting-to-gz-sim gap above and the Phase 1 mobility robot description/URDF are still open — update this section again once either lands.
+<!-- 위 no_roof_small_warehouse.launch.py/small_warehouse.launch.py의 gz-sim 포팅 공백과 Phase 1 이동 로봇 모델/URDF는 아직 없음 — 둘 중 하나라도 추가되면 이 섹션을 다시 갱신할 것. -->
 
 When scaffolding is added (ROS 2 package structure, `colcon build`, world/model files, launch files), update this file with the actual build/run/test commands and the real architecture (package layout, node/topic graph, where world and robot description files live).
 <!--
