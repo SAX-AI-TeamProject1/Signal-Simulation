@@ -1,0 +1,90 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "0. 워크스페이스 빌드 (colcon build)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "source /opt/ros/jazzy/setup.bash && colcon build --symlink-install"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "1. rosbridge 서버 실행",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "2. 로봇 스폰 (Gazebo + tracker_robot)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch signal_tracker_robot spawn_tracker_robot.launch.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "3. 모션 리타겟팅 노드 실행",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 run signal_tracker_robot motion_retarget_node"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "시뮬 전체 실행 (rosbridge + 로봇 스폰 + 리타겟팅)",
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "1. rosbridge 서버 실행",
+                "2. 로봇 스폰 (Gazebo + tracker_robot)",
+                "3. 모션 리타겟팅 노드 실행"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
