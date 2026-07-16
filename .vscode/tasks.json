@@ -46,7 +46,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && gz sim empty.sdf -r"
+                "source /opt/ros/jazzy/setup.bash && gz sim --render-engine ogre empty.sdf -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -64,7 +64,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\" && gz sim \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/small_warehouse/small_warehouse.world\" -r"
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\" && gz sim --render-engine ogre \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/small_warehouse/small_warehouse.world\" -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
