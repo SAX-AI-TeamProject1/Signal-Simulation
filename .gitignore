@@ -225,9 +225,9 @@ __marimo__/
 #AI
 .claude/local/
 .claude/settings.local.json
+CLAUDE.md
 
 # macOS
 .DS_Store
 
-# Claude
-CLAUDE.md
+

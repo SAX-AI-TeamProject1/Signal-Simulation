@@ -41,12 +41,12 @@
             "problemMatcher": []
         },
         {
-            "label": "2. 로봇 스폰 (Gazebo + tracker_robot)",
+            "label": "2. Gazebo 실행 (빈 월드)",
             "type": "shell",
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch signal_tracker_robot spawn_tracker_robot.launch.py"
+                "source /opt/ros/jazzy/setup.bash && gz sim empty.sdf -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -59,12 +59,12 @@
             "problemMatcher": []
         },
         {
-            "label": "3. 모션 리타겟팅 노드 실행",
+            "label": "3. Gazebo 실행 (창고 월드)",
             "type": "shell",
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 run signal_tracker_robot motion_retarget_node"
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\" && gz sim \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/small_warehouse/small_warehouse.world\" -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -74,16 +74,6 @@
                 "reveal": "always",
                 "panel": "dedicated"
             },
-            "problemMatcher": []
-        },
-        {
-            "label": "시뮬 전체 실행 (rosbridge + 로봇 스폰 + 리타겟팅)",
-            "dependsOrder": "parallel",
-            "dependsOn": [
-                "1. rosbridge 서버 실행",
-                "2. 로봇 스폰 (Gazebo + tracker_robot)",
-                "3. 모션 리타겟팅 노드 실행"
-            ],
             "problemMatcher": []
         }
     ]
