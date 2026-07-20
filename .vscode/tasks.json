@@ -75,6 +75,116 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "4. 툴 환경 설정 (.venv 생성 + requirements 설치)",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "(command -v python3.12 >/dev/null && python3.12 -m venv .venv || python3 -m venv .venv) && .venv/bin/pip install -r requirements.txt"
+                ]
+            },
+            "osx": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "(command -v python3.12 >/dev/null && python3.12 -m venv .venv || python3 -m venv .venv) && .venv/bin/pip install -r requirements.txt"
+                ]
+            },
+            "windows": {
+                "command": "cmd",
+                "args": [
+                    "/d",
+                    "/c",
+                    "(py -3.12 -m venv .venv || python -m venv .venv) && .venv\\Scripts\\pip install -r requirements.txt"
+                ]
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "5. 트랙 편집기 실행 (track_editor)",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "linux": {
+                "command": ".venv/bin/python",
+                "args": [
+                    "tools/track_editor.py",
+                    "--map",
+                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
+                    "--out",
+                    "config/tracks.yaml"
+                ]
+            },
+            "osx": {
+                "command": ".venv/bin/python",
+                "args": [
+                    "tools/track_editor.py",
+                    "--map",
+                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
+                    "--out",
+                    "config/tracks.yaml"
+                ]
+            },
+            "windows": {
+                "command": ".venv\\Scripts\\python.exe",
+                "args": [
+                    "tools/track_editor.py",
+                    "--map",
+                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
+                    "--out",
+                    "config/tracks.yaml"
+                ]
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "6. 트랙 → 월드 반영 (actors + markers 주입)",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    ".venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
+                ]
+            },
+            "osx": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    ".venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
+                ]
+            },
+            "windows": {
+                "command": "cmd",
+                "args": [
+                    "/d",
+                    "/c",
+                    ".venv\\Scripts\\python tools\\tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv\\Scripts\\python tools\\tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
+                ]
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }
