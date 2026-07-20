@@ -52,11 +52,14 @@ Do not type waypoint coordinates by hand — author them by clicking on the occu
 
 ```bash
 .venv/bin/python tools/track_editor.py \
-  --map src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml \
+  --map <path-to-map.yaml> \
   --out config/tracks.yaml
 # left click = add, right click = undo, n = new track, t = switch, l = toggle loop, s = save
 # p = place signal point, m = add station point, d = delete nearest station
 ```
+
+No map currently ships in this repo (the previous `maps/005` was deleted) — generate one first per §8 below, then pass its `map.yaml` here.
+<!-- 이 레포에는 현재 맵이 없음(예전 maps/005는 삭제됨) — 아래 8장대로 먼저 맵을 만든 뒤 그 map.yaml을 여기에 넘길 것. -->
 
 Besides tracks, the same editor places the named points: the signal point (`p`) and station points (`m`) — the spots vehicles visit and return from. They are saved into the same YAML under `signal_point` and `stations`.
 <!-- 같은 편집기로 트랙 외의 지점들도 찍는다: 수신호 포인트(p)와 운송장비가 찍고 돌아오는 경유 지점(m). 같은 YAML의 signal_point / stations 항목에 저장된다. -->
@@ -135,7 +138,7 @@ To make the layout visible on the warehouse floor, generate painted markers from
 
 ```bash
 .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml \
-  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/navi_factory/navi_factory.world
+  --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 ```
 
 ## 5. Method A — background vehicle as an actor
@@ -146,7 +149,7 @@ Do not write actor SDF by hand — generate it from `tracks.yaml` with `tools/tr
 
 ```bash
 .venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --speed 0.75 \
-  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/navi_factory/navi_factory.world
+  --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 ```
 
 The generated SDF looks like this (shown for reference; times correspond to ~0.75 m/s):
@@ -278,11 +281,8 @@ Requirements and caveats:
 Gazebo itself has no navmesh concept. There are two practical routes:
 <!-- Gazebo 자체에는 navmesh 개념이 없다. 실용적인 경로는 두 가지다: -->
 
-**Route 1 (recommended) — 2D occupancy grid, the ROS-native equivalent.** The vendored warehouse package already ships a ready-made map matching `navi_factory`'s layout: `src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml` (PGM + YAML, standard `map_server` format). Use this with Nav2 for path planning; this is what Phase 2 obstacle-avoidance should build on.
-<!-- 경로 1 (권장) — ROS 표준 방식인 2D occupancy grid. 벤더링된 창고 패키지에 navi_factory 배치와 맞는 완성된 맵이 이미 있다(maps/005의 PGM+YAML, map_server 표준 형식). Nav2 경로 계획에 이걸 쓰면 되고, Phase 2 장애물 회피도 이 위에 쌓으면 된다. -->
-
-If the world layout changes (added shelves, new tracks), regenerate the map by driving a robot with the mounted LiDAR around while running `slam_toolbox`, then save with `ros2 run nav2_map_server map_saver_cli -f maps/custom/map`.
-<!-- 월드 배치가 바뀌면(선반 추가, 새 트랙 등) 라이다 장착 로봇을 slam_toolbox를 켠 채로 몰고 다닌 뒤 map_saver_cli로 저장해서 맵을 다시 만든다. -->
+**Route 1 (recommended) — 2D occupancy grid, the ROS-native equivalent.** The warehouse package used to ship a ready-made map matching `navi_factory`'s layout, but it has since been deleted (along with the package's other AWS RoboMaker boilerplate) — `worlds/navi_factory/maps/` is currently empty. Generate a fresh one (PGM + YAML, standard `map_server` format) by driving a robot with the mounted LiDAR around while running `slam_toolbox`, then save with `ros2 run nav2_map_server map_saver_cli -f worlds/navi_factory/maps/<name>/map`. Use the result with Nav2 for path planning; this is what Phase 2 obstacle-avoidance should build on.
+<!-- 경로 1 (권장) — ROS 표준 방식인 2D occupancy grid. 예전에는 창고 패키지에 navi_factory 배치와 맞는 완성된 맵이 있었지만, (패키지의 다른 AWS RoboMaker 부속 문서들과 함께) 삭제되어 지금 worlds/navi_factory/maps/는 비어 있다. 라이다 장착 로봇을 slam_toolbox를 켠 채로 몰고 다니며 새로 만들고(PGM+YAML, map_server 표준 형식), ros2 run nav2_map_server map_saver_cli -f worlds/navi_factory/maps/<name>/map으로 저장한다. 그 결과를 Nav2 경로 계획에 쓰면 되고, Phase 2 장애물 회피도 이 위에 쌓으면 된다. -->
 
 **Route 2 — a true 3D navmesh, only if an external (non-ROS) planner needs one.** Export the model meshes (`models/*/meshes/*.DAE`) into Blender, merge the floor and obstacles into one mesh, export as OBJ, and bake the navmesh with recastnavigation's RecastDemo (adjust agent radius/height to the vehicle size). Nothing in the current ROS 2 pipeline consumes a navmesh, so skip this route unless a specific tool demands it.
 <!-- 경로 2 — 진짜 3D navmesh는 ROS 외부 플래너가 요구할 때만. 모델 메시(models/*/meshes/*.DAE)를 Blender로 모아 바닥+장애물을 하나의 메시로 합치고 OBJ로 내보낸 뒤 recastnavigation의 RecastDemo로 굽는다(agent 반경/높이를 장비 크기에 맞출 것). 현재 ROS 2 파이프라인에는 navmesh를 쓰는 곳이 없으므로, 특정 도구가 요구하지 않는 한 이 경로는 생략한다. -->

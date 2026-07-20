@@ -17,7 +17,7 @@ Usage:
     # write/replace it inside a world file, between the markers
     # <!-- BEGIN GENERATED TRACK MARKERS --> ... <!-- END GENERATED TRACK MARKERS -->
     python3 tools/tracks_to_markers.py --tracks config/tracks.yaml \
-        --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/navi_factory/navi_factory.world
+        --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 """
 
 import argparse
