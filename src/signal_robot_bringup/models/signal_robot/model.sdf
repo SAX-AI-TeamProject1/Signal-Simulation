@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<!--
+  A minimal differential-drive cargo robot: a flat deck to carry a load, two
+  driven wheels, and two casters to keep it upright.
+
+  It is deliberately primitive. The point of this model is to prove that a
+  command coming from the perception side actually moves something in Gazebo;
+  it is not an attempt at the real vehicle. Swap it out once the actual robot
+  is chosen — nothing outside this file depends on its shape, only on the
+  cmd_vel topic the DiffDrive plugin listens to.
+-->
+<sdf version="1.9">
+  <model name="signal_robot">
+    <pose>0 0 0.1 0 0 0</pose>
+
+    <link name="base_link">
+      <inertial>
+        <mass>10.0</mass>
+        <inertia>
+          <!-- Box inertia for 0.6 x 0.4 x 0.15 m at 10 kg. gz-sim validates the
+               triangle inequality here and refuses to load the model if it is
+               violated, so these are computed rather than guessed. -->
+          <ixx>0.1521</ixx>
+          <iyy>0.3188</iyy>
+          <izz>0.4333</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="base_collision">
+        <geometry>
+          <box><size>0.6 0.4 0.15</size></box>
+        </geometry>
+      </collision>
+
+      <visual name="base_visual">
+        <geometry>
+          <box><size>0.6 0.4 0.15</size></box>
+        </geometry>
+        <material>
+          <ambient>0.9 0.6 0.1 1</ambient>
+          <diffuse>0.9 0.6 0.1 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- A block standing in for the cargo, so the robot's heading is obvious
+           at a glance when it turns. -->
+      <visual name="cargo_visual">
+        <pose>0 0 0.15 0 0 0</pose>
+        <geometry>
+          <box><size>0.35 0.3 0.15</size></box>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.35 1</ambient>
+          <diffuse>0.3 0.3 0.35 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Wheels: radius 0.1, separation 0.44. These two numbers must match the
+         DiffDrive plugin below, or commanded and actual velocity will differ. -->
+    <link name="left_wheel">
+      <pose>0 0.22 0 -1.5707 0 0</pose>
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.0035</ixx>
+          <iyy>0.0035</iyy>
+          <izz>0.005</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="left_wheel_collision">
+        <geometry>
+          <cylinder><radius>0.1</radius><length>0.05</length></cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="left_wheel_visual">
+        <geometry>
+          <cylinder><radius>0.1</radius><length>0.05</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <link name="right_wheel">
+      <pose>0 -0.22 0 -1.5707 0 0</pose>
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>0.0035</ixx>
+          <iyy>0.0035</iyy>
+          <izz>0.005</izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="right_wheel_collision">
+        <geometry>
+          <cylinder><radius>0.1</radius><length>0.05</length></cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="right_wheel_visual">
+        <geometry>
+          <cylinder><radius>0.1</radius><length>0.05</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Frictionless spheres rather than modelled casters: a real swivel caster
+         adds joints that can fight the drive wheels, which is a distraction we
+         do not need while proving out the command path. -->
+    <link name="front_caster">
+      <pose>0.22 0 -0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="front_caster_collision">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        <surface>
+          <friction>
+            <ode><mu>0.0</mu><mu2>0.0</mu2></ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="front_caster_visual">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+      </visual>
+    </link>
+
+    <link name="rear_caster">
+      <pose>-0.22 0 -0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="rear_caster_collision">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        <surface>
+          <friction>
+            <ode><mu>0.0</mu><mu2>0.0</mu2></ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="rear_caster_visual">
+        <geometry><sphere><radius>0.05</radius></sphere></geometry>
+      </visual>
+    </link>
+
+    <joint name="left_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>left_wheel</child>
+      <axis>
+        <xyz expressed_in="__model__">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <joint name="right_wheel_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>right_wheel</child>
+      <axis>
+        <xyz expressed_in="__model__">0 1 0</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <joint name="front_caster_joint" type="ball">
+      <parent>base_link</parent>
+      <child>front_caster</child>
+    </joint>
+
+    <joint name="rear_caster_joint" type="ball">
+      <parent>base_link</parent>
+      <child>rear_caster</child>
+    </joint>
+
+    <!-- The seam between ROS 2 and Gazebo. This plugin listens on a *Gazebo*
+         topic, not a ROS one; ros_gz_bridge is what connects the two. The topic
+         name here has to match config/bridge.yaml exactly. -->
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.44</wheel_separation>
+      <wheel_radius>0.1</wheel_radius>
+      <topic>/model/signal_robot/cmd_vel</topic>
+      <odom_topic>/model/signal_robot/odometry</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <odom_publish_frequency>30</odom_publish_frequency>
+    </plugin>
+  </model>
+</sdf>
