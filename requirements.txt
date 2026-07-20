@@ -1,0 +1,4 @@
+# deps for tools/ (track editing & SDF generation) — not for ROS 2 nodes
+matplotlib
+pillow
+pyyaml

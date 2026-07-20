@@ -1,0 +1,174 @@
+<sdf version='1.10'>
+  <world name='navi_factory'>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <physics name='default_physics' default='false' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
+    <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
+    <scene>
+      <shadows>false</shadows>
+      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
+      <background>0.699999988 0.699999988 0.699999988 1</background>
+    </scene>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_RoofB_01</uri>
+      <name>aws_robomaker_warehouse_RoofB_01_001</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfF_01</uri>
+      <name>aws_robomaker_warehouse_ShelfF_01_001</name>
+      <pose>-5.7951430000000004 -0.95663500000000001 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_WallB_01</uri>
+      <name>aws_robomaker_warehouse_WallB_01_001</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_001</name>
+      <pose>4.73156 0.57943 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_002</name>
+      <pose>4.73156 -4.8270489999999997 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>aws_robomaker_warehouse_ShelfE_01_003</name>
+      <pose>4.73156 -8.6651000000000007 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_001</name>
+      <pose>4.73156 -1.2426680000000001 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_002</name>
+      <pose>4.73156 -3.038551 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>aws_robomaker_warehouse_ShelfD_01_003</name>
+      <pose>4.73156 -6.7505420000000003 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_GroundB_01</uri>
+      <name>aws_robomaker_warehouse_GroundB_01_001</name>
+      <pose>0 0 -0.090092000000000005 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_Lamp_01</uri>
+      <name>aws_robomaker_warehouse_Lamp_01_005</name>
+      <pose>0 0 -4 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_020</name>
+      <pose>0.43344899999999997 9.6317059999999994 0 0 0 -1.5631609999999998</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_021</name>
+      <pose>-1.8321000000000001 -6.3752000000000004 0 0 0 -1.5631609999999998</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_Bucket_01</uri>
+      <name>aws_robomaker_warehouse_Bucket_01_022</name>
+      <pose>0.43344899999999997 8.5899999999999999 0 0 0 -1.5631609999999998</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_016</name>
+      <pose>5.7081379999999999 8.6168440000000004 -0.017476999999999999 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_017</name>
+      <pose>3.4086379999999998 8.6168440000000004 -0.017476999999999999 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringA_01_018</name>
+      <pose>-1.491287 5.2224349999999999 -0.017476999999999999 0 0 -1.5831850000000003</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_027</name>
+      <pose>3.3249590000000002 3.8224490000000002 -0.012064 0 0 1.5638710000000007</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_028</name>
+      <pose>5.5417100000000001 3.8164750000000001 -0.015663 0 0 -1.5831909999999998</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_029</name>
+      <pose>5.384239 6.1371539999999998 0 0 0 -3.1331853071795868</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_030</name>
+      <pose>3.2360000000000002 6.1371539999999998 0 0 0 -3.1331853071795868</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_031</name>
+      <pose>-1.573677 2.3019940000000001 -0.015663 0 0 -3.1331910000000001</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringC_01_032</name>
+      <pose>-1.2196 9.407 -0.015663 0 0 1.5638710000000007</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01</uri>
+      <name>aws_robomaker_warehouse_ClutteringD_01_005</name>
+      <pose>-1.634682 -7.8118129999999999 -0.31955899999999998 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_TrashCanC_01</uri>
+      <name>aws_robomaker_warehouse_TrashCanC_01_002</name>
+      <pose>-1.592441 7.7154199999999999 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/jaeseong/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01</uri>
+      <name>aws_robomaker_warehouse_PalletJackB_01_001</name>
+      <pose>-0.27609800000000001 -9.4819440000000004 0.023265999999999998 0 0 0</pose>
+    </include>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>1</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>
