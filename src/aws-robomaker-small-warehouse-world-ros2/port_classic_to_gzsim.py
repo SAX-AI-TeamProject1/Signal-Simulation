@@ -4,7 +4,7 @@ aws-robomaker-small-warehouse-world (Gazebo Classic, SDF 1.6)
   -> Gazebo Harmonic(gz-sim) / ROS 2 Jazzy 용 변환 스크립트
 
 사용법:
-    python3 port_aws_warehouse_to_gz.py <repo_root>
+    python3 port_classic_to_gzsim.py <repo_root>
 
 수행 작업 (모두 원본 파일 검사로 확인된 비호환 항목):
  1) models/*/model.sdf 의 메시 URI

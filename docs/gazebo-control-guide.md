@@ -135,7 +135,7 @@ To make the layout visible on the warehouse floor, generate painted markers from
 
 ```bash
 .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml \
-  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/no_roof_small_warehouse/no_roof_small_warehouse.world
+  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/navi_factory/navi_factory.world
 ```
 
 ## 5. Method A — background vehicle as an actor
@@ -146,7 +146,7 @@ Do not write actor SDF by hand — generate it from `tracks.yaml` with `tools/tr
 
 ```bash
 .venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --speed 0.75 \
-  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/no_roof_small_warehouse/no_roof_small_warehouse.world
+  --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/navi_factory/navi_factory.world
 ```
 
 The generated SDF looks like this (shown for reference; times correspond to ~0.75 m/s):
@@ -278,8 +278,8 @@ Requirements and caveats:
 Gazebo itself has no navmesh concept. There are two practical routes:
 <!-- Gazebo 자체에는 navmesh 개념이 없다. 실용적인 경로는 두 가지다: -->
 
-**Route 1 (recommended) — 2D occupancy grid, the ROS-native equivalent.** The vendored warehouse package already ships ready-made maps: `src/aws-robomaker-small-warehouse-world-ros2/maps/002/map.yaml` and `maps/005/map.yaml` (PGM + YAML, standard `map_server` format). Use these with Nav2 for path planning; this is what Phase 2 obstacle-avoidance should build on.
-<!-- 경로 1 (권장) — ROS 표준 방식인 2D occupancy grid. 벤더링된 창고 패키지에 이미 완성된 맵이 있다(maps/002, maps/005의 PGM+YAML, map_server 표준 형식). Nav2 경로 계획에 이걸 쓰면 되고, Phase 2 장애물 회피도 이 위에 쌓으면 된다. -->
+**Route 1 (recommended) — 2D occupancy grid, the ROS-native equivalent.** The vendored warehouse package already ships a ready-made map matching `navi_factory`'s layout: `src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml` (PGM + YAML, standard `map_server` format). Use this with Nav2 for path planning; this is what Phase 2 obstacle-avoidance should build on.
+<!-- 경로 1 (권장) — ROS 표준 방식인 2D occupancy grid. 벤더링된 창고 패키지에 navi_factory 배치와 맞는 완성된 맵이 이미 있다(maps/005의 PGM+YAML, map_server 표준 형식). Nav2 경로 계획에 이걸 쓰면 되고, Phase 2 장애물 회피도 이 위에 쌓으면 된다. -->
 
 If the world layout changes (added shelves, new tracks), regenerate the map by driving a robot with the mounted LiDAR around while running `slam_toolbox`, then save with `ros2 run nav2_map_server map_saver_cli -f maps/custom/map`.
 <!-- 월드 배치가 바뀌면(선반 추가, 새 트랙 등) 라이다 장착 로봇을 slam_toolbox를 켠 채로 몰고 다닌 뒤 map_saver_cli로 저장해서 맵을 다시 만든다. -->

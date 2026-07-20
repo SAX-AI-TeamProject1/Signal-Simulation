@@ -2,7 +2,8 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "0. 워크스페이스 빌드 (colcon build)",
+            "label": "1. 워크스페이스 빌드 (colcon build)",
+            "detail": "ROS 2 워크스페이스를 빌드합니다 (colcon build --symlink-install). 코드나 world/launch 파일을 고친 뒤 가장 먼저 실행할 것.",
             "type": "shell",
             "command": "bash",
             "args": [
@@ -23,12 +24,13 @@
             "problemMatcher": []
         },
         {
-            "label": "1. rosbridge 서버 실행",
+            "label": "2. Gazebo 실행 (navi_factory 월드)",
+            "detail": "rosbridge 없이 Gazebo만 실행합니다 — world 배치·트랙·라이다 확인 등 시뮬레이션 자체를 들여다볼 때 사용.",
             "type": "shell",
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml"
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\" && gz sim --render-engine ogre \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/navi_factory/navi_factory.world\" -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -41,12 +43,13 @@
             "problemMatcher": []
         },
         {
-            "label": "2. Gazebo 실행 (빈 월드)",
+            "label": "3. 전체 프로세스 실행 (rosbridge + Gazebo, 수신호 명령 수신 준비)",
+            "detail": "rosbridge 서버를 먼저 띄우고 Gazebo(navi_factory 월드)를 이어서 실행합니다 — 끝나면 Signal-Vision에서 오는 수신호 명령을 받을 준비가 된 상태. 태스크를 멈추면 rosbridge도 함께 종료됩니다.",
             "type": "shell",
             "command": "bash",
             "args": [
                 "-c",
-                "source /opt/ros/jazzy/setup.bash && gz sim --render-engine ogre empty.sdf -r"
+                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && trap 'kill -TERM -$$ 2>/dev/null' EXIT; ros2 launch rosbridge_server rosbridge_websocket_launch.xml & sleep 2; export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\"; gz sim --render-engine ogre \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/navi_factory/navi_factory.world\" -r"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -55,134 +58,6 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "3. Gazebo 실행 (창고 월드)",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "-c",
-                "source /opt/ros/jazzy/setup.bash && source install/setup.bash && export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/models\" && gz sim --render-engine ogre \"$(ros2 pkg prefix aws_robomaker_small_warehouse_world)/share/aws_robomaker_small_warehouse_world/worlds/small_warehouse/small_warehouse.world\" -r"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "isBackground": true,
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "4. 툴 환경 설정 (.venv 생성 + requirements 설치)",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "linux": {
-                "command": "bash",
-                "args": [
-                    "-c",
-                    "(command -v python3.12 >/dev/null && python3.12 -m venv .venv || python3 -m venv .venv) && .venv/bin/pip install -r requirements.txt"
-                ]
-            },
-            "osx": {
-                "command": "bash",
-                "args": [
-                    "-c",
-                    "(command -v python3.12 >/dev/null && python3.12 -m venv .venv || python3 -m venv .venv) && .venv/bin/pip install -r requirements.txt"
-                ]
-            },
-            "windows": {
-                "command": "cmd",
-                "args": [
-                    "/d",
-                    "/c",
-                    "(py -3.12 -m venv .venv || python -m venv .venv) && .venv\\Scripts\\pip install -r requirements.txt"
-                ]
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "5. 트랙 편집기 실행 (track_editor)",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "linux": {
-                "command": ".venv/bin/python",
-                "args": [
-                    "tools/track_editor.py",
-                    "--map",
-                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
-                    "--out",
-                    "config/tracks.yaml"
-                ]
-            },
-            "osx": {
-                "command": ".venv/bin/python",
-                "args": [
-                    "tools/track_editor.py",
-                    "--map",
-                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
-                    "--out",
-                    "config/tracks.yaml"
-                ]
-            },
-            "windows": {
-                "command": ".venv\\Scripts\\python.exe",
-                "args": [
-                    "tools/track_editor.py",
-                    "--map",
-                    "src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml",
-                    "--out",
-                    "config/tracks.yaml"
-                ]
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "6. 트랙 → 월드 반영 (actors + markers 주입)",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "linux": {
-                "command": "bash",
-                "args": [
-                    "-c",
-                    ".venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
-                ]
-            },
-            "osx": {
-                "command": "bash",
-                "args": [
-                    "-c",
-                    ".venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
-                ]
-            },
-            "windows": {
-                "command": "cmd",
-                "args": [
-                    "/d",
-                    "/c",
-                    ".venv\\Scripts\\python tools\\tracks_to_actors.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world && .venv\\Scripts\\python tools\\tracks_to_markers.py --tracks config/tracks.yaml --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/small_warehouse/small_warehouse.world"
-                ]
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
             },
             "problemMatcher": []
         }

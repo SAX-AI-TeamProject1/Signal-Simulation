@@ -2,7 +2,7 @@
 """
 worlds/*/*.world 안에 중복 삽입된 <light>, <plugin> 을 제거하는 스크립트.
 
-port_aws_warehouse_to_gz.py 를 같은 world 파일에 2번 이상 돌렸을 때 발생하는
+port_classic_to_gzsim.py 를 같은 world 파일에 2번 이상 돌렸을 때 발생하는
 "Error Code 2: light with name[sun] already exists" 같은 중복 삽입을 정리한다.
 키는 light -> name 속성, plugin -> (filename, name) 조합. 각 키의 첫 등장만 남기고
 이후 중복은 제거.
