@@ -9,7 +9,7 @@ direction, so you only click x/y positions).
 
 Usage:
     python3 tools/track_editor.py \
-        --map src/aws-robomaker-small-warehouse-world-ros2/maps/005/map.yaml \
+        --map <path-to-map.yaml> \
         --out config/tracks.yaml
 
 Controls (in the plot window):

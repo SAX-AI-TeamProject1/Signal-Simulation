@@ -14,7 +14,7 @@ Usage:
     # <!-- BEGIN GENERATED ACTORS --> ... <!-- END GENERATED ACTORS -->
     # (markers are added before </world> if missing)
     python3 tools/tracks_to_actors.py --tracks config/tracks.yaml \
-        --inject src/aws-robomaker-small-warehouse-world-ros2/worlds/no_roof_small_warehouse/no_roof_small_warehouse.world
+        --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 """
 
 import argparse
