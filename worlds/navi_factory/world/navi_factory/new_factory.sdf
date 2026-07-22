@@ -1,0 +1,384 @@
+<sdf version='1.10'>
+  <world name='warehouse_fuel'>
+    <gravity>0 0 -9.8</gravity>
+    <physics name='default_physics' default='false' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
+    <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
+    <scene>
+      <shadows>false</shadows>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+    </scene>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.1 -0.9</direction>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>1</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+
+    <include>
+      <uri>model://warehouse_mohamedazimal27_2x</uri>
+      <name>warehouse</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+
+    <!-- NW zone: red track, 개별 작업 구역 -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfF_01</uri>
+      <name>zone_nw_shelf</name>
+      <pose>-13 13 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringA_01</uri>
+      <name>zone_nw_clutter</name>
+      <pose>-8 13 0 0 0 0</pose>
+    </include>
+
+    <!-- NE zone: blue track, 상자 적재 랙 -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfE_01</uri>
+      <name>zone_ne_shelf</name>
+      <pose>9 13 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_Bucket_01</uri>
+      <name>zone_ne_bucket</name>
+      <pose>13 13 0 0 0 0</pose>
+    </include>
+
+    <!-- SW zone: orange track -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_ShelfD_01</uri>
+      <name>zone_sw_shelf</name>
+      <pose>-13 -13 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringC_01</uri>
+      <name>zone_sw_clutter</name>
+      <pose>-8 -13 0 0 0 0</pose>
+    </include>
+
+    <!-- SE zone: yellow track, 상자 적재 랙 -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_ClutteringD_01</uri>
+      <name>zone_se_clutter</name>
+      <pose>9 -13 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://aws_robomaker_warehouse_TrashCanC_01</uri>
+      <name>zone_se_trash</name>
+      <pose>13 -13 0 0 0 0</pose>
+    </include>
+
+    <!-- 지게차 전용 공간 (forklift zone) -->
+    <include>
+      <uri>model://aws_robomaker_warehouse_PalletJackB_01</uri>
+      <name>forklift_pallet_jack</name>
+      <pose>0 -16 0.023266 0 0 0</pose>
+    </include>
+
+    <!-- 중앙 대기열 AMR -->
+    <include>
+      <uri>model://OGV</uri>
+      <name>amr_queue_1</name>
+      <pose>0 0 0.1 0 0 0</pose>
+    </include>
+
+    <!-- AMR 대기열: 중앙 파란색 굵은 선 -->
+    <model name='track_center_queue'>
+      <static>true</static>
+      <pose>0 0 0.03 0 0 -1.5708</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>12 0.5 0.05</size></box></geometry>
+          <material><ambient>0.1 0.3 0.9 1</ambient><diffuse>0.1 0.3 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name='track_center_to_forklift'>
+      <static>true</static>
+      <pose>0 -7.5 0.03 0 0 -1.5708</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>3 0.5 0.05</size></box></geometry>
+          <material><ambient>0.1 0.3 0.9 1</ambient><diffuse>0.1 0.3 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 빨강: 중앙 -> NW 작업 트랙 -->
+    <model name='track_center_to_nw'>
+      <static>true</static>
+      <pose>-4.5 9 0.03 0 0 2.554</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>10.82 0.4 0.05</size></box></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>0.9 0.1 0.1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 파랑: 중앙 -> NE 작업 트랙 -->
+    <model name='track_center_to_ne'>
+      <static>true</static>
+      <pose>4.5 9 0.03 0 0 0.588</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>10.82 0.4 0.05</size></box></geometry>
+          <material><ambient>0.1 0.3 0.9 1</ambient><diffuse>0.1 0.3 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 주황: 중앙 -> SW 작업 트랙 -->
+    <model name='track_center_to_sw'>
+      <static>true</static>
+      <pose>-4.5 -9 0.03 0 0 -2.554</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>10.82 0.4 0.05</size></box></geometry>
+          <material><ambient>0.95 0.55 0.05 1</ambient><diffuse>0.95 0.55 0.05 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 노랑: 중앙 -> SE 작업 트랙 -->
+    <model name='track_center_to_se'>
+      <static>true</static>
+      <pose>4.5 -9 0.03 0 0 -0.588</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><box><size>10.82 0.4 0.05</size></box></geometry>
+          <material><ambient>0.95 0.85 0.1 1</ambient><diffuse>0.95 0.85 0.1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 수신호 자리 (hand signal spot) -->
+    <!-- 수신호 자리: 지게차 구역(남쪽) 반대편 북쪽 벽 앞 -->
+    <model name='hand_signal_spot'>
+      <static>true</static>
+      <pose>0 44 0.03 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry><cylinder><radius>1.0</radius><length>0.05</length></cylinder></geometry>
+          <material><ambient>1.0 0.45 0.0 1</ambient><diffuse>1.0 0.45 0.0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+
+    <!-- 지게차 전용 공간 노란 테두리 -->
+    <model name='forklift_zone_top'>
+      <static>true</static>
+      <pose>0 -13 0.03 0 0 0</pose>
+      <link name='link'><visual name='visual'>
+        <geometry><box><size>6 0.3 0.1</size></box></geometry>
+        <material><ambient>0.95 0.85 0.1 1</ambient><diffuse>0.95 0.85 0.1 1</diffuse></material>
+      </visual></link>
+    </model>
+    <model name='forklift_zone_bottom'>
+      <static>true</static>
+      <pose>0 -19 0.03 0 0 0</pose>
+      <link name='link'><visual name='visual'>
+        <geometry><box><size>6 0.3 0.1</size></box></geometry>
+        <material><ambient>0.95 0.85 0.1 1</ambient><diffuse>0.95 0.85 0.1 1</diffuse></material>
+      </visual></link>
+    </model>
+    <model name='forklift_zone_left'>
+      <static>true</static>
+      <pose>-3 -16 0.03 0 0 1.5708</pose>
+      <link name='link'><visual name='visual'>
+        <geometry><box><size>6 0.3 0.1</size></box></geometry>
+        <material><ambient>0.95 0.85 0.1 1</ambient><diffuse>0.95 0.85 0.1 1</diffuse></material>
+      </visual></link>
+    </model>
+    <model name='forklift_zone_right'>
+      <static>true</static>
+      <pose>3 -16 0.03 0 0 1.5708</pose>
+      <link name='link'><visual name='visual'>
+        <geometry><box><size>6 0.3 0.1</size></box></geometry>
+        <material><ambient>0.95 0.85 0.1 1</ambient><diffuse>0.95 0.85 0.1 1</diffuse></material>
+      </visual></link>
+    </model>
+
+    <!-- 인간 작업자 경로: 녹색 점선 (구역별 타원형 대시) -->
+    <model name='dash_nw_1'><static>true</static><pose>-6 13 0.02 0 0 1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_nw_2'><static>true</static><pose>-8.5 16.46 0.02 0 0 2.618</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_nw_3'><static>true</static><pose>-13.5 16.46 0.02 0 0 3.665</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_nw_4'><static>true</static><pose>-16 13 0.02 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_nw_5'><static>true</static><pose>-13.5 9.54 0.02 0 0 -0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_nw_6'><static>true</static><pose>-8.5 9.54 0.02 0 0 0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+
+    <model name='dash_ne_1'><static>true</static><pose>16 13 0.02 0 0 1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_ne_2'><static>true</static><pose>13.5 16.46 0.02 0 0 2.618</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_ne_3'><static>true</static><pose>8.5 16.46 0.02 0 0 3.665</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_ne_4'><static>true</static><pose>6 13 0.02 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_ne_5'><static>true</static><pose>8.5 9.54 0.02 0 0 -0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_ne_6'><static>true</static><pose>13.5 9.54 0.02 0 0 0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+
+    <model name='dash_sw_1'><static>true</static><pose>-6 -13 0.02 0 0 1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_sw_2'><static>true</static><pose>-8.5 -9.54 0.02 0 0 2.618</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_sw_3'><static>true</static><pose>-13.5 -9.54 0.02 0 0 3.665</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_sw_4'><static>true</static><pose>-16 -13 0.02 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_sw_5'><static>true</static><pose>-13.5 -16.46 0.02 0 0 -0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_sw_6'><static>true</static><pose>-8.5 -16.46 0.02 0 0 0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+
+    <model name='dash_se_1'><static>true</static><pose>16 -13 0.02 0 0 1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_se_2'><static>true</static><pose>13.5 -9.54 0.02 0 0 2.618</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_se_3'><static>true</static><pose>8.5 -9.54 0.02 0 0 3.665</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_se_4'><static>true</static><pose>6 -13 0.02 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_se_5'><static>true</static><pose>8.5 -16.46 0.02 0 0 -0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+    <model name='dash_se_6'><static>true</static><pose>13.5 -16.46 0.02 0 0 0.523</pose><link name='link'><visual name='visual'><geometry><box><size>1.2 0.15 0.04</size></box></geometry><material><ambient>0.1 0.8 0.2 1</ambient><diffuse>0.1 0.8 0.2 1</diffuse></material></visual></link></model>
+
+
+
+
+    <model name='stack_1_0'><static>true</static><pose>7.67 -43.70 0.25 0 0 -1.41</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_2_0'><static>true</static><pose>13.01 16.26 0.25 0 0 2.46</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_3_0'><static>true</static><pose>-15.47 0.49 0.25 0 0 -2.97</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_4_0'><static>true</static><pose>-12.20 33.98 0.25 0 0 1.63</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_5_0'><static>true</static><pose>-8.79 -31.70 0.25 0 0 2.87</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_5_1'><static>true</static><pose>-8.79 -31.70 0.75 0 0 2.87</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_6_0'><static>true</static><pose>-22.40 -37.10 0.25 0 0 2.18</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_6_1'><static>true</static><pose>-22.40 -37.10 0.75 0 0 2.18</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_7_0'><static>true</static><pose>16.89 21.14 0.25 0 0 0.23</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_7_1'><static>true</static><pose>16.89 21.14 0.75 0 0 0.23</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_8_0'><static>true</static><pose>6.52 33.28 0.25 0 0 0.49</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_8_1'><static>true</static><pose>6.52 33.28 0.75 0 0 0.49</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_8_2'><static>true</static><pose>6.52 33.28 1.25 0 0 0.49</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_9_0'><static>true</static><pose>-24.98 -25.03 0.25 0 0 -1.32</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_10_0'><static>true</static><pose>20.16 -11.03 0.25 0 0 -0.29</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_10_1'><static>true</static><pose>20.16 -11.03 0.75 0 0 -0.29</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_11_0'><static>true</static><pose>-7.14 -26.73 0.25 0 0 -1.46</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_11_1'><static>true</static><pose>-7.14 -26.73 0.75 0 0 -1.46</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_11_2'><static>true</static><pose>-7.14 -26.73 1.25 0 0 -1.46</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_12_0'><static>true</static><pose>6.00 -30.26 0.25 0 0 1.44</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_13_0'><static>true</static><pose>-6.63 45.04 0.25 0 0 0.88</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_13_1'><static>true</static><pose>-6.63 45.04 0.75 0 0 0.88</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_14_0'><static>true</static><pose>10.15 31.54 0.25 0 0 1.73</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_15_0'><static>true</static><pose>16.78 -9.09 0.25 0 0 -2.72</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_15_1'><static>true</static><pose>16.78 -9.09 0.75 0 0 -2.72</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_16_0'><static>true</static><pose>-15.81 -0.07 0.25 0 0 2.42</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_16_1'><static>true</static><pose>-15.81 -0.07 0.75 0 0 2.42</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_16_2'><static>true</static><pose>-15.81 -0.07 1.25 0 0 2.42</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_17_0'><static>true</static><pose>-19.64 -33.15 0.25 0 0 1.54</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_17_1'><static>true</static><pose>-19.64 -33.15 0.75 0 0 1.54</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_18_0'><static>true</static><pose>13.59 -6.58 0.25 0 0 0.52</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_18_1'><static>true</static><pose>13.59 -6.58 0.75 0 0 0.52</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_19_0'><static>true</static><pose>27.35 -33.27 0.25 0 0 -0.04</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_20_0'><static>true</static><pose>-19.09 -31.28 0.25 0 0 1.13</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_20_1'><static>true</static><pose>-19.09 -31.28 0.75 0 0 1.13</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_21_0'><static>true</static><pose>-6.34 8.82 0.25 0 0 -0.2</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_21_1'><static>true</static><pose>-6.34 8.82 0.75 0 0 -0.2</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_22_0'><static>true</static><pose>19.84 -44.94 0.25 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_22_1'><static>true</static><pose>19.84 -44.94 0.75 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_22_2'><static>true</static><pose>19.84 -44.94 1.25 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_23_0'><static>true</static><pose>13.80 24.71 0.25 0 0 -1.0</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_23_1'><static>true</static><pose>13.80 24.71 0.75 0 0 -1.0</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_24_0'><static>true</static><pose>-18.80 -45.70 0.25 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_24_1'><static>true</static><pose>-18.80 -45.70 0.75 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_24_2'><static>true</static><pose>-18.80 -45.70 1.25 0 0 1.39</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_25_0'><static>true</static><pose>25.95 24.10 0.25 0 0 0.05</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_26_0'><static>true</static><pose>18.79 0.70 0.25 0 0 -1.89</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_26_1'><static>true</static><pose>18.79 0.70 0.75 0 0 -1.89</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_27_0'><static>true</static><pose>-9.67 -44.21 0.25 0 0 2.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_27_1'><static>true</static><pose>-9.67 -44.21 0.75 0 0 2.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_28_0'><static>true</static><pose>-24.31 34.78 0.25 0 0 2.81</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_29_0'><static>true</static><pose>17.38 43.97 0.25 0 0 0.21</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_30_0'><static>true</static><pose>8.79 41.11 0.25 0 0 -2.1</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_30_1'><static>true</static><pose>8.79 41.11 0.75 0 0 -2.1</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_31_0'><static>true</static><pose>-16.44 -17.32 0.25 0 0 3.11</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_31_1'><static>true</static><pose>-16.44 -17.32 0.75 0 0 3.11</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_31_2'><static>true</static><pose>-16.44 -17.32 1.25 0 0 3.11</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_32_0'><static>true</static><pose>-20.84 -25.33 0.25 0 0 -1.02</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_32_1'><static>true</static><pose>-20.84 -25.33 0.75 0 0 -1.02</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_33_0'><static>true</static><pose>-14.84 -25.74 0.25 0 0 -2.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_33_1'><static>true</static><pose>-14.84 -25.74 0.75 0 0 -2.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_33_2'><static>true</static><pose>-14.84 -25.74 1.25 0 0 -2.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_34_0'><static>true</static><pose>-14.91 37.30 0.25 0 0 2.26</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_35_0'><static>true</static><pose>-14.41 15.55 0.25 0 0 -1.79</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_36_0'><static>true</static><pose>-22.31 14.63 0.25 0 0 -0.92</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_36_1'><static>true</static><pose>-22.31 14.63 0.75 0 0 -0.92</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_37_0'><static>true</static><pose>20.01 -41.02 0.25 0 0 0.96</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_37_1'><static>true</static><pose>20.01 -41.02 0.75 0 0 0.96</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_37_2'><static>true</static><pose>20.01 -41.02 1.25 0 0 0.96</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_38_0'><static>true</static><pose>-24.17 21.00 0.25 0 0 1.89</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_39_0'><static>true</static><pose>-16.96 3.34 0.25 0 0 -2.26</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_40_0'><static>true</static><pose>-23.35 28.34 0.25 0 0 2.24</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_41_0'><static>true</static><pose>8.37 3.73 0.25 0 0 -3.05</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_42_0'><static>true</static><pose>-18.35 -1.32 0.25 0 0 -1.8</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_42_1'><static>true</static><pose>-18.35 -1.32 0.75 0 0 -1.8</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_43_0'><static>true</static><pose>-18.44 -45.80 0.25 0 0 -0.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_43_1'><static>true</static><pose>-18.44 -45.80 0.75 0 0 -0.69</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_44_0'><static>true</static><pose>27.25 5.13 0.25 0 0 1.37</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_45_0'><static>true</static><pose>-11.18 43.12 0.25 0 0 0.5</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_45_1'><static>true</static><pose>-11.18 43.12 0.75 0 0 0.5</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_46_0'><static>true</static><pose>13.64 -40.74 0.25 0 0 0.53</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_46_1'><static>true</static><pose>13.64 -40.74 0.75 0 0 0.53</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_47_0'><static>true</static><pose>-18.84 42.39 0.25 0 0 -2.64</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_48_0'><static>true</static><pose>5.23 16.12 0.25 0 0 -1.66</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_49_0'><static>true</static><pose>-13.96 8.70 0.25 0 0 0.75</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_49_1'><static>true</static><pose>-13.96 8.70 0.75 0 0 0.75</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_50_0'><static>true</static><pose>-13.16 15.61 0.25 0 0 -1.17</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_50_1'><static>true</static><pose>-13.16 15.61 0.75 0 0 -1.17</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_51_0'><static>true</static><pose>-20.30 13.39 0.25 0 0 -0.27</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_52_0'><static>true</static><pose>27.29 -39.26 0.25 0 0 -1.8</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_52_1'><static>true</static><pose>27.29 -39.26 0.75 0 0 -1.8</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_53_0'><static>true</static><pose>23.83 35.04 0.25 0 0 2.38</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_53_1'><static>true</static><pose>23.83 35.04 0.75 0 0 2.38</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_54_0'><static>true</static><pose>-18.82 30.70 0.25 0 0 1.28</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_54_1'><static>true</static><pose>-18.82 30.70 0.75 0 0 1.28</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_55_0'><static>true</static><pose>-27.07 29.17 0.25 0 0 -1.26</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_55_1'><static>true</static><pose>-27.07 29.17 0.75 0 0 -1.26</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_55_2'><static>true</static><pose>-27.07 29.17 1.25 0 0 -1.26</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_56_0'><static>true</static><pose>24.14 -33.65 0.25 0 0 -2.42</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_57_0'><static>true</static><pose>-18.95 -20.08 0.25 0 0 -1.82</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_57_1'><static>true</static><pose>-18.95 -20.08 0.75 0 0 -1.82</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_58_0'><static>true</static><pose>10.31 32.47 0.25 0 0 0.03</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_58_1'><static>true</static><pose>10.31 32.47 0.75 0 0 0.03</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_59_0'><static>true</static><pose>-22.42 -7.03 0.25 0 0 -1.4</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_60_0'><static>true</static><pose>-13.09 22.19 0.25 0 0 0.32</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_60_1'><static>true</static><pose>-13.09 22.19 0.75 0 0 0.32</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_61_0'><static>true</static><pose>-26.97 -39.08 0.25 0 0 2.41</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.55 0.50 0.42 1</ambient><diffuse>0.55 0.50 0.42 1</diffuse></material></visual></link></model>
+    <model name='stack_62_0'><static>true</static><pose>-25.52 -12.03 0.25 0 0 0.33</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_62_1'><static>true</static><pose>-25.52 -12.03 0.75 0 0 0.33</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_63_0'><static>true</static><pose>-25.20 -12.45 0.25 0 0 2.72</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.78 0.58 0.36 1</ambient><diffuse>0.78 0.58 0.36 1</diffuse></material></visual></link></model>
+    <model name='stack_64_0'><static>true</static><pose>-15.95 -23.04 0.25 0 0 -2.49</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_64_1'><static>true</static><pose>-15.95 -23.04 0.75 0 0 -2.49</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_65_0'><static>true</static><pose>26.06 22.95 0.25 0 0 2.67</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_66_0'><static>true</static><pose>26.19 28.59 0.25 0 0 2.4</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_67_0'><static>true</static><pose>13.01 -15.44 0.25 0 0 2.71</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_67_1'><static>true</static><pose>13.01 -15.44 0.75 0 0 2.71</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_67_2'><static>true</static><pose>13.01 -15.44 1.25 0 0 2.71</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_68_0'><static>true</static><pose>-12.83 26.44 0.25 0 0 -2.46</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.60 0.42 0.24 1</ambient><diffuse>0.60 0.42 0.24 1</diffuse></material></visual></link></model>
+    <model name='stack_69_0'><static>true</static><pose>-15.27 29.13 0.25 0 0 -0.25</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_69_1'><static>true</static><pose>-15.27 29.13 0.75 0 0 -0.25</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.65 0.47 0.28 1</ambient><diffuse>0.65 0.47 0.28 1</diffuse></material></visual></link></model>
+    <model name='stack_70_0'><static>true</static><pose>-15.24 14.72 0.25 0 0 -0.64</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+    <model name='stack_70_1'><static>true</static><pose>-15.24 14.72 0.75 0 0 -0.64</pose><link name='link'><visual name='visual'><geometry><box><size>0.55 0.55 0.5</size></box></geometry><material><ambient>0.72 0.53 0.32 1</ambient><diffuse>0.72 0.53 0.32 1</diffuse></material></visual></link></model>
+
+  </world>
+</sdf>
