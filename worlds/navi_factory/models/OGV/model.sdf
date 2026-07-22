@@ -7,7 +7,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>Body</name>
               <center>false</center>
@@ -27,9 +27,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -38,7 +38,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>AxelFR</name>
               <center>false</center>
@@ -58,9 +58,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -69,7 +69,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>WheelFR</name>
               <center>false</center>
@@ -89,9 +89,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -100,7 +100,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>AxelBR</name>
               <center>false</center>
@@ -120,9 +120,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -131,7 +131,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>WheelBR</name>
               <center>false</center>
@@ -151,9 +151,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -162,7 +162,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>AxelFL</name>
               <center>false</center>
@@ -182,9 +182,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -193,7 +193,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>WheelFL</name>
               <center>false</center>
@@ -213,9 +213,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -224,7 +224,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>AxelBL</name>
               <center>false</center>
@@ -244,9 +244,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
@@ -255,7 +255,7 @@
         <geometry>
           <mesh>
             <uri>model://OGV/meshes/ogv.dae</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <submesh>
               <name>WheelBL</name>
               <center>false</center>
@@ -275,9 +275,9 @@
           <!-- fallback to script if no PBR support-->
           <script>
             <uri>model://OGV/materials/scripts/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <uri>model://OGV/materials/textures/</uri>
-						<scale> 2 2 2</scale>
+						<scale> 6 6 6</scale>
             <name>UrbanTile/OGV_Diffuse</name>
           </script>
         </material>
