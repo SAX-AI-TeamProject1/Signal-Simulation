@@ -28,8 +28,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "-c",
-                "source /opt/ros/jazzy/setup.bash && pkill -TERM -f 'gz sim server' 2>/dev/null; sleep 1; export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(pwd)/worlds/navi_factory/models\" && gz sim --render-engine ogre worlds/navi_factory/world/navi_factory/navi_factory.sdf -r"
+                "${workspaceFolder}/scripts/run_gazebo.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -47,8 +46,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "-c",
-                "source /opt/ros/jazzy/setup.bash && pkill -TERM -f 'gz sim server' 2>/dev/null; sleep 1; trap 'kill -TERM -$$ 2>/dev/null' EXIT; ros2 launch rosbridge_server rosbridge_websocket_launch.xml & sleep 2; export GZ_SIM_RESOURCE_PATH=\"$GZ_SIM_RESOURCE_PATH:$(pwd)/worlds/navi_factory/models\"; gz sim --render-engine ogre worlds/navi_factory/world/navi_factory/navi_factory.sdf -r"
+                "${workspaceFolder}/scripts/run_full_stack.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
