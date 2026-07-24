@@ -1,6 +1,8 @@
 import rclpy
 from rclpy.node import Node
 import std_msgs.msg
+import custom_msg2.msg
+from custom_msg2.srv import SrvBigInt
 
 
 class MinimalPublisher(Node):
@@ -12,8 +14,11 @@ class MinimalPublisher(Node):
         #String Type의 메세지
         # 토픽의 이름은 'pub_test'로 설정
         # topic의 이름이 같은 노드끼리는 서로 통신이 가능하다. -> **subscriber와 publisher의 topic 이름이 같아야 통신 가능**
-        self.publisher_ = self.create_publisher(msg_type=std_msgs.msg.String, topic='pub_test',qos_profile=10)
-
+        self.publisher_ = self.create_publisher(msg_type=custom_msg2.msg.MyCustomMsg, topic='pub_test',qos_profile=10)
+        # req = SrvBigInt.Request()
+        # req.a = 10
+        # req.b = 20
+        #MyCustomMsg.
         # 이런거 외부에서 주입 받아서 하면 좋지 않을까? (예를 들어, 토픽 이름이나 메시지 타입을 외부에서 주입받는 방식)
         
         # 타이머 생성: (주기(sec), 콜백 함수)
@@ -21,10 +26,13 @@ class MinimalPublisher(Node):
         self.pub_msg_cnt = 0
 
     def timer_callback(self):
-        msg = std_msgs.msg.String()
-        msg.data = f"Topic Test, cnt={self.pub_msg_cnt}"
+        # msg = std_msgs.msg.String()
+        msg = custom_msg2.msg.MyCustomMsg()
+        msg.x = 10
+        msg.y = 20
+        # msg.data = f"Topic Test, cnt={self.pub_msg_cnt}"
         self.publisher_.publish(msg) #퍼블리셔에 메세지 보내기
-        self.get_logger().info('Publishing: "%s"' % msg.data) #c++ spdlog와 비슷한 기능, 로그를 출력하는 기능
+        self.get_logger().info(f'Publishing: {msg.x}, {msg.y}') #c++ spdlog와 비슷한 기능, 로그를 출력하는 기능
         
         self.pub_msg_cnt += 1 # 메세지 발행 횟수 증가
 
