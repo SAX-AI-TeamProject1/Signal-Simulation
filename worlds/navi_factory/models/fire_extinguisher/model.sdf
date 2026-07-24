@@ -1,0 +1,24 @@
+<?xml version='1.0' ?>
+<sdf version="1.6">
+    <model name="fire_extinguisher">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/extinguisher.dae</uri>
+                        <scale>3.3333 3.3333 3.3333</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/extinguisher.dae</uri>
+                        <scale>3.3333 3.3333 3.3333</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+        </link>
+    </model>
+</sdf>

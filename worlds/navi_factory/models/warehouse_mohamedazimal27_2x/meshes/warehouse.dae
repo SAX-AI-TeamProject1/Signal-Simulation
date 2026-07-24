@@ -226,7 +226,7 @@
       <init_from>Asphalt010_1K_Color.jpg</init_from>
     </image>
     <image id="Rough_Square_Concrete_Block" name="Rough_Square_Concrete_Block">
-      <init_from>Rough_Square_Concrete_Block.jpg</init_from>
+      <init_from>WallB_01_smooth.png</init_from>
     </image>
     <image id="Tape001_1K_Color" name="Tape001_1K_Color">
       <init_from>Tape001_1K_Color.png</init_from>
@@ -238,7 +238,7 @@
       <init_from>Tape001_1K_Color.png</init_from>
     </image>
     <image id="Terrazzo005_1K_Color_jpg" name="Terrazzo005_1K_Color_jpg">
-      <init_from>Terrazzo005_1K_Color.jpg</init_from>
+      <init_from>Asphalt010_1K_Color_bright.jpg</init_from>
     </image>
   </library_images>
   <library_materials>
