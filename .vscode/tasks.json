@@ -3,12 +3,11 @@
     "tasks": [
         {
             "label": "1. 워크스페이스 빌드 (colcon build)",
-            "detail": "ROS 2 워크스페이스를 빌드합니다 (colcon build --symlink-install). 코드나 world/launch 파일을 고친 뒤 가장 먼저 실행할 것.",
+            "detail": "ROS 2 워크스페이스를 빌드합니다 (colcon build --symlink-install). 코드나 world/launch 파일을 고친 뒤 가장 먼저 실행할 것. ROS 2 Jazzy가 설치되어 있지 않으면 먼저 자동으로 설치합니다 (sudo 비밀번호 입력 필요, 수 GB 다운로드).",
             "type": "shell",
             "command": "bash",
             "args": [
-                "-c",
-                "source /opt/ros/jazzy/setup.bash && colcon build --symlink-install"
+                "${workspaceFolder}/scripts/build_workspace.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
