@@ -230,4 +230,8 @@ CLAUDE.md
 # macOS
 .DS_Store
 
-
+# colcon build artifacts. `build/` already matches the Python rule above, but
+# only by coincidence — name all three so the intent survives.
+build/
+install/
+log/
