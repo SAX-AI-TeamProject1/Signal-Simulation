@@ -1,0 +1,9 @@
+#Req
+int64 a
+int64 b
+---
+
+#Ans
+int64 sum
+
+# C2S a,b Req -> Server process -> S2C sum Ans
