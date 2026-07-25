@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>custom_msg2</name>
+  <version>0.0.0</version>
+  <description>Gen custom MSG</description>
+  <maintainer email="shp9826@naver.com">sho</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <!-- 인터페이스 생성 의존성 -->
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <!-- 실행 시 런타임 의존성 -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <!-- 인터페이스 패키지임을 선언 -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
