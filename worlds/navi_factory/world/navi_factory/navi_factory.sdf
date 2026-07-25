@@ -22,7 +22,7 @@
     <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
     <model name='warehouse'>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 -0.1002 0 0 0</pose>
       <self_collide>false</self_collide>
       <link name='warehouse_base'>
         <pose>0 0 0 0 0 0</pose>
@@ -31,7 +31,7 @@
           <geometry>
             <mesh>
               <scale>2 2 2</scale>
-              <uri>model://warehouse_mohamedazimal27_2x/meshes/warehouse_colision.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/warehouse_mohamedazimal27_2x/meshes/warehouse_colision.stl</uri>
             </mesh>
           </geometry>
         </collision>
@@ -40,7 +40,7 @@
           <geometry>
             <mesh>
               <scale>2 2 2</scale>
-              <uri>model://warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -49,7 +49,7 @@
           <geometry>
             <mesh>
               <scale>2 2 2</scale>
-              <uri>model://warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
               <submesh>
                 <name>drop1</name>
                 <center>true</center>
@@ -112,8 +112,8 @@
         <visual name='Body_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>Body</name>
                 <center>false</center>
@@ -131,19 +131,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='AxelFR_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>AxelFR</name>
                 <center>false</center>
@@ -161,19 +161,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='WheelFR_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>WheelFR</name>
                 <center>false</center>
@@ -191,19 +191,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='AxelBR_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>AxelBR</name>
                 <center>false</center>
@@ -221,19 +221,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='WheelBR_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>WheelBR</name>
                 <center>false</center>
@@ -251,19 +251,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='AxelFL_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>AxelFL</name>
                 <center>false</center>
@@ -281,19 +281,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='WheelFL_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>WheelFL</name>
                 <center>false</center>
@@ -311,19 +311,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='AxelBL_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>AxelBL</name>
                 <center>false</center>
@@ -341,19 +341,19 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
         <visual name='WheelBL_visual'>
           <geometry>
             <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>6 6 6</scale>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <scale>9 9 9</scale>
               <submesh>
                 <name>WheelBL</name>
                 <center>false</center>
@@ -371,11 +371,11 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://OGV/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
-              <scale>6 6 6</scale>
-              <scale>6 6 6</scale>
+              <scale>9 9 9</scale>
+              <scale>9 9 9</scale>
             </script>
           </material>
         </visual>
@@ -393,6 +393,86 @@
           </inertia>
         </inertial>
         <enable_wind>false</enable_wind>
+        <sensor name='camera' type='camera'>
+          <pose>0.29999999999999999 0 0.29999999999999999 0 0.2618000000000002 0</pose>
+          <topic>amr_queue_1/camera</topic>
+          <update_rate>30</update_rate>
+          <enable_metrics>false</enable_metrics>
+          <camera name='__default__'>
+            <pose>0 0 0 0 0 0</pose>
+            <horizontal_fov>1.05</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>RGB_INT8</format>
+              <anti_aliasing>4</anti_aliasing>
+            </image>
+            <camera_info_topic>__default__</camera_info_topic>
+            <trigger_topic></trigger_topic>
+            <triggered>false</triggered>
+            <clip>
+              <near>0.10000000000000001</near>
+              <far>50</far>
+            </clip>
+            <save enabled='false'>
+              <path>__default__</path>
+            </save>
+            <visibility_mask>4294967295</visibility_mask>
+            <noise>
+              <type>none</type>
+              <mean>0</mean>
+              <stddev>0</stddev>
+            </noise>
+            <distortion>
+              <k1>0</k1>
+              <k2>0</k2>
+              <k3>0</k3>
+              <p1>0</p1>
+              <p2>0</p2>
+              <center>0.5 0.5</center>
+            </distortion>
+            <lens>
+              <type>stereographic</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707963267948966</cutoff_angle>
+              <env_texture_size>256</env_texture_size>
+            </lens>
+            <optical_frame_id></optical_frame_id>
+          </camera>
+        </sensor>
+        <sensor name='lidar' type='gpu_lidar'>
+          <pose>0 0 0.40000000000000002 0 0 0</pose>
+          <topic>amr_queue_1/lidar</topic>
+          <update_rate>10</update_rate>
+          <enable_metrics>false</enable_metrics>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>360</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415899999999999</min_angle>
+                <max_angle>3.1415899999999999</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+                <resolution>1</resolution>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.10000000000000001</min>
+              <max>15</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>none</type>
+              <mean>0</mean>
+              <stddev>0</stddev>
+            </noise>
+            <visibility_mask>4294967295</visibility_mask>
+          </lidar>
+        </sensor>
       </link>
       <pose>0 36 0.18572151660919189 0 0 3.1415900000000754</pose>
       <self_collide>false</self_collide>
@@ -414,7 +494,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -433,7 +513,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -444,7 +524,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-14 16.473766326904297 0 0 0 0</pose>
+      <pose>-14.300000190734863 17.617965698242188 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_shelfe_2'>
@@ -464,7 +544,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -483,7 +563,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -494,7 +574,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-14 10.5 0 0 0 0</pose>
+      <pose>-14.300000190734863 5.9602818489074707 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_shelfd_1'>
@@ -514,7 +594,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -533,7 +613,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -544,7 +624,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-8 15.5 0 0 0 0</pose>
+      <pose>-7.6999998092651367 17.43535041809082 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_shelfd_2'>
@@ -564,7 +644,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -583,7 +663,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -594,7 +674,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-8 10.5 0 0 0 0</pose>
+      <pose>-7.6999998092651367 7.0370550155639648 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_shelfe_1'>
@@ -614,7 +694,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -633,7 +713,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -644,7 +724,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>8 15.5 0 0 0 0</pose>
+      <pose>7.6999998092651367 17.622100830078125 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_shelfe_2'>
@@ -664,7 +744,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -683,7 +763,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -694,7 +774,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>8 10.5 0 0 0 0</pose>
+      <pose>7.6999998092651367 7.0369277000427246 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_shelfd_1'>
@@ -714,7 +794,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -733,7 +813,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -744,7 +824,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14 16.83723258972168 0 0 0 0</pose>
+      <pose>14.300000190734863 17.610858917236328 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_shelfd_2'>
@@ -764,7 +844,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -783,7 +863,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -794,7 +874,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14 10.5 0 0 0 0</pose>
+      <pose>15.755478858947754 10.300000190734863 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_shelfe_1'>
@@ -814,7 +894,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -833,7 +913,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -844,7 +924,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-14 -10.5 0 0 0 0</pose>
+      <pose>-13.679391860961914 -9.4551868438720703 0 0 0 0.68069701718117215</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_shelfe_2'>
@@ -864,7 +944,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -883,7 +963,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -894,7 +974,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-14 -19.23388671875 0 0 0 0</pose>
+      <pose>-14.300000190734863 -17.190229415893555 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_shelfd_1'>
@@ -914,7 +994,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -933,7 +1013,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -944,7 +1024,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-8 -10.5 0 0 0 0</pose>
+      <pose>-7.6999998092651367 -8.4913396835327148 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_shelfd_2'>
@@ -964,7 +1044,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -983,7 +1063,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -994,7 +1074,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-8 -15.5 0 0 0 0</pose>
+      <pose>-7.6999998092651367 -18.313291549682617 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_shelfe_1'>
@@ -1014,7 +1094,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1033,7 +1113,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1044,7 +1124,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>8 -10.5 0 0 0 0</pose>
+      <pose>7.6999998092651367 -8.9419870376586914 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_shelfe_2'>
@@ -1064,7 +1144,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1083,7 +1163,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1094,7 +1174,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>8 -15.5 0 0 0 0</pose>
+      <pose>7.6999998092651367 -17.945823669433594 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_shelfd_1'>
@@ -1114,7 +1194,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1133,7 +1213,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1144,7 +1224,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14 -10.5 0 0 0 0</pose>
+      <pose>14.300000190734863 -10.300000190734863 0 0 0 -0.42517043385969089</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_shelfd_2'>
@@ -1164,7 +1244,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1183,7 +1263,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1194,7 +1274,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14 -13.65416431427002 0 0 0 0</pose>
+      <pose>14.300000190734863 -20.006683349609375 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_clutter_1'>
@@ -1214,7 +1294,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1242,7 +1322,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1273,7 +1353,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1301,7 +1381,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1332,7 +1412,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1360,7 +1440,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1391,7 +1471,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1419,7 +1499,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1450,7 +1530,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1478,7 +1558,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1509,7 +1589,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1537,7 +1617,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1568,7 +1648,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1596,7 +1676,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1627,7 +1707,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1655,7 +1735,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1686,7 +1766,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1714,7 +1794,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1745,7 +1825,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1773,7 +1853,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1784,7 +1864,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14.004995346069336 13.431881904602051 0 0 0 -2.6831900037121375</pose>
+      <pose>15.474643707275391 12.454978942871094 0 0 0 -2.6831900037121375</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_clutter_1'>
@@ -1804,7 +1884,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1832,7 +1912,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1843,7 +1923,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-12.594699859619141 -13.590999603271484 0.10495410859584808 0 0 -2.4431900310516315</pose>
+      <pose>-19.105161666870117 -5.8364009857177734 0.10495399683713913 0 0 -2.4431900310516315</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_clutter_2'>
@@ -1863,7 +1943,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1891,7 +1971,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1922,7 +2002,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1950,7 +2030,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1981,7 +2061,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2009,7 +2089,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2040,7 +2120,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2068,7 +2148,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2099,7 +2179,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2127,7 +2207,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2158,7 +2238,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2186,7 +2266,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2217,7 +2297,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2245,7 +2325,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2276,7 +2356,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2304,7 +2384,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2335,7 +2415,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2363,7 +2443,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2402,7 +2482,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2447,7 +2527,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2492,7 +2572,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2537,7 +2617,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2582,7 +2662,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2627,7 +2707,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2648,7 +2728,7 @@
       <static>true</static>
     </model>
     <model name='shelf_big_east_2'>
-      <pose>27.283506393432617 7.6165342330932617 0 0 0 0.089000003219997362</pose>
+      <pose>27.283506393432617 7.6165342330932617 0 0 0 0.089000003219997306</pose>
       <self_collide>true</self_collide>
       <link name='shelf_big_base'>
         <pose>-0.5 0 0 0 0 0</pose>
@@ -2672,7 +2752,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2717,7 +2797,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2762,7 +2842,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2807,7 +2887,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2828,7 +2908,7 @@
       <static>true</static>
     </model>
     <model name='shelf_big_west_3'>
-      <pose>-26.866483688354492 30.637149810791016 0 0 0 -0.026000002004562452</pose>
+      <pose>-26.866483688354492 30.637149810791016 0 0 0 -0.026000002004562438</pose>
       <self_collide>true</self_collide>
       <link name='shelf_big_base'>
         <pose>-0.5 0 0 0 0 0</pose>
@@ -2852,7 +2932,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2878,7 +2958,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://cone_red/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_red/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2890,7 +2970,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://cone_red/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_red/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2910,7 +2990,7 @@
         <pose>0 0 0 0 0 0</pose>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>-12.897780418395996 13 0.24965299665927887 0 0 0</pose>
+      <pose>-12.128399848937988 10.911842346191406 0.24965299665927887 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_cone_orange'>
@@ -2919,7 +2999,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://cone_orange/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_orange/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2931,7 +3011,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://cone_orange/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_orange/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2960,7 +3040,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://cone_yellow/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_yellow/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2972,7 +3052,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://cone_yellow/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_yellow/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3001,7 +3081,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://cone_blue/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_blue/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3013,7 +3093,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://cone_blue/meshes/cone.stl</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_blue/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3042,7 +3122,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3050,7 +3130,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3070,7 +3150,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>-14.184173583984375 1.1439399719238281 0 0 0 0</pose>
+      <pose>-11 16.606903076171875 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_ne_extinguisher'>
@@ -3079,7 +3159,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3087,7 +3167,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3107,7 +3187,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>13.687496185302734 0.31176304817199707 0 0 0 3.0555699983163165</pose>
+      <pose>11 17.135345458984375 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_extinguisher'>
@@ -3116,7 +3196,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3124,7 +3204,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3144,7 +3224,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>-13.534717559814453 -16.033300399780273 0 0 0 0</pose>
+      <pose>-14.141287803649902 -7.2342100143432617 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_extinguisher'>
@@ -3153,7 +3233,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3161,7 +3241,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3181,7 +3261,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>13.62050724029541 -16.204421997070312 0 0 0 2.8949499972345718</pose>
+      <pose>11 -7.3117737770080566 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_palletjack'>
@@ -3201,7 +3281,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3220,7 +3300,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3232,7 +3312,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>12.399999618530273 -18.000299453735352 0 0 0 0.23068752390445885</pose>
+      <pose>14.100000381469727 -22.556936264038086 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_palletjack'>
@@ -3252,7 +3332,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3271,7 +3351,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3283,7 +3363,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>-22.520500183105469 5.6947298049926758 0 0 0 0.53198797536268927</pose>
+      <pose>-9.8000001907348633 20.465499877929688 0 0 0 0.86043120016193542</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_sw_tire'>
@@ -3332,14 +3412,14 @@
           <pose>0 0 -0.80579999999999996 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://car_wheel_x10/meshes/car_wheel.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/car_wheel_x10/meshes/car_wheel.dae</uri>
               <scale>10 10 10</scale>
             </mesh>
           </geometry>
         </visual>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>6.9189100265502912 26.056400299072266 0.22146099805831887 0 0.68749829672906837 0</pose>
+      <pose>6.9189100265502894 26.056400299072266 0.22146099805831843 0 0.68749829672906837 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_nw_tire'>
@@ -3388,7 +3468,7 @@
           <pose>0 0 -0.80579999999999996 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://car_wheel_x10/meshes/car_wheel.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/car_wheel_x10/meshes/car_wheel.dae</uri>
               <scale>10 10 10</scale>
             </mesh>
           </geometry>
@@ -3444,7 +3524,7 @@
           <pose>0 0 -0.80579999999999996 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>model://car_wheel_x10/meshes/car_wheel.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/car_wheel_x10/meshes/car_wheel.dae</uri>
               <scale>10 10 10</scale>
             </mesh>
           </geometry>
@@ -3485,7 +3565,7 @@
           </surface>
         </collision>
         <collision name='bar_1'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3501,7 +3581,7 @@
           </surface>
         </collision>
         <collision name='bar_2'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3517,7 +3597,7 @@
           </surface>
         </collision>
         <collision name='bar_3'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3533,7 +3613,7 @@
           </surface>
         </collision>
         <collision name='bar_4'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3553,7 +3633,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -3569,7 +3649,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://mecanum_lift/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -3613,7 +3693,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3660,7 +3740,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3707,7 +3787,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3754,7 +3834,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3897,7 +3977,7 @@
           </surface>
         </collision>
         <collision name='bar_1'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3913,7 +3993,7 @@
           </surface>
         </collision>
         <collision name='bar_2'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3929,7 +4009,7 @@
           </surface>
         </collision>
         <collision name='bar_3'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3945,7 +4025,7 @@
           </surface>
         </collision>
         <collision name='bar_4'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -3965,7 +4045,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -3981,7 +4061,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://mecanum_lift/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -4025,7 +4105,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4072,7 +4152,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4119,7 +4199,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4166,7 +4246,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4309,7 +4389,7 @@
           </surface>
         </collision>
         <collision name='bar_1'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -4325,7 +4405,7 @@
           </surface>
         </collision>
         <collision name='bar_2'>
-          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 0.29399999999999998 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -4341,7 +4421,7 @@
           </surface>
         </collision>
         <collision name='bar_3'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.5780000000000001 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -4357,7 +4437,7 @@
           </surface>
         </collision>
         <collision name='bar_4'>
-          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000006846 0</pose>
+          <pose>-0.042000000000000003 -0.55800000000000005 1.98 0 1.5700000000008241 0</pose>
           <geometry>
             <cylinder>
               <radius>0.029999999999999999</radius>
@@ -4377,7 +4457,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -4393,7 +4473,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>model://mecanum_lift/materials/scripts/</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -4403,7 +4483,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='front_right_wheel'>
-        <pose>0.85799999999999876 -0.55200000000000315 0.186 0 0 0</pose>
+        <pose>0.85800000000000409 -0.55199999999999605 0.186 0 0 0</pose>
         <inertial>
           <mass>2</mass>
           <inertia>
@@ -4437,7 +4517,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4484,7 +4564,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4497,7 +4577,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='front_left_wheel'>
-        <pose>0.85800000000000232 0.28199999999998937 0.186 0 0 0</pose>
+        <pose>0.85800000000000232 0.28199999999998582 0.186 0 0 0</pose>
         <inertial>
           <mass>2</mass>
           <inertia>
@@ -4531,7 +4611,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4578,7 +4658,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4690,29 +4770,699 @@
       <pose>23.000011444091797 -2.8962013721466064 0 0 0 1.5708000357176291</pose>
       <self_collide>false</self_collide>
     </model>
-    <!-- NE(주황): 콘(11,13) 두르는 작은 원형 루프. 진입로는 정중앙(x=0)에서 곧장 남하 -> 좌회전 1번으로 철제 선반 사이를 통과해 콘까지 -->
-    <model name='track_ne_dash_1'><static>true</static><pose>12.300 13.000 0.06 0 0 1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_2'><static>true</static><pose>12.052 13.764 0.06 0 0 2.1991</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_3'><static>true</static><pose>11.402 14.236 0.06 0 0 2.8274</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_4'><static>true</static><pose>10.598 14.236 0.06 0 0 3.4558</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_5'><static>true</static><pose>9.948 13.764 0.06 0 0 4.0841</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_6'><static>true</static><pose>9.700 13.000 0.06 0 0 4.7124</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_7'><static>true</static><pose>9.948 12.236 0.06 0 0 5.3407</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_8'><static>true</static><pose>10.598 11.764 0.06 0 0 5.9690</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_9'><static>true</static><pose>11.402 11.764 0.06 0 0 6.5973</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_dash_10'><static>true</static><pose>12.052 12.236 0.06 0 0 7.2257</pose><link name='link'><visual name='visual'><geometry><box><size>0.35 0.12 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <!-- NE(주황) 진입로: 대시 길이를 늘려서 개수 축소 (정중앙 직진 -> 좌회전 1번, 원은 그대로) -->
-    <model name='track_ne_entry_1'><static>true</static><pose>0.000 32.250 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_2'><static>true</static><pose>0.000 29.750 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_3'><static>true</static><pose>0.000 27.250 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_4'><static>true</static><pose>0.000 22.250 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_5'><static>true</static><pose>0.000 19.750 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_6'><static>true</static><pose>0.000 17.250 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_7'><static>true</static><pose>0.000 14.750 0.06 0 0 -1.5708</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_8'><static>true</static><pose>1.250 13.000 0.06 0 0 0.0000</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_9'><static>true</static><pose>3.750 13.000 0.06 0 0 0.0000</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_10'><static>true</static><pose>6.250 13.000 0.06 0 0 0.0000</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
-    <model name='track_ne_entry_11'><static>true</static><pose>8.750 13.000 0.06 0 0 0.0000</pose><link name='link'><visual name='visual'><geometry><box><size>1.8 0.15 0.12</size></box></geometry><material><ambient>1.0 0.35 0.0 1</ambient><diffuse>1.0 0.35 0.0 1</diffuse><emissive>0.2 0.07 0 1</emissive></material></visual></link></model>
+    <model name='track_ne_dash_1'>
+      <static>true</static>
+      <pose>12.300000000000001 13 0.059999999999999998 0 0 1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_2'>
+      <static>true</static>
+      <pose>12.052 13.763999999999999 0.059999999999999998 0 0 2.1991000000000001</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_3'>
+      <static>true</static>
+      <pose>11.401999999999999 14.236000000000001 0.059999999999999998 0 0 2.8273999999999999</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_4'>
+      <static>true</static>
+      <pose>10.598000000000001 14.236000000000001 0.059999999999999998 0 0 -2.8273853071795867</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_5'>
+      <static>true</static>
+      <pose>9.9480000000000004 13.763999999999999 0.059999999999999998 0 0 -2.1990853071795864</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_6'>
+      <static>true</static>
+      <pose>9.6999999999999993 13 0.059999999999999998 0 0 -1.5707853071795874</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_7'>
+      <static>true</static>
+      <pose>9.9480000000000004 12.236000000000001 0.059999999999999998 0 0 -0.94248530717958701</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_8'>
+      <static>true</static>
+      <pose>10.598000000000001 11.763999999999999 0.059999999999999998 0 0 -0.31418530717958648</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_9'>
+      <static>true</static>
+      <pose>11.401999999999999 11.763999999999999 0.059999999999999998 0 0 0.3141146928204131</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_dash_10'>
+      <static>true</static>
+      <pose>12.052 12.236000000000001 0.059999999999999998 0 0 0.94251469282041311</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.34999999999999998 0.12 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_1'>
+      <static>true</static>
+      <pose>0 32.25 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_2'>
+      <static>true</static>
+      <pose>0 29.75 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_3'>
+      <static>true</static>
+      <pose>0 27.25 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_4'>
+      <static>true</static>
+      <pose>0 22.25 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_5'>
+      <static>true</static>
+      <pose>0 19.75 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_6'>
+      <static>true</static>
+      <pose>0 17.25 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_7'>
+      <static>true</static>
+      <pose>0 14.75 0.059999999999999998 0 0 -1.5708000000000011</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_8'>
+      <static>true</static>
+      <pose>1.25 13 0.059999999999999998 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_9'>
+      <static>true</static>
+      <pose>3.75 13 0.059999999999999998 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_10'>
+      <static>true</static>
+      <pose>6.25 13 0.059999999999999998 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='track_ne_entry_11'>
+      <static>true</static>
+      <pose>8.75 13 0.059999999999999998 0 0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1.8 0.14999999999999999 0.12</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.349999994 0 1</ambient>
+            <diffuse>1 0.349999994 0 1</diffuse>
+            <emissive>0.200000003 0.0700000003 0 1</emissive>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <self_collide>false</self_collide>
+    </model>
     <light name='sun' type='directional'>
       <pose>0 0 10 0 0 0</pose>
       <cast_shadows>false</cast_shadows>
