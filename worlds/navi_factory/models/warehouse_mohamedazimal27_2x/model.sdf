@@ -6,6 +6,9 @@
         <!-- BASE_LINK FRAME -->
         <link name="warehouse_base">
             <pose>0 0 0 0 0 0</pose>
+            <!-- 벽 충돌용으로 유지: 벽 삼각형은 양면(법선 균형)이라 정상 동작.
+                 바닥 삼각형만 결함(법선 -z 뒤집힘+퇴화)이라 문제였는데, 그건 launch 의 flat_ground 를
+                 이 STL 바닥(z≈0.2)보다 살짝 위(z=0.25)에 깔아 로봇이 flat_ground 에 먼저 닿게 함으로써 회피. -->
             <collision name="warehouse_collision">
                 <pose>0 0 0 0 0 0</pose>
                 <geometry>

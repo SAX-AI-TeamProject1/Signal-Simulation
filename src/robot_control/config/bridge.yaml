@@ -1,0 +1,35 @@
+# ros_gz_bridge 설정 (ROS 2 ↔ Gazebo 토픽 변환 목록)
+# launch 의 bridge 노드가 이 파일을 config_file 로 읽는다.
+# direction: GZ_TO_ROS(gz→ros) / ROS_TO_GZ(ros→gz) / BIDIRECTIONAL(양방향)
+# 토픽 추가/로봇 여러 대로 늘릴 때 여기 항목만 추가하면 됨(브릿지 노드는 하나로 충분). => 네임 스페이스 추가하여 구분
+
+# clock 은 로봇별이 아니라 월드 전역 → 네임스페이스 붙이면 안 됨(/clock 유지).
+- ros_topic_name: "/clock"                  # 시뮬 시계 (월드 전역)
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot1/cmd_vel"        # 속도 명령 (ROS → gz)
+  gz_topic_name: "/robot1/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/robot1/odom"           # 주행거리 (gz → ROS)
+  gz_topic_name: "/robot1/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot1/joint_states"   # 바퀴 관절 상태 (gz → ROS)
+  gz_topic_name: "/robot1/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot1/tf"             # odom→base tf (gz → ROS)
+  gz_topic_name: "/robot1/tf"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS

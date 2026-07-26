@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_control</name>
+  <version>0.0.0</version>
+  <description>K-NAVI robot driving: diff-drive URDF, Gazebo Harmonic bringup, ros_gz bridge</description>
+  <maintainer email="shp9826@naver.com">sho</maintainer>
+  <license>MIT</license>
+
+  <!--
+    런타임 의존성 (exec_depend): "이 패키지를 실행할 때 이런 다른 패키지가 깔려 있어야 한다"는 선언.
+    ros2 pkg create 는 의존성을 비워 두므로, 로봇 구동에 실제로 쓰는 것만 아래에 직접 추가했다.
+    (exec_depend = 실행 의존성. 빌드타임 코드가 없고 launch/urdf 만 쓰므로 build_depend 는 불필요)
+    그냥 depend로 하면 컴파일/런타임 포괄 -> 파이썬은 컴파일이 없으니 exec_depend로 생성했다.
+  -->
+  <exec_depend>rclpy</exec_depend>              <!-- ROS 2 파이썬 클라이언트. launch 안에서 노드/파라미터 다룰 때 필요 -->
+  <exec_depend>geometry_msgs</exec_depend>      <!-- Twist 메시지(/cmd_vel). 이걸로 로봇에 속도 명령을 준다 -->
+  <exec_depend>nav_msgs</exec_depend>           <!-- Odometry 메시지(/odom). diff-drive 가 발행하는 주행거리 -->
+  <exec_depend>sensor_msgs</exec_depend>        <!-- JointState(/joint_states). robot_state_publisher 가 tf 계산에 사용 -->
+  <exec_depend>robot_state_publisher</exec_depend> <!-- URDF+joint_states → 링크들의 tf 를 발행하는 표준 노드 -->
+  <exec_depend>xacro</exec_depend>              <!-- robot.urdf.xacro 를 순수 URDF 로 펼치는 도구(launch에서 호출) -->
+  <exec_depend>ros_gz_sim</exec_depend>         <!-- Gazebo(gz sim) 실행 + 로봇 스폰(create) 담당 -->
+  <exec_depend>ros_gz_bridge</exec_depend>      <!-- ROS 2 ↔ Gazebo 메시지 변환(/cmd_vel, /odom, /clock 브리지) -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
