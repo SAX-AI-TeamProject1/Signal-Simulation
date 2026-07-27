@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!--
+  K-NAVI 로봇 (A안): OGV 메시를 "외형"으로 쓰고, 구동은 자체 diff-drive 로 얹는다.
+  - OGV(worlds/navi_factory/models/OGV) 원본은 static·관절·충돌·관성·플러그인이 없는 "시각 껍데기"라 그대로는 못 굴린다.
+  - 그래서 외형(ogv.dae)만 base_link 의 visual 로 재사용하고,
+    실제 물리/구동에 필요한 바퀴 링크·관절·충돌·관성 + DiffDrive 플러그인은 여기서 새로 정의한다.
+  - 치수는 ogv.dae 를 파싱해 측정한 실측값(단위 cm×SDF scale 6 반영):
+      전체 1.04(X)×1.15(Y)×0.62(H) m, 바퀴반지름 0.135 m, 좌우 축간거리 0.89 m.
+  - 주의(외형): OGV 의 PBR 텍스쳐는 원본 model.sdf 의 <material> 에 정의돼 있어 URDF 경로에선 그대로 안 붙을 수 있다.
+    (형상은 재사용되지만 금속 텍스쳐가 빠질 수 있음 — P0 구동엔 무관, 필요하면 나중에 SDF 재질로 보강)
+-->
+<robot name="knavi_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 네임스페이스: 로봇마다 다르게 주입(launch 에서 ns:=robotN 전달). gz 토픽을 /robotN/... 으로 분리.
+       같은 모델 여러 대여도 URDF 파일은 이 하나로 충분(인자만 바꿔 넘김). -->
+  <xacro:arg name="ns" default="robot1"/>
+
+  <!-- ===== 외형 메시 (OGV) ===== -->
+  <!-- model:// 참조 → gz 가 GZ_SIM_RESOURCE_PATH(launch 에서 models 폴더 등록)로 해석.
+       절대경로 하드코딩 제거 → 팀원 누구 경로에서도 동작.
+       (rsp 는 메시를 로드 안 하고 tf 만 계산하므로 model:// 여도 무방) -->
+  <xacro:property name="ogv_mesh" value="model://OGV/meshes/ogv.dae"/>
+  <xacro:property name="ogv_scale" value="6 6 6"/>
+  <!-- OGV 정면이 메시 +Y → ROS 전진(+X)에 맞추려 yaw -90° 회전 -->
+  <xacro:property name="mesh_yaw" value="-1.5708"/>
+
+  <!-- ===== 구동 파라미터 (실측) ===== -->
+  <xacro:property name="wheel_radius" value="0.135"/>
+  <xacro:property name="wheel_width"  value="0.10"/>
+  <xacro:property name="wheel_sep"    value="0.89"/>   <!-- 좌우 구동바퀴 중심 간 거리 -->
+  <xacro:property name="caster_radius" value="0.06"/>
+  <xacro:property name="caster_x"      value="0.45"/>  <!-- 앞/뒤 캐스터 위치 -->
+
+  <xacro:property name="base_mass"   value="20.0"/>
+  <xacro:property name="wheel_mass"  value="1.0"/>
+
+  <!-- ===== 관성 매크로 ===== -->
+  <xacro:macro name="box_inertia" params="m x y z">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${m*(y*y+z*z)/12.0}" ixy="0" ixz="0"
+               iyy="${m*(x*x+z*z)/12.0}" iyz="0"
+               izz="${m*(x*x+y*y)/12.0}"/>
+    </inertial>
+  </xacro:macro>
+  <xacro:macro name="cyl_inertia" params="m r l">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${m*(3*r*r+l*l)/12.0}" ixy="0" ixz="0"
+               iyy="${m*(3*r*r+l*l)/12.0}" iyz="0"
+               izz="${m*r*r/2.0}"/>
+    </inertial>
+  </xacro:macro>
+  <xacro:macro name="sphere_inertia" params="m r">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${2*m*r*r/5.0}" ixy="0" ixz="0"
+               iyy="${2*m*r*r/5.0}" iyz="0" izz="${2*m*r*r/5.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- ===== base_link (지면 기준, 원점 z=0) ===== -->
+  <link name="base_link">
+    <!-- 외형: OGV 메시 (시각 전용, 충돌엔 안 씀) -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${mesh_yaw}"/>
+      <geometry>
+        <mesh filename="${ogv_mesh}" scale="${ogv_scale}"/>
+      </geometry>
+    </visual>
+    <!-- 충돌: 차체 근사 박스(바퀴 접지 위쪽에 띄워 바닥에 안 끌리게) -->
+    <collision>
+      <origin xyz="0 0 0.35" rpy="0 0 0"/>
+      <geometry><box size="0.9 0.9 0.4"/></geometry>
+    </collision>
+    <xacro:box_inertia m="${base_mass}" x="0.9" y="0.9" z="0.4"/>
+  </link>
+
+  <!-- ===== 구동 바퀴 매크로 (충돌·관성만; 외형은 OGV 메시가 대신) ===== -->
+  <xacro:macro name="drive_wheel" params="prefix side_y">
+    <link name="${prefix}_wheel">
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      </collision>
+      <xacro:cyl_inertia m="${wheel_mass}" r="${wheel_radius}" l="${wheel_width}"/>
+    </link>
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child  link="${prefix}_wheel"/>
+      <!-- 좌우로 벌리고, 바닥 접점이 z=0 이 되도록 중심을 wheel_radius 높이에 -->
+      <origin xyz="0 ${side_y} ${wheel_radius}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:drive_wheel prefix="left"  side_y="${ wheel_sep/2}"/>
+  <xacro:drive_wheel prefix="right" side_y="${-wheel_sep/2}"/>
+
+  <!-- ===== 캐스터 매크로 (앞/뒤 지지, 마찰 0) ===== -->
+  <xacro:macro name="caster" params="prefix px">
+    <link name="${prefix}_caster">
+      <collision>
+        <geometry><sphere radius="${caster_radius}"/></geometry>
+      </collision>
+      <xacro:sphere_inertia m="0.5" r="${caster_radius}"/>
+    </link>
+    <joint name="${prefix}_caster_joint" type="fixed">
+      <parent link="base_link"/>
+      <child  link="${prefix}_caster"/>
+      <origin xyz="${px} 0 ${caster_radius}" rpy="0 0 0"/>
+    </joint>
+    <gazebo reference="${prefix}_caster">
+      <mu1>0.0</mu1><mu2>0.0</mu2>
+    </gazebo>
+  </xacro:macro>
+  <xacro:caster prefix="front" px="${ caster_x}"/>
+  <xacro:caster prefix="back"  px="${-caster_x}"/>
+
+  <!-- ===== 시뮬 카메라 링크 (P1 대비 정의만) ===== -->
+  <link name="camera_link">
+    <xacro:box_inertia m="0.05" x="0.02" y="0.06" z="0.02"/>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="camera_link"/>
+    <origin xyz="0.5 0 0.5" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_sep}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+      <odom_publish_frequency>30</odom_publish_frequency>
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+      <topic>$(arg ns)/cmd_vel</topic>
+      <odom_topic>$(arg ns)/odom</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <tf_topic>$(arg ns)/tf</tf_topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+      <topic>$(arg ns)/joint_states</topic>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="sim_camera" type="camera">
+      <always_on>1</always_on>
+      <update_rate>15</update_rate>
+      <topic>camera/image</topic>
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov>
+        <image><width>640</width><height>480</height></image>
+        <clip><near>0.1</near><far>100.0</far></clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+</robot>
