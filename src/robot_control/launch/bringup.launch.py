@@ -167,10 +167,16 @@ def generate_launch_description():
     # 5) 웹캠 노드 (P0 입력). 실물 웹캠 1대를 여러 로봇이 공유하는 구조라
     #    로봇 루프 밖에 두고 네임스페이스도 붙이지 않는다(/image_webcam, /gesture 전역).
     #    use_sim_time 을 주지 않는 이유: 실물 카메라는 Gazebo 시계가 아니라 실제 시간으로 돈다.
+    #
+    #    리맵이 필요한 이유: 이 노드는 네임스페이스가 없어 cmd_vel_gesture 를 그냥 발행하면
+    #    /cmd_vel_gesture 가 된다. 반면 twist_mux 는 로봇 네임스페이스 안에서 돌기 때문에
+    #    /robot1/cmd_vel_gesture 를 구독한다. 둘을 여기서 이어준다.
+    #    (로봇이 여러 대가 되면 어느 로봇에 수신호를 보낼지 여기서 정하게 된다)
     camera = Node(
         package='robot_control',
         executable='camera_node',
         condition=IfCondition(enable_camera),
+        remappings=[('cmd_vel_gesture', '/robot1/cmd_vel_gesture')],
         output='screen',
     )
 

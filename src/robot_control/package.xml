@@ -23,6 +23,7 @@
   <exec_depend>ros_gz_bridge</exec_depend>      <!-- ROS 2 ↔ Gazebo 메시지 변환(/cmd_vel, /odom, /clock 브리지) -->
   <exec_depend>cv_bridge</exec_depend>          <!-- sensor_msgs/Image ↔ OpenCV ndarray 변환 -->
   <exec_depend>python3-opencv</exec_depend>     <!-- 웹캠 캡처(cv2.VideoCapture). rosdep 키(apt: python3-opencv) -->
+  <exec_depend>std_msgs</exec_depend>           <!-- String 메시지(/gesture). 추론 워커가 발행하는 수신호 라벨 -->
   <exec_depend>twist_mux</exec_depend>          <!-- 속도 명령 우선순위 중재. 자작 아님, 설치 패키지 사용 -->
 
   <test_depend>ament_copyright</test_depend>
