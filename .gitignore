@@ -235,3 +235,6 @@ CLAUDE.md
 build/
 install/
 log/
+
+*.venv
+*.venv-infer

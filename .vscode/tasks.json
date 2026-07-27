@@ -60,6 +60,31 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "4. Vision 패키지 설치 (venv)",
+            "detail": "Signal-Vision을 pip으로 설치한 venv(.venv-infer)를 만듭니다 — 설치 확인용. 태그 버전을 바꾸려면 인자로 전달 (기본 v1.0.1). rclpy 연동은 아직 없음. ROS와 무관해 OS 상관없이 동작.",
+            "type": "shell",
+            "osx": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "linux": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "windows": {
+                "command": "py",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }
