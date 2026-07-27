@@ -1,4 +1,4 @@
-# Last updated: 2026-07-27
+# Last updated: 2026-07-28
 '''
 외부(ROS 노드 등)에서 이 파일 하나만 import해서 추론/GUI를 호출할 수 있게 묶은 진입점.
 
@@ -6,8 +6,12 @@ predict.py의 main()은 무한루프+argparse CLI라 다른 프로세스에 끼�
 여기서는 같은 로직을 "프레임 한 장 처리"만 하는 두 함수(infer, show_gui)로 쪼갰다 —
 모델/카메라/HUD/안정화 필터 상태는 모듈 안에 숨겨두고, 첫 infer() 호출 때 한 번만 초기화한다.
 
+pip으로 설치된 signal-vision 패키지(scripts/setup_infer_env.py가 만든 .venv-infer)의
+src.* 모듈을 그대로 가져다 쓴다 — 코드를 복사(vendor)하지 않는다. setup_infer_env.py를
+다시 돌려 ref를 갱신하면 여기서 쓰는 로직도 자동으로 최신화된다.
+
 사용 예:
-    from src.inference.function import infer, show_gui
+    from function import infer, show_gui
     while True:
         signal, confidence = infer()      # 웹캠 한 프레임 처리 + 안정화된 신호
         if show_gui():                    # 관절/확률 패널 표시, True면 종료 요청(q/ESC)
@@ -21,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from ..capture.extractor import (
+from src.capture.extractor import (
     HAND_DIM,
     FeatureExtractor,
     HandWarning,
@@ -30,8 +34,12 @@ from ..capture.extractor import (
     open_camera,
     process_frame,
 )
-from .predict import DEFAULT_MODEL_PATH, SignalStabilizer, load_model
-from .ui import Hud
+from src.inference.predict import SignalStabilizer, load_model
+from src.inference.ui import Hud
+
+# pip 설치된 signal-vision의 DEFAULT_MODEL_PATH는 site-packages 기준 상대경로라
+# 체크포인트가 없다 (패키지에 가중치가 포함되지 않음) — 이 리포에 커밋된 체크포인트를 직접 가리킨다.
+MODEL_PATH = Path(__file__).resolve().parent / "pub_test" / "models" / "sign_classifier.pt"
 
 
 class _Runtime:
@@ -106,7 +114,7 @@ def _get_runtime() -> _Runtime:
     global _runtime
     if _runtime is None:
         # predict.py의 argparse 기본값과 동일 (--threshold 0.8 --consecutive 5 --ema 0.4 --release-grace 1.0)
-        _runtime = _Runtime(DEFAULT_MODEL_PATH, threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
+        _runtime = _Runtime(MODEL_PATH, threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
     return _runtime
 
 

@@ -102,8 +102,13 @@ def main() -> int:
     py = str(venv_python(VENV_DIR))
     step("pip 업그레이드 중")
     subprocess.run([py, "-m", "pip", "install", "--upgrade", "pip"], check=True)
-    step(f"Signal-Vision 설치 중 ({ref})")
+    step("Signal-Vision 의존성 확인/설치 중")
     subprocess.run([py, "-m", "pip", "install", f"{REPO}@{ref}"], check=True)
+    # pyproject.toml의 version이 태그마다 안 올라가서, pip이 "이미 설치됨"으로 보고
+    # ref가 바뀐 소스 갱신을 건너뛸 수 있다 — signal-vision 소스만 강제로 다시 받는다.
+    # (의존성은 위에서 이미 확인됐으니 --no-deps로 무거운 재설치는 피한다)
+    step(f"Signal-Vision 소스 갱신 중 ({ref})")
+    subprocess.run([py, "-m", "pip", "install", "--force-reinstall", "--no-deps", f"{REPO}@{ref}"], check=True)
 
     banner(True, f'설치 완료. 확인: {py} -c "from src.capture.extractor import FeatureExtractor; print(\'OK\')"')
     return 0

@@ -1,5 +1,5 @@
-# Last updated: 2026-07-27
-"""pub_test/vision/의 vendor된 Signal-Vision 코드가 실제 웹캠으로 동작하는지 확인하는 단독 스크립트.
+# Last updated: 2026-07-28
+"""pip 설치된 signal-vision(.venv-infer)이 실제 웹캠으로 동작하는지 확인하는 단독 스크립트.
 ROS 없이 실행 가능 (rclpy import 없음). 실행: .venv-infer/bin/python examples/src/pub_test/smoke_test_vision.py
 종료: 표시되는 창에서 q 또는 ESC.
 """
@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from pub_test.vision.inference.function import close, infer, show_gui
+from function import close, infer, show_gui
 
 
 def main() -> None:

@@ -11,8 +11,8 @@
   <depend>std_msgs</depend>
   <depend>custom_msg2</depend>
 
-  <!-- pub_test/vision/ 에 넣은 Signal-Vision 코드가 쓰는 라이브러리.
-       apt 패키지가 있어 rosdep이 보통 풀어주는 것만 depend로 선언 (리눅스에서 rosdep resolve로 재확인 필요). -->
+  <!-- smoke_test_vision.py가 쓰는 pip 설치 signal-vision(.venv-infer, scripts/setup_infer_env.py)의
+       라이브러리. apt 패키지가 있어 rosdep이 보통 풀어주는 것만 depend로 선언 (리눅스에서 rosdep resolve로 재확인 필요). -->
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-scikit-learn</exec_depend>
   <exec_depend>python3-opencv</exec_depend>     <!-- 웹캠 캡처(cv2.VideoCapture). contrib 전용 API(cv2.aruco 등) 안 써서 기본판으로 충분 -->
