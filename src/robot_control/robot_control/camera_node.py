@@ -36,7 +36,29 @@ from robot_control.metrics import InferenceMetrics
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
+# 2026-07-28-JaeSeong
+# package install 은 setup_infer_env.py 를 실행
+# ===================================================================================
+from collections import deque
+from pathlib import Path
 
+import numpy as np
+import torch
+
+from src.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
+from src.inference.predict import SignalStabilizer             # + 신규
+from src.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
+
+MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "sign_classifier.pt"
+
+# signal-vision 라벨 -> LABELS 매핑. 없는 키(back/slow/idle)는 .get()이 알아서 None.
+LABEL_MAP = {
+    'stop': 'STOP',
+    'come': 'FORWARD',
+    'left_go': 'LEFT',
+    'right_go': 'RIGHT',
+}
+# ===================================================================================
 class CameraNode(Node):
     """웹캠을 읽어 이미지를 발행하고, 별도 스레드에서 수신호를 추론한다."""
 
@@ -279,9 +301,16 @@ class CameraNode(Node):
         워커가 1개이므로 여기서 만든 객체는 한 스레드에서만 쓰인다.
         (MediaPipe Hands 처럼 스레드 안전하지 않은 객체도 그대로 써도 된다)
         """
-        self.get_logger().warn(
-            'load_model() 이 아직 비어 있습니다 — 추론 없이 대기만 합니다. '
-            'camera_node.py 의 "팀원 구현 구간"을 채워주세요.')
+        self._device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self._model, self._labels, self._num_frames = load_signal_model(MODEL_PATH, self._device)
+        self._extractor = FeatureExtractor()
+        self._window = deque(maxlen=self._num_frames)
+        self._stabilizer = SignalStabilizer(threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
+        self._t0 = time.monotonic()
+
+        # self.get_logger().warn(
+        #     'load_model() 이 아직 비어 있습니다 — 추론 없이 대기만 합니다. '
+        #     'camera_node.py 의 "팀원 구현 구간"을 채워주세요.')
 
     def infer(self, frame):
         """
@@ -290,7 +319,7 @@ class CameraNode(Node):
         인자:
             frame: numpy.ndarray, shape=(height, width, 3), dtype=uint8, 채널 순서 BGR.
                    (OpenCV 기본 순서. RGB 가 필요하면 cv2.cvtColor 로 직접 변환)
-
+                                                                                                                      
         반환:
             LABELS 중 하나의 문자열 → 그대로 gesture 토픽으로 발행된다.
             None → 이번 프레임은 판단 불가. 아무것도 발행하지 않는다.
@@ -301,9 +330,38 @@ class CameraNode(Node):
             - 예외는 호출부가 잡아 로그만 남기므로 워커는 죽지 않는다.
             - LABELS 에 없는 문자열을 반환하면 발행되지 않고 경고만 남는다.
         """
-        time.sleep(0.05)  # 50ms sleep 걸기 (추론 시간 흉내)
-        self.get_logger().warn('Test infer Log', throttle_duration_sec=1.0)
-        return None
+
+        timestamp_ms = int((time.monotonic() - self._t0) * 1000)
+        hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
+        self._window.append(FeatureExtractor.vector(hand_result, pose_result))
+
+        if len(self._window) < self._num_frames: 
+            return None
+
+        arr = np.stack(self._window)
+        pose_ratio = float((arr[:, HAND_DIM * 2:] != 0).any(axis=1).mean())
+        if pose_ratio < 0.3:
+            self._stabilizer.mark_person_absent(is_blurred=False)
+            return None
+
+        x = torch.from_numpy(arr[None]).to(self._device)
+        with torch.no_grad():
+            raw_probs = torch.softmax(self._model(x), dim=1)[0].cpu().numpy()
+        self._stabilizer.update(raw_probs, self._labels, is_blurred=False)
+
+        idx = self._stabilizer.confirmed_idx
+        if idx is None:
+            return None
+
+        return LABEL_MAP.get(self._labels[idx])
+
+
+        # time.sleep(0.05)  # 50ms sleep 걸기 (추론 시간 흉내)
+        # self.get_logger().warn('Test infer Log', throttle_duration_sec=1.0)
+        # return None
+
+    def show_ui(self):
+        pass
 
     # ==================== 팀원 구현 구간 끝 ====================
 

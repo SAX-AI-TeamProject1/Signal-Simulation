@@ -57,6 +57,31 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "4. Vision 패키지 설치 (.venv-infer)",
+            "detail": "Signal-Vision을 pip으로 설치한 .venv-infer를 만듭니다 (--system-site-packages라 camera_node.py를 이 venv 파이썬으로 실행하면 rclpy/cv_bridge와 mediapipe/torch/signal-vision을 동시에 쓸 수 있음). 태그 버전을 바꾸려면 인자로 전달 (기본: origin 최신 v*.*.* 태그).",
+            "type": "shell",
+            "osx": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "linux": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "windows": {
+                "command": "py",
+                "args": ["${workspaceFolder}/scripts/setup_infer_env.py"]
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }

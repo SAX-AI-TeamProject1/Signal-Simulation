@@ -235,3 +235,6 @@ CLAUDE.md
 build/
 install/
 log/
+
+*venv-infer
+examples/src/pub_test/pub_test/vision/
