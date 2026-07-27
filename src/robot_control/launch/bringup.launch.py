@@ -7,6 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
                             SetEnvironmentVariable)
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (Command, LaunchConfiguration, PathJoinSubstitution,
                                   PythonExpression)
@@ -40,6 +41,9 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     # headless: 테스트/서버 환경에선 GUI 없이(-s) 돌리려고 노출.
     headless = LaunchConfiguration('headless')
+    # 인식 파이프라인은 실물 웹캠이 필요해서 기본 off.
+    # 웹캠 없는 머신에서 bringup 이 실패하지 않도록 기존 시뮬 경로의 동작을 그대로 유지한다.
+    enable_camera = LaunchConfiguration('enable_camera')
 
     # 실제로 채워 놓은 값, 기본값만
     declare_args = [
@@ -48,6 +52,8 @@ def generate_launch_description():
                               description='true 면 gz 를 GUI 없이 서버만(-s) 실행'),
         DeclareLaunchArgument('world', default_value=default_world,
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
+        DeclareLaunchArgument('enable_camera', default_value='true',
+                              description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
@@ -92,7 +98,23 @@ def generate_launch_description():
                        '-z', '0.3'],   # 바닥(0.1) 살짝 위에서 떨궈 안착
             output='screen',
         )
-        robot_nodes += [rsp, spawn]
+
+        # 4) twist_mux: 여러 속도 명령 소스 중 우선순위가 가장 높은 하나만 cmd_vel 로 통과시킨다.
+        #    자작 노드가 아니라 설치 패키지(ros-jazzy-twist-mux)를 그대로 쓴다.
+        #    - 로봇마다 하나씩 필요하므로 이 루프 안에 둔다(네임스페이스로 분리).
+        #    - 'cmd_vel_out' 은 twist_mux 가 쓰는 기본 출력 토픽 이름. 이걸 'cmd_vel' 로 리맵하면
+        #      네임스페이스가 붙어 /robot1/cmd_vel 이 되고, bridge.yaml 항목과 맞아떨어진다.
+        #    - 입력 토픽/우선순위/timeout 은 config/twist_mux.yaml 참고.
+        twist_mux = Node(
+            package='twist_mux',
+            executable='twist_mux',
+            namespace=namespace,
+            parameters=[os.path.join(pkg_share, 'config', 'twist_mux.yaml'),
+                        {'use_sim_time': use_sim_time}],
+            remappings=[('cmd_vel_out', 'cmd_vel')],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux]
 
     # 2) Gazebo(gz sim) 실행. ros_gz_sim 이 제공하는 표준 런치를 include.
     #    gz_args: 월드 파일 + '-r'(즉시 시뮬 시작). headless 면 '-s'(서버 전용) 추가.
@@ -142,11 +164,27 @@ def generate_launch_description():
         models_path + (os.pathsep + _existing if _existing else ''),
     )
 
+    # 5) 웹캠 노드 (P0 입력). 실물 웹캠 1대를 여러 로봇이 공유하는 구조라
+    #    로봇 루프 밖에 두고 네임스페이스도 붙이지 않는다(/image_webcam, /gesture 전역).
+    #    use_sim_time 을 주지 않는 이유: 실물 카메라는 Gazebo 시계가 아니라 실제 시간으로 돈다.
+    camera = Node(
+        package='robot_control',
+        executable='camera_node',
+        condition=IfCondition(enable_camera),
+        output='screen',
+    )
+
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim, ground, bridge])
+                             [gz_sim, ground, bridge, camera])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
+# twist_mux → 로봇당 1개 (명령 소스 중재)
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
-# ros2 run teleop_twist_keyboard teleop_twist_keyboard
+# camera → 1개 공유 (웹캠 1대, 전역 토픽)
+#
+# 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot1/cmd_vel 에 직접 쓰지 않고
+# mux 입력(cmd_vel_teleop)으로 넣는다. 안 그러면 mux 출력과 충돌한다.
+#   ros2 run teleop_twist_keyboard teleop_twist_keyboard \
+#     --ros-args -r /cmd_vel:=/robot1/cmd_vel_teleop

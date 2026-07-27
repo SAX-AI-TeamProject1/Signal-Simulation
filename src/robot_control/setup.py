@@ -39,7 +39,10 @@ setup(
         ],
     },
     entry_points={
+        # ros2 run robot_control <이름> 으로 실행될 노드들.
+        # twist_mux 는 여기 없다 — 설치 패키지(ros-jazzy-twist-mux)를 쓰므로 config/launch 만 담당.
         'console_scripts': [
+            'camera_node = robot_control.camera_node:main',
         ],
     },
 )
