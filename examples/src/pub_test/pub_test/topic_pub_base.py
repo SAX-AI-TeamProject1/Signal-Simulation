@@ -5,10 +5,11 @@ import custom_msg2.msg
 from custom_msg2.srv import SrvBigInt
 
 
-class MinimalPublisher(Node):
+class MinimalPublisher(Node): # NODE를 상속해야 ROS2 기능 함수들을 사용가능... 얘가 핵심 객체 클래스
 
-    def __init__(self):
+    def __init__(self): # 자식도 자기만에 내부에서 쓸준비를 함 초기화 시켜줌
         super().__init__('minimal_publisher')
+        #부모 Node 초기화 = 내부에서 쓸수있게 준비 과정 > Node 이름을 minimal_publisher로 변경
         # 퍼블리셔 생성: (메시지 타입, 토픽 이름, 큐 사이즈)
 
         #String Type의 메세지
@@ -50,7 +51,10 @@ def main(args=None):
     rclpy.init(args=args)
 
     minimal_publisher = MinimalPublisher() #이거는 위에 객체
-
+    # 객체를 만들어서 함수에 인자로 사용할수있음 self.에 결국 minimal_publisher 가 들어감!
+    # Node를 상속받은 클래스(설계도)만 만드는 것으로는 실제 객체가 생성되지 않음
+    # MinimalPublisher()로 객체를 만들어야 __init__()이 실행되고
+    # self가 실제 생성된 객체를 가리키며 기능들이 작동함
     # 여기까지는 global_executor는 아직 존재 하지 않음.
 
     
@@ -86,21 +90,21 @@ def main(args=None):
     '''
 
     rclpy.spin(minimal_publisher)
+    # 타이머 0.5초되면 도달(True) > executor 감지 > callback실행 > 터미널출력 > 다음 0.5초도달까지 기다림(False)
 
     '''
-    rclpy/Timer.py - 65Line
-    # True when the callback is ready to fire but has not been "taken" by an executor
-    등록된 콜백(Node의 Timer 객체가 가진 callback)은 executor가 가지지 않아도 True이다?
-    
+    rclpy/Timer.py - 65줄
+    Timer의 실행 시간이 되면 callback은 ready 상태가 된다.
+    Executor가 callback을 가져가 실행하기 전까지 ready=True이다.
+
     rclpy::spin() 에서 global executor를 가져옴(인자 전달 안하는 케이스)
-    
+
     '''
 
     # 노드 종료 처리
-    minimal_publisher.destroy_node()
-    
-    
-    rclpy.utilities.try_shutdown() # 이걸로 해도 되지 않나?
+    minimal_publisher.destroy_node() # > 내 노드 정리
+
+    rclpy.utilities.try_shutdown() # 이걸로 해도 되지 않나? > ROS2 전체 종료
 
 
 if __name__ == '__main__':
