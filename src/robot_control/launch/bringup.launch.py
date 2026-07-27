@@ -5,15 +5,14 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
+                            SetEnvironmentVariable)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (Command, LaunchConfiguration, PathJoinSubstitution,
                                   PythonExpression)
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import SetEnvironmentVariable
-
 
 
 def generate_launch_description():
@@ -32,10 +31,9 @@ def generate_launch_description():
     #     world:=<repo>/worlds/navi_factory/world/navi_factory/navi_factory.sdf
     #   (창고 모델 로딩은 GZ_SIM_RESOURCE_PATH 에 그 models 폴더가 잡혀 있어야 함)
 
+    # LaunchConfiguration()은 인자로 받을 객체에 대한 변수? => 위에 world:=~와 같이 ~를 저장할 객체
 
-    #LaunchConfiguration()은 인자로 받을 객체에 대한 변수? => 위에 world:=~와 같이 ~를 저장할 객체
-
-    #world 변수를 저장
+    # world 변수를 저장
     world = LaunchConfiguration('world')
 
     # sim time: Gazebo 가 /clock 을 발행하고, ROS 노드들은 그 시계를 따라야 tf 타임스탬프가 맞는다.
@@ -52,22 +50,18 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
     ]
 
-
-
-
-
     # 이부분은 로봇이 여러대면 여러개 작성해야함
     # @우진 - 이거 최초 위치 정보도 세팅 가능한데, 해주면 좋을듯?
     robot_info = [
-        ('robot.urdf.xacro','robot1','knavi_robot')
+        ('robot.urdf.xacro', 'robot1', 'knavi_robot')
     ]
     robot_nodes = []
     for info in robot_info:
-        model_info = info[0] # 어떤 모델 urdf를 읽을지
-        namespace = info[1]  # 이 로봇의 식별 정보
-        name = info[2]       # 이 로봇의 이름(가제보 GUI)
+        model_info = info[0]  # 어떤 모델 urdf를 읽을지
+        namespace = info[1]   # 이 로봇의 식별 정보
+        name = info[2]        # 이 로봇의 이름(가제보 GUI)
         # xacro 를 실행 시점에 펼쳐 URDF 문자열을 만든다(파일에 미리 펼쳐두지 않음 → 파라미터 바뀌면 자동 반영).
-        xacro_file = os.path.join(pkg_share, 'urdf', model_info) # 3번 인자의 객체의 urdf 파일
+        xacro_file = os.path.join(pkg_share, 'urdf', model_info)  # 3번 인자의 객체의 urdf 파일
         # ns 인자를 xacro 에 넘겨 gz 토픽을 /robot1/... 으로 분리(bridge.yaml 과 일치).
         robot_description = ParameterValue(
             Command(['xacro ', xacro_file, ' ns:=', namespace]), value_type=str)
@@ -79,11 +73,10 @@ def generate_launch_description():
         rsp = Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
-            namespace =namespace, # 이 namespace를 붙여서 토픽 발생
+            namespace=namespace,  # 이 namespace를 붙여서 토픽 발생
             parameters=[{
                 'robot_description': robot_description,
-                         'use_sim_time': use_sim_time}
-                         ],
+                'use_sim_time': use_sim_time}],
         )
 
         # 3) 로봇 스폰: robot_state_publisher 가 발행하는 robot_description 토픽에서 모델을 읽어 월드에 생성.
@@ -106,7 +99,7 @@ def generate_launch_description():
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'])
-        ), #ros_gz_sim 패키지 안에 gz sim 해주는 그런게 있다네요
+        ),  # ros_gz_sim 패키지 안에 gz sim 해주는 그런게 있다네요
         launch_arguments={
             # headless=true 면 ' -s'(서버 전용, GUI 없음)를 뒤에 붙인다.
             'gz_args': [world, ' -r -v 4',
@@ -149,10 +142,11 @@ def generate_launch_description():
         models_path + (os.pathsep + _existing if _existing else ''),
     )
 
-    return LaunchDescription([set_resource] + declare_args + robot_nodes + [gz_sim, ground, bridge])
+    return LaunchDescription([set_resource] + declare_args + robot_nodes +
+                             [gz_sim, ground, bridge])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
-#ros2 run teleop_twist_keyboard teleop_twist_keyboard
+# ros2 run teleop_twist_keyboard teleop_twist_keyboard

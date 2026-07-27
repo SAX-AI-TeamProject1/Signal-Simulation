@@ -1,7 +1,7 @@
 # os, glob: 아래 data_files 에서 launch/urdf/worlds 폴더의 파일 목록을 자동으로 긁어오려고 추가함.
 # (ros2 pkg create 기본 setup.py 에는 없던 import — 데이터 파일 설치를 위해 직접 넣음)
-import os
 from glob import glob
+import os
 
 from setuptools import find_packages, setup
 
