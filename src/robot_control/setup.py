@@ -43,6 +43,9 @@ setup(
         # twist_mux 는 여기 없다 — 설치 패키지(ros-jazzy-twist-mux)를 쓰므로 config/launch 만 담당.
         'console_scripts': [
             'camera_node = robot_control.camera_node:main',
+            # 리팩토링본. 원본과 나란히 두어 A/B 비교가 가능하게 했다.
+            # 검증이 끝나면 원본을 지우고 이 항목을 camera_node 로 되돌린다.
+            'camera_node_refactory = robot_control.camera_node_refactory:main',
         ],
     },
 )
