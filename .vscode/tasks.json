@@ -82,6 +82,31 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "5. PERCEPTION 패키지 설치 (.venv-perception)",
+            "detail": "Signal-Vision을 pip으로 설치한 .venv-perception를 만듭니다", 
+            "type": "shell",
+            "osx": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_perception_env.py"]
+            },
+            "linux": {
+                "command": "python3",
+                "args": ["${workspaceFolder}/scripts/setup_perception_env.py"]
+            },
+            "windows": {
+                "command": "py",
+                "args": ["${workspaceFolder}/scripts/setup_perception_env.py"]
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }
