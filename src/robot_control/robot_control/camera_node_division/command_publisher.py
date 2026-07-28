@@ -1,0 +1,114 @@
+"""
+책임 4 — 라벨을 로봇 속도 명령으로 바꿔 발행.
+
+config/twist_mux.yaml 은 이 변환을 별도 command_node 가 맡는 것으로 적고 있다.
+지금 같은 프로세스에 두는 이유는 변환이 딕셔너리 조회 한 번이라 노드를 하나 더
+띄울 만큼의 일이 아니어서다. 다만 파일로는 분리해 두어, 나중에 노드로 떼어낼 때
+이 파일을 그대로 옮기면 되게 했다.
+"""
+
+from geometry_msgs.msg import Twist
+from robot_control.camera_node_division.labels import LABEL_MOTION, LABELS
+from robot_control.camera_node_division.shutdown import is_shutting_down
+from std_msgs.msg import String
+
+
+class GestureCommandPublisher:
+    """
+    라벨 문자열을 받아 두 토픽으로 내보낸다.
+
+        gesture (std_msgs/String)          — 관측·기록용.
+            rosbag 에 남겨야 "언제 무슨 수신호였나"를 알 수 있고,
+            "인식→반응 지연시간" 측정도 이 타임스탬프가 있어야 한다.
+
+        cmd_vel_gesture (geometry_msgs/Twist) — 제어용.
+            twist_mux 의 gesture 입력(priority 50)으로 들어간다.
+            이 노드는 네임스페이스가 없어 그냥 두면 /cmd_vel_gesture 가 되는데
+            twist_mux 는 /robot1/cmd_vel_gesture 를 구독한다 → launch 에서 리맵.
+
+    QoS 는 둘 다 depth 10 + 기본 RELIABLE. 영상과 달리 라벨은 유실되면 안 된다
+    (특히 STOP). 그래서 BEST_EFFORT 를 쓰지 않는다.
+    """
+
+    def __init__(self, node, stop_event, linear_speed, angular_speed,
+                 gesture_topic='gesture', cmd_vel_topic='cmd_vel_gesture'):
+        """
+        퍼블리셔 2개를 만들고, 라벨별 Twist 를 미리 만들어 캐싱한다.
+
+        인자:
+            linear_speed: FORWARD 전진 속도 (m/s)
+            angular_speed: LEFT/RIGHT 회전 속도 (rad/s)
+
+        Twist 를 미리 만드는 이유: 라벨이 4개뿐이라 매 프레임 새로 만들 이유가 없다.
+        캐시된 객체를 재발행해도 되는 것은 publish() 가 내부에서 직렬화하기 때문이다
+        (발행 후 그 객체를 고치지만 않으면 된다 → 이 클래스 밖으로 내보내지 않는다).
+        """
+        if linear_speed < 0.0 or angular_speed < 0.0:
+            raise ValueError(
+                f'속도는 음수일 수 없습니다 (linear={linear_speed}, angular={angular_speed}). '
+                '방향은 LABEL_MOTION 의 부호가 정합니다.')
+
+        self._node = node
+        self._stop_event = stop_event
+        self._last_label = None     # 워커 스레드에서만 읽고 쓴다 → 락 불필요
+
+        self._pub_gesture = node.create_publisher(String, gesture_topic, 10)
+        self._pub_cmd_vel = node.create_publisher(Twist, cmd_vel_topic, 10)
+
+        self._label_to_twist = {}
+        for label, (lin_mul, ang_mul) in LABEL_MOTION.items():
+            twist = Twist()
+            twist.linear.x = linear_speed * lin_mul
+            twist.angular.z = angular_speed * ang_mul
+            self._label_to_twist[label] = twist
+
+    def publish(self, label):
+        """
+        라벨 하나를 발행한다. 워커 스레드에서 호출된다.
+
+        (rclpy 퍼블리셔는 스레드 안전하므로 워커에서 바로 발행해도 된다)
+
+        인자:
+            label: LABELS 중 하나. None 이거나 목록에 없으면 발행하지 않는다.
+
+        반환:
+            True  — 발행했거나, 발행할 것이 없어 건너뛰었다
+            False — 종료 중이다(호출자는 워커 루프를 빠져나와야 한다)
+
+        ┌─ 미해결 설계 이슈 (팀 결정 필요) ────────────────────────────────┐
+        │ twist_mux 의 gesture timeout 은 0.5초다. label 이 None 인 동안은  │
+        │ 여기서 아무것도 발행하지 않으므로, 인식이 0.5초 넘게 끊기면        │
+        │ twist_mux 가 gesture 소스를 버리고 속도 0 으로 본다.              │
+        │ → 손이 잠깐 흔들려도 FORWARD 중이던 로봇이 덜컥거린다.            │
+        │                                                                   │
+        │ 해결하려면 마지막 라벨을 일정 시간 유지(hold/latch)해야 하는데,    │
+        │ "STOP 은 오래 유지하고 FORWARD 는 빨리 놓는" 비대칭 정책이 안전상  │
+        │ 맞을 수 있다. 이건 동작을 바꾸는 결정이라 리팩토링 범위 밖으로     │
+        │ 두었다. 정책이 정해지면 이 클래스 안에서 처리하면 된다.            │
+        └───────────────────────────────────────────────────────────────────┘
+        """
+        if label is None:
+            return True
+        if label not in LABELS:
+            # fatal 이 아니라 warn: 무시하고 계속 도는 상황이라 치명적이지 않다.
+            # 모델이 오타 난 라벨을 뱉는 흔한 실수라서 눈에는 띄어야 한다.
+            self._node.get_logger().warn(
+                f'정의되지 않은 라벨이라 무시합니다: {label!r} (허용: {LABELS})')
+            return True
+
+        # infer() 가 도는 사이에 종료가 시작됐을 수 있다 → 발행 직전에 확인.
+        if is_shutting_down(self._stop_event):
+            return False
+
+        try:
+            # 라벨이 바뀔 때만 로그. 매 프레임 찍으면 초당 20줄이 쏟아진다.
+            if label != self._last_label:
+                self._node.get_logger().info(f'수신호 인식: {label}')
+                self._last_label = label
+            self._pub_gesture.publish(String(data=label))
+            self._pub_cmd_vel.publish(self._label_to_twist[label])
+        except RuntimeError:
+            # 위 검사와 발행 사이에 종료가 끼어든 경우.
+            self._stop_event.set()
+            return False
+        return True

@@ -265,3 +265,13 @@ ROS도 OpenCV도 없는 Windows 머신에서, `cv2`·`rclpy`·`cv_bridge`·메�
 3. 6장에 따라 실제 모델을 붙이고, 그 모델의 실제 추론 시간에 맞춰 `fps` 재측정
 4. 소스 주석이 "핸드오프 §4/§6/§8/§10"을 참조하는데 **그 문서가 리포지토리에 없다.** `doc/work.md`와 `doc/ml-flow.md`는 둘 다 빈 파일이다. 문서를 추가하든가 참조를 제거할 것
 5. `doc/AGENT.md`가 아직 "벤더링한 창고 월드 외에 패키지가 없다"고 적고 있다. `robot_control`보다 앞선 내용이므로 launch 전환이 끝나면 갱신할 것
+
+'''
+지금 같은 노드가 3벌 있습니다:
+
+camera_node.py — 원본
+camera_node_refactory.py — 클래스 분리, 단일 파일
+camera_node_division/ — 파일까지 분리 ← 방금 만든 것
+셋 다 노드 이름이 camera_node라 동시에 띄우면 충돌합니다. 비교가 끝나면 하나만 남기는 게 좋은데, 어느 걸 남길지는 말씀해주시면 나머지 삭제하고 bringup.launch.py와 문서까지 맞추겠습니다. 지금은 비교 중이실 것 같아 셋 다 뒀습니다.
+
+'''
