@@ -4,17 +4,34 @@
 이 파일은 cv2 도 모델도 Twist 도 직접 다루지 않는다. 그래서 import 목록에
 cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 보인다.
 
-두 개의 실행 흐름:
+세 개의 실행 흐름:
 
     [실행기 스레드]  1/fps 마다 _on_timer
         FrameSource.read() → ImagePublisher.publish() → LatestFrameQueue.put_latest()
 
-    [워커 스레드 1개]  _infer_loop
+    [추론 워커 1개]  _infer_loop
         LatestFrameQueue.get() → GestureInference.infer() → GestureCommandPublisher.publish()
+        → take_render_payload() 로 결과를 꺼내 렌더 워커에게 넘기고 깨운다
 
-워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
+    [렌더 워커 1개]  _render_loop
+        _render_cv 에서 대기 → GestureInference.show(payload) → 다시 대기
+
+추론 워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
 라벨은 이벤트가 아니라 상태(STOP/FORWARD/...)라서, 낡은 라벨이 최신 라벨을 덮으면
 STOP 다음에 FORWARD 가 나가는 사고가 된다.
+
+렌더를 추론 워커에서 분리한 이유: GUI 갱신이 느리면 추론 처리율이 그만큼 깎인다.
+분리하되 **자유 실행이 아니라 신호 기반**이다 — 아무도 상태를 갱신하지 않았는데 다시
+그려봐야 같은 화면이므로, 추론 주기에 한 번만 그린다.
+
+두 워커가 상태를 공유하지 않는 이유(중요): 렌더가 추론 객체 내부를 직접 읽으면
+레이스가 난다(자세한 것은 inference.py 의 RenderPayload 주석 참고). 그래서 추론이
+끝난 뒤 결과를 **불변 묶음으로 떠서 넘기고**, 렌더는 그 묶음만 본다. 넘긴 뒤 추론은
+그 프레임을 다시 건드리지 않으므로 렌더가 그리는 동안 겹쳐 돌아도 안전하다.
+
+깨우는 시점이 infer() 뒤인데도 처리율이 안 깎이는 이유: notify 는 락을 μs 만 쥐고
+놓으므로 추론 워커는 곧바로 다음 프레임으로 넘어간다. 렌더가 그리는 시간은 그
+다음 infer() 안에 묻힌다.
 
 발행: image_webcam (sensor_msgs/Image, bgr8), gesture (std_msgs/String),
       cmd_vel_gesture (geometry_msgs/Twist)
@@ -104,6 +121,20 @@ class CameraNode(Node):
         self._inference = None
         self._infer_thread = None
         self._render_thread = None
+
+        # 추론 워커 → 렌더 워커로 결과를 넘기는 한 칸짜리 슬롯 + 그 신호.
+        #
+        # 슬롯이 따로 필요한 이유: notify() 는 대기 중인 스레드가 없으면 그냥 사라진다.
+        # 렌더가 아직 이전 화면을 그리는 중에 온 notify 를 놓치지 않으려면 "그릴 게
+        # 밀려 있다"는 사실이 남아 있어야 한다. payload 자체가 그 표시를 겸한다
+        # (None 이 아니면 그릴 게 있다).
+        #
+        # 한 칸인 이유: 렌더가 밀린 동안 추론이 3번 돌았어도 그릴 것은 최신 결과
+        # 하나뿐이다. LatestFrameBuffer 가 프레임을 다루는 방식과 같다.
+        # 낡은 payload 를 덮어써도 안전하다 — 렌더가 이미 꺼내 간 것은 자기 지역
+        # 변수로 참조를 들고 있어서 살아 있다.
+        self._render_cv = threading.Condition()
+        self._render_payload = None
         if params['enable_inference']:
             self._inference = self._build_inference()
             self._inference.load_model()    # 워커 시작 전에 1회 (무거운 초기화)
@@ -212,13 +243,39 @@ class CameraNode(Node):
         if self._swap_buffer.put_latest(frame):
             self._metrics.record_drop()
 
-
-    # ------------------------------------------------------ 워커 스레드 (추론)
+    # ------------------------------------------------- 워커 스레드 (추론/렌더)
 
     def _render_loop(self):
-        """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 '렌더링'만 한다."""
+        """렌더 워커 본체. 추론 워커가 깨울 때만 한 번 그리고 다시 잠든다."""
         while not self._stop_event.is_set():
-            self._inference.show()
+            with self._render_cv:
+                # wait_for 로 조건을 다시 검사하는 이유: notify 없이 깨어나는 경우
+                # (spurious wakeup)에 그냥 그리면 안 되기 때문.
+                # timeout 을 두는 이유: notify 를 한 번도 못 받아도 WORKER_POLL_SEC 마다
+                # 깨어나 위의 종료 플래그를 다시 본다(추론이 죽어도 매달리지 않는다).
+                self._render_cv.wait_for(
+                    lambda: self._render_payload is not None or self._stop_event.is_set(),
+                    timeout=self.WORKER_POLL_SEC)
+                if self._stop_event.is_set():
+                    break
+                if self._render_payload is None:
+                    # 타임아웃으로 깨어났다(= wait_for 가 조건 불만족으로 반환). 흔한 길이다:
+                    # 슬롯은 바로 아래에서 렌더 자신이 비우므로, 다음 추론이 끝나기 전까지는
+                    # 계속 None 이다. 추론 한 바퀴가 WORKER_POLL_SEC 보다 길거나(느린 모델)
+                    # 카메라 프레임이 끊기면 매번 여기로 온다.
+                    continue
+                # 슬롯을 비우면서 참조를 가져온다. 이 지역 변수가 살아 있는 한
+                # 추론이 슬롯을 덮어써도 이 payload 는 온전하다.
+                payload, self._render_payload = self._render_payload, None
+
+            # show() 는 락 **밖에서** 부른다. GUI 갱신은 느린데, 락을 쥔 채 그리면
+            # 추론 워커가 notify 하려고 락을 기다리다 그만큼 멈춘다.
+            try:
+                self._inference.show(payload)
+            except Exception as exc:                                 # noqa: BLE001
+                # 렌더 예외로 이 스레드가 죽어도 추론/발행은 계속돼야 한다.
+                # (GUI 코드는 외부 리포지토리 소관이라 어떤 예외가 올지 모른다)
+                self.get_logger().error(f'show() 예외: {exc}', throttle_duration_sec=1.0)
 
     def _infer_loop(self):
         """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 추론하고 라벨을 발행한다."""
@@ -234,13 +291,28 @@ class CameraNode(Node):
                 # 추론 예외로 스레드가 죽으면 이후 라벨이 영영 안 나간다 → 잡아서 계속 돈다.
                 # (모델 코드는 외부 리포지토리 소관이라 어떤 예외가 올지 모른다)
                 self.get_logger().error(f'infer() 예외: {exc}', throttle_duration_sec=1.0)
-                continue
-            # time.time() 이 아니라 monotonic: 시스템 시각이 뒤로 점프해도
-            # 음수 소요시간이 나오지 않는다.
-            self._metrics.record_inference((time.monotonic() - started) * 1000.0)
+                label = None
+            else:
+                # time.time() 이 아니라 monotonic: 시스템 시각이 뒤로 점프해도
+                # 음수 소요시간이 나오지 않는다.
+                self._metrics.record_inference((time.monotonic() - started) * 1000.0)
+
+            # 예외가 났어도 넘긴다 — 마지막 상태라도 그려야 화면이 멈춘 것처럼 안 보인다.
+            self._hand_off_render() # render스레드로 그래야 할 정보 던지기(inference객체 내에 저장된 pending정보를 가져온다{swap})
 
             if not self._command_pub.publish(label):
                 break       # 종료 감지
+
+    def _hand_off_render(self):
+        """이번 프레임의 추론 결과를 렌더 워커에게 넘기고 깨운다. 추론 스레드 전용."""
+        payload = self._inference.take_render_payload()
+        if payload is None:
+            return          # GUI 를 안 쓰는 구현체(기본 구현이 None 을 준다)
+        with self._render_cv:
+            # 낡은 payload 가 남아 있으면 그냥 덮어쓴다. 렌더가 밀렸다는 뜻이고,
+            # 그 경우 그려야 할 것은 최신 것 하나뿐이다.
+            self._render_payload = payload
+            self._render_cv.notify()
 
     # ------------------------------------------------------------------ 통계
 
@@ -259,6 +331,11 @@ class CameraNode(Node):
         """워커를 멈추고 카메라 장치를 반납한다. 부품의 역순으로 정리한다."""
         self._stop_event.set()
 
+        # 플래그만 세우면 렌더 워커는 wait_for 의 timeout 이 끝날 때까지 자고 있다.
+        # 깨워 줘야 곧바로 종료 플래그를 보고 빠져나온다.
+        with self._render_cv:
+            self._render_cv.notify_all()
+
         if self._infer_thread is not None:
             # 진행 중인 infer() 한 번(느려도 수백 ms)이 끝날 여유를 준다.
             self._infer_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)
@@ -266,6 +343,16 @@ class CameraNode(Node):
                 # daemon=True 라서 프로세스 종료를 막지는 않는다. 알리기만 한다.
                 self.get_logger().warn('추론 워커가 제때 끝나지 않아 그대로 종료합니다.')
             self._infer_thread = None
+
+        if self._render_thread is not None:
+            self._render_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)
+            if self._render_thread.is_alive():
+                self.get_logger().warn('렌더 워커가 제때 끝나지 않아 그대로 종료합니다.')
+            self._render_thread = None
+
+        if self._inference is not None:
+            # 렌더 워커를 join 한 **뒤에** 부른다. 그려는 중에 창을 닫으면 안 된다.
+            self._inference.close()
 
         self._source.release()
         return super().destroy_node()
