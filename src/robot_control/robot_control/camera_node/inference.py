@@ -12,21 +12,20 @@ doc/design.md: 카메라 기반 이미지 프로세싱은 별도 리포지토리
 node.py 의 _build_inference() 에서 만들어 주면 된다.
 """
 
-import time
-
 # 2026-07-28-JaeSeong
 # package install 은 setup_infer_env.py 를 실행
 # ===================================================================================
 from collections import deque, namedtuple
 from pathlib import Path
+import time
 
 import numpy as np
+from robot_control.vision_hand.capture.extractor import FeatureExtractor, HAND_DIM
+from robot_control.vision_hand.inference.predict import load_model as load_signal_model
+from robot_control.vision_hand.inference.predict import SignalStabilizer
+from robot_control.vision_hand.inference.ui import Hud
 import torch
 
-from robot_control.vision_hand.capture.extractor import HAND_DIM, FeatureExtractor, draw_detections   # + 신규
-from robot_control.vision_hand.inference.predict import SignalStabilizer             # + 신규
-from robot_control.vision_hand.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
-from robot_control.vision_hand.inference.ui import Hud                               # HUD 렌더러(cv2 창)
 
 # 추론 스레드 → 렌더 스레드로 넘기는 한 프레임분 결과.
 #
@@ -54,7 +53,7 @@ RenderPayload = namedtuple(
 # 주의: --symlink-install 전제다. resolve() 가 심링크를 따라 src/ 로 되돌아가야 이 경로가 맞는다.
 #       심링크 없는 일반 빌드로 바꾸면 setup.py data_files 에 models/ 를 넣고
 #       get_package_share_directory('robot_control') 기준으로 다시 잡아야 한다.
-MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "sign_classifier.pt"
+MODEL_PATH = Path(__file__).resolve().parents[2] / 'models' / 'sign_classifier.pt'
 
 # signal-vision 라벨 -> LABELS 매핑. 없는 키(back/slow/idle)는 .get()이 알아서 None.
 LABEL_MAP = {
@@ -64,6 +63,7 @@ LABEL_MAP = {
     'right_go': 'RIGHT',
 }
 # ===================================================================================
+
 
 class InferenceBase:
     """
@@ -146,6 +146,10 @@ class InferenceBase:
         인자:
             payload: take_render_payload() 의 반환값. None 이 올 수 있다.
 
+        반환:
+            True  — 사용자가 창에서 종료를 요청했다(q/ESC). 호출부가 노드를 내린다.
+            False/None — 계속 진행.
+
         스레드 계약: 이 메서드만 렌더 스레드에서 불린다. load_model()/infer() 이
             쓰는 객체(MediaPipe 추출기, 모델, 안정화 필터)를 **절대 건드리면 안 된다** —
             그쪽은 추론 워커 1개 전용이라는 위 계약 아래 락 없이 돌고 있다.
@@ -190,7 +194,8 @@ class GestureInference(InferenceBase):
         self._model, self._labels, self._num_frames = load_signal_model(MODEL_PATH, self._device)
         self._extractor = FeatureExtractor()
         self._window = deque(maxlen=self._num_frames)
-        self._stabilizer = SignalStabilizer(threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
+        self._stabilizer = SignalStabilizer(
+            threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
         self._t0 = time.monotonic()
         # HUD 는 폰트 로더만 들고 있다(창은 첫 render 때 열린다). 창을 여는 것도 닫는 것도
         # 렌더 스레드 쪽이라, cv2 HighGUI 호출이 한 스레드에 모인다.
@@ -200,15 +205,15 @@ class GestureInference(InferenceBase):
     def infer(self, frame):
         """
         프레임 한 장을 보고 수신호 라벨을 반환한다. 워커 스레드에서 호출된다.
-    
+
         인자:
             frame: numpy.ndarray, shape=(height, width, 3), dtype=uint8, 채널 순서 BGR.
                    (OpenCV 기본 순서. RGB 가 필요하면 cv2.cvtColor 로 직접 변환)
-                                                                                                                      
+
         반환:
             LABELS 중 하나의 문자열 → 그대로 gesture 토픽으로 발행된다.
             None → 이번 프레임은 판단 불가. 아무것도 발행하지 않는다.
-    
+
         주의:
             - 여기서 오래 걸려도 캡처는 멈추지 않는다. 대신 그동안 들어온 프레임은
               버려지고 가장 최신 것만 남는다.
@@ -239,7 +244,7 @@ class GestureInference(InferenceBase):
         # 한 스레드에서만 돈다. 렌더 스레드는 _pending 을 아예 안 본다 — 조립자인
         # node.py 가 이 반환값을 받아 자기 Condition 아래에서 렌더에 건네준다.
 
-        #더블 버퍼 스왑
+        # 더블 버퍼 스왑
         payload, self._pending = self._pending, None
         return payload
 
@@ -249,25 +254,25 @@ class GestureInference(InferenceBase):
         hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
         draw_detections(frame, hand_result, pose_result)   # 렌더용 — 손/포즈 랜드마크를 프레임에 직접 그린다
         self._window.append(FeatureExtractor.vector(hand_result, pose_result))
-    
-        if len(self._window) < self._num_frames: 
+
+        if len(self._window) < self._num_frames:
             return None
-    
+
         arr = np.stack(self._window)
         pose_ratio = float((arr[:, HAND_DIM * 2:] != 0).any(axis=1).mean())
         if pose_ratio < 0.3:
             self._stabilizer.mark_person_absent(is_blurred=False)
             return None
-    
+
         x = torch.from_numpy(arr[None]).to(self._device)
         with torch.no_grad():
             raw_probs = torch.softmax(self._model(x), dim=1)[0].cpu().numpy()
         self._stabilizer.update(raw_probs, self._labels, is_blurred=False)
-    
+
         idx = self._stabilizer.confirmed_idx
         if idx is None:
             return None
-    
+
         return LABEL_MAP.get(self._labels[idx])
 
     def show(self, payload):
@@ -283,7 +288,7 @@ class GestureInference(InferenceBase):
         if payload is None:
             return False
 
-        #허재성 여기 렌더코드 떔빵인데, 기존 show_gui 함수 수정해서 해주면 됨.
+        # 허재성 여기 렌더코드 떔빵인데, 기존 show_gui 함수 수정해서 해주면 됨.
         # 확정된 신호가 있으면 초록, 없으면 붉은 기 — 헤더 색으로 한눈에 구분한다.
         header_color = (0, 220, 0) if payload.confirmed_idx is not None else (80, 80, 255)
         return self._hud.render(

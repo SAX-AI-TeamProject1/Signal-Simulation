@@ -43,7 +43,7 @@ class FrameSource:
         """
         if width <= 0 or height <= 0:
             raise ValueError(f'해상도는 0 보다 커야 합니다 (받은 값: {width}x{height})')
-        if backend not in CAPTURE_BACKENDS: # keys 대상으로 확인
+        if backend not in CAPTURE_BACKENDS:  # keys 대상으로 확인
             raise ValueError(
                 f'알 수 없는 캡처 백엔드: {backend!r} (가능: {list(CAPTURE_BACKENDS)})')
 
