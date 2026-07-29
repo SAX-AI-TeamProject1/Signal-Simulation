@@ -317,7 +317,9 @@ class CameraNode(Node):
                 self._metrics.record_inference((time.monotonic() - started) * 1000.0)
 
             # 예외가 났어도 넘긴다 — 마지막 상태라도 그려야 화면이 멈춘 것처럼 안 보인다.
-            self._hand_off_render() # render스레드로 그래야 할 정보 던지기(inference객체 내에 저장된 pending정보를 가져온다{swap})
+            # render스레드로 그래야 할 정보 던지기
+            # (inference객체 내에 저장된 pending정보를 가져온다{swap})
+            self._hand_off_render()
 
             if not self._command_pub.publish(label):
                 break       # 종료 감지

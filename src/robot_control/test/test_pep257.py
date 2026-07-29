@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pathlib import Path
+
 from ament_pep257.main import main
 import pytest
+
+# 제외 이유는 test_flake8.py 의 같은 상수 주석 참고 (벤더링한 Signal-Vision 사본).
+VENDORED = str(Path(__file__).resolve().parent.parent / 'robot_control' / 'vision_hand')
 
 
 @pytest.mark.linter
 @pytest.mark.pep257
 def test_pep257():
-    rc = main(argv=['.', 'test'])
+    rc = main(argv=['.', 'test', '--exclude', VENDORED])
     assert rc == 0, 'Found code style errors / warnings'
