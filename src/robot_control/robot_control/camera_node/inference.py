@@ -20,7 +20,7 @@ from pathlib import Path
 import time
 
 import numpy as np
-from robot_control.vision_hand.capture.extractor import FeatureExtractor, HAND_DIM
+from robot_control.vision_hand.capture.extractor import FeatureExtractor, HAND_DIM, draw_detections
 from robot_control.vision_hand.inference.predict import load_model as load_signal_model
 from robot_control.vision_hand.inference.predict import SignalStabilizer
 from robot_control.vision_hand.inference.ui import Hud
