@@ -45,9 +45,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from src.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
-from src.inference.predict import SignalStabilizer             # + 신규
-from src.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
+from robot_control.vision_hand.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
+from robot_control.vision_hand.inference.predict import SignalStabilizer             # + 신규
+from robot_control.vision_hand.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
 
 MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "sign_classifier.pt"
 
