@@ -4,7 +4,7 @@
 이 파일은 cv2 도 모델도 Twist 도 직접 다루지 않는다. 그래서 import 목록에
 cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 보인다.
 
-두 개의 실행 흐름:
+세 개의 실행 흐름:
 
     [실행기 스레드]  1/fps 마다 _on_timer
         FrameSource.read() → ImagePublisher.publish() → LatestFrameQueue.put_latest()
@@ -12,9 +12,25 @@ cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 
     [워커 스레드 1개]  _infer_loop
         LatestFrameQueue.get() → GestureInference.infer() → GestureCommandPublisher.publish()
 
+    [렌더 스레드 1개]  _render_loop  (show_window:=true 일 때만)
+        GestureInference.show() 를 계속 폴링해서 창을 띄운다.
+
 워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
 라벨은 이벤트가 아니라 상태(STOP/FORWARD/...)라서, 낡은 라벨이 최신 라벨을 덮으면
 STOP 다음에 FORWARD 가 나가는 사고가 된다.
+
+렌더를 추론 스레드에 같이 넣지 않고 별도 스레드로 뺀 이유: cv2.imshow/waitKey 는
+그 자체로 GUI 이벤트를 처리하느라 수 ms~수십 ms 가 걸릴 수 있는데, 그걸 추론 스레드에서
+부르면 딱 그만큼 다음 프레임 추론이 밀린다. infer() 는 매 프레임 결과(라벨/확률/프레임)를
+GestureInference 내부의 한 칸 버퍼에 채워 넣기만 하고, 화면에 실제로 그리는 건 별도
+렌더 스레드가 그 버퍼를 자기 페이스대로 꺼내(show()) 하게 분리했다.
+
+(별도 렌더 스레드 대신 실행기 스레드의 타이머로 돌리는 방식도 시도해 봤다 — cv2 의 GUI
+백엔드가 Qt5(cv2.getBuildInformation() 로 확인)라서 "GUI는 자신을 만든 스레드에서만"
+이라는 제약을 만족시키려는 목적이었다. 하지만 화면 깨짐/프레임 드랍 증상이 그 변경
+전후로 동일하게 재현돼서, 원인이 스레드 모델이 아닌 다른 곳(웹캠 패스스루 등)일 가능성이
+높다고 보고 이 스레드 방식으로 되돌렸다 — 원인이 확실해지기 전까지는 구조를 자꾸
+바꾸지 않는다.)
 
 발행: image_webcam (sensor_msgs/Image, bgr8), gesture (std_msgs/String),
       cmd_vel_gesture (geometry_msgs/Twist)
@@ -103,6 +119,7 @@ class CameraNode(Node):
         self._swap_buffer = LatestFrameBuffer()
         self._inference = None
         self._infer_thread = None
+        self._render_thread = None
         if params['enable_inference']:
             self._inference = self._build_inference()
             self._inference.load_model()    # 워커 시작 전에 1회 (무거운 초기화)
@@ -111,6 +128,11 @@ class CameraNode(Node):
             #              False 면 무한 루프인 워커 때문에 프로세스가 안 죽는다.
             self._infer_thread = threading.Thread(target=self._infer_loop, daemon=True)
             self._infer_thread.start()
+
+            if params['show_window']:
+                # 추론 스레드와 분리(파일 상단 설명 참고) — GUI 호출이 추론을 지연시키지 않는다.
+                self._render_thread = threading.Thread(target=self._render_loop, daemon=True)
+                self._render_thread.start()
 
         # ── 타이머 2개 ───────────────────────────────────────────────────
         self._timer = self.create_timer(1.0 / params['fps'], self._on_timer)
@@ -148,6 +170,9 @@ class CameraNode(Node):
         self.declare_parameter('capture_backend', 'v4l2')
         # 추론을 끄면 순수 카메라 노드로 동작한다(카메라만 검증할 때 사용).
         self.declare_parameter('enable_inference', True)
+        # 추론 결과(손/포즈 랜드마크 + 확률 패널)를 창으로 띄울지. enable_inference:=false 면
+        # 무시된다. 디스플레이 없는 헤드리스 배포(bringup 등)에서는 false로 꺼야 한다.
+        self.declare_parameter('show_window', True)
         # 이미지 토픽 발행. 기본 off — 이유는 image_publisher.py 독스트링 참고.
         self.declare_parameter('publish_image', False)
         # 처리량/유실 통계를 몇 초마다 찍을지. 0 이하면 끔.
@@ -157,7 +182,7 @@ class CameraNode(Node):
         self.declare_parameter('angular_speed', 0.5)        # LEFT/RIGHT 회전 속도 (rad/s)
 
         names = ('device_id', 'frame_width', 'frame_height', 'fps', 'frame_id',
-                 'capture_backend', 'enable_inference', 'publish_image',
+                 'capture_backend', 'enable_inference', 'show_window', 'publish_image',
                  'stats_period', 'linear_speed', 'angular_speed')
         params = {name: self.get_parameter(name).value for name in names}
 
@@ -233,6 +258,27 @@ class CameraNode(Node):
             if not self._command_pub.publish(label):
                 break       # 종료 감지
 
+    # ------------------------------------------------------------------ 렌더 스레드 (창 표시)
+
+    def _render_loop(self):
+        """
+        렌더 스레드 본체. GestureInference.show() 를 계속 폴링해서 창을 갱신한다.
+
+        추론 스레드와 완전히 분리되어 있다 — show() 는 infer() 가 채워 둔 최신 결과를
+        읽기만 하므로, 여기서 GUI 이벤트 처리가 몇 ms 걸려도 추론 처리율에는 영향이 없다.
+        """
+        while not self._stop_event.is_set():
+            try:
+                quit_requested = self._inference.show()
+            except Exception as exc:                                    # noqa: BLE001
+                # 디스플레이가 없는 환경(헤드리스) 등에서 cv2 가 예외를 던질 수 있다.
+                # 렌더는 디버그용 부가 기능이므로, 죽이더라도 노드 자체는 계속 돈다.
+                self.get_logger().error(f'show() 예외 — 렌더 스레드를 멈춥니다: {exc}')
+                return
+            if quit_requested:
+                self.get_logger().info('디버그 창 종료 요청(q/ESC) — 렌더만 멈추고 노드는 계속 동작합니다.')
+                return
+
     # ------------------------------------------------------------------ 통계
 
     def _log_stats(self):
@@ -257,6 +303,15 @@ class CameraNode(Node):
                 # daemon=True 라서 프로세스 종료를 막지는 않는다. 알리기만 한다.
                 self.get_logger().warn('추론 워커가 제때 끝나지 않아 그대로 종료합니다.')
             self._infer_thread = None
+
+        if self._render_thread is not None:
+            self._render_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)
+            if self._render_thread.is_alive():
+                self.get_logger().warn('렌더 스레드가 제때 끝나지 않아 그대로 종료합니다.')
+            self._render_thread = None
+
+        if self._inference is not None:
+            self._inference.close()   # show() 가 연 창 등을 정리 (Hud.close())
 
         self._source.release()
         return super().destroy_node()
