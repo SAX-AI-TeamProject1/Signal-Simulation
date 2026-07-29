@@ -26,6 +26,14 @@ robot_control/robot_control/vision_hand/ 로 그대로 복사한다(vendor). cam
 모든 `from src.` / `import src.` 를 `from robot_control.vision_hand.` /
 `import robot_control.vision_hand.` 로 일괄 치환해서, vision_hand가 pip src 패키지 없이도
 완전히 자기 완결적으로 동작하게 만든다.
+
+마지막으로 torch/mediapipe/numpy/opencv-contrib-python을 **시스템 python3.12**에도
+설치한다. .venv-infer 는 위 벤더 복사의 "출처"일 뿐 실행 환경이 아니다 — colcon이
+빌드하는 console_scripts(ros2 run이 실행하는 것)는 venv가 활성화되어 있어도 항상
+시스템 python3.12로 만들어진다(colcon 자체가 시스템 파이썬으로 설치돼 있어서). 그래서
+vision_hand가 import 문 레벨에서는 자기 완결적이어도, 그 안에서 쓰는 torch/mediapipe
+같은 실제 라이브러리는 시스템 python3.12에도 있어야 `ros2 run robot_control camera_node`
+가 동작한다. 이미 설치돼 있으면 건너뛰므로 여러 머신에서 반복 실행해도 안전하다.
 """
 import re
 import shutil
@@ -33,7 +41,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from setup_repo_venv import install, venv_python
+from setup_repo_venv import find_latest_tag, install, venv_python
+from task_output import banner, step
 
 REPO_URL = "https://github.com/SAX-AI-TeamProject1/Signal-Vision.git"
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -70,8 +79,74 @@ def _vendor_copy() -> None:
     print(f"vendor 복사 완료: {src_pkg} -> {VENDOR_DEST} (내부 src.* import도 robot_control.vision_hand.*로 치환)")
 
 
+def _install_system_runtime_deps(ref: str) -> int:
+    """
+    torch/mediapipe/numpy/opencv-contrib-python/Signal-Vision을 시스템 python3.12에 설치한다.
+
+    이미 임포트가 되면(=이미 설치돼 있으면) 건너뛴다 — 매 머신마다, 매번 이 스크립트를
+    다시 돌려도 무거운 pip install을 반복하지 않기 위해서다.
+    """
+    check = subprocess.run([sys.executable, "-c", "import torch, mediapipe"],
+                           capture_output=True)
+    if check.returncode == 0:
+        step("시스템 python3.12에 torch/mediapipe 이미 설치됨 — 건너뜀")
+        return 0
+
+    step("시스템 python3.12에 torch/mediapipe 없음 — 설치 시작 (sudo 비밀번호 필요할 수 있음)")
+
+    if subprocess.run([sys.executable, "-m", "pip", "--version"],
+                      capture_output=True).returncode != 0:
+        step("시스템 pip 없음 — apt install python3-pip")
+        if subprocess.run(["sudo", "apt", "install", "-y", "python3-pip"]).returncode != 0:
+            banner(False, "python3-pip 설치 실패")
+            return 1
+
+    step("torch/numpy/opencv-contrib-python/mediapipe/Signal-Vision 설치 중 (수 분 소요)")
+    install_cmd = [
+        "sudo", sys.executable, "-m", "pip", "install",
+        "--break-system-packages", "--ignore-installed",
+        "torch", "numpy==1.26.4", "opencv-contrib-python", "mediapipe",
+        f"git+{REPO_URL}@{ref}",
+    ]
+    if subprocess.run(install_cmd).returncode != 0:
+        banner(False, "시스템 라이브러리 설치 실패")
+        return 1
+
+    # 위 설치가 setuptools를 80 이상으로 끌어올리면 colcon-core(<80 요구)가 깨진다.
+    # (실제로 겪은 문제: colcon build가 "error: option --uninstall not recognized"로 실패)
+    step("setuptools 버전 고정 (colcon-core 호환, <80)")
+    fix_cmd = [
+        "sudo", sys.executable, "-m", "pip", "install",
+        "--break-system-packages", "--ignore-installed", "setuptools<80,>=30.3.0",
+    ]
+    if subprocess.run(fix_cmd).returncode != 0:
+        banner(False, "setuptools 재고정 실패")
+        return 1
+
+    banner(True, "시스템 python3.12 런타임 라이브러리 설치 완료")
+    return 0
+
+
+def _cleanup_venv() -> None:
+    """
+    .venv-infer 는 vendor 복사의 "재료"일 뿐 실행 환경이 아니라서(파일 상단 설명 참고),
+    이 스크립트가 성공적으로 끝나면 더 남아 있을 이유가 없다. 다음에 이 스크립트를
+    다시 돌리면 setup_repo_venv.install() 이 없는 걸 보고 알아서 새로 만든다.
+    """
+    if VENV_DIR.exists():
+        step(f"{VENV_DIR.name} 정리 중 (vendor 복사는 이미 끝났으므로 더 필요 없음)")
+        shutil.rmtree(VENV_DIR)
+
+
 if __name__ == "__main__":
     ref = sys.argv[1] if len(sys.argv) > 1 else None
+    if ref is None:
+        step("최신 태그 확인 중")
+        ref = find_latest_tag(REPO_URL)
+        if ref is None:
+            raise SystemExit("최신 태그를 확인하지 못했습니다 (네트워크/Github 인증 확인 필요.)")
+        step(f"최신 태그: {ref}")
+
     rc = install(
         REPO_URL, VENV_DIR,
         verify_hint="from src.capture.extractor import FeatureExtractor; print('OK')",
@@ -79,4 +154,7 @@ if __name__ == "__main__":
     )
     if rc == 0:
         _vendor_copy()
+        rc = _install_system_runtime_deps(ref)
+    if rc == 0:
+        _cleanup_venv()
     raise SystemExit(rc)

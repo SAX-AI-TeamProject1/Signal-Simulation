@@ -23,10 +23,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from src.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
-from src.inference.predict import SignalStabilizer             # + 신규
-from src.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
-from src.inference.ui import Hud                               # HUD 렌더러(cv2 창)
+from robot_control.vision_hand.capture.extractor import HAND_DIM, FeatureExtractor, draw_detections   # + 신규
+from robot_control.vision_hand.inference.predict import SignalStabilizer             # + 신규
+from robot_control.vision_hand.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
+from robot_control.vision_hand.inference.ui import Hud                               # HUD 렌더러(cv2 창)
 
 # 추론 스레드 → 렌더 스레드로 넘기는 한 프레임분 결과.
 #
@@ -247,6 +247,7 @@ class GestureInference(InferenceBase):
         """infer() 의 실제 본문. 계약과 주의사항은 infer() 독스트링 참고."""
         timestamp_ms = int((time.monotonic() - self._t0) * 1000)
         hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
+        draw_detections(frame, hand_result, pose_result)   # 렌더용 — 손/포즈 랜드마크를 프레임에 직접 그린다
         self._window.append(FeatureExtractor.vector(hand_result, pose_result))
     
         if len(self._window) < self._num_frames: 
