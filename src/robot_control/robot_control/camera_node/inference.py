@@ -26,6 +26,7 @@ import torch
 from src.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
 from src.inference.predict import SignalStabilizer             # + 신규
 from src.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
+from src.inference.function import show_gui as cam_renderer  # 이름 충돌 회피용 alias
 
 # 가중치는 패키지 루트의 models/ 에 있다(launch/, urdf/, config/ 와 형제).
 #   .../src/robot_control/robot_control/camera_node/inference.py
@@ -189,6 +190,7 @@ class GestureInference(InferenceBase):
         return LABEL_MAP.get(self._labels[idx])
 
     def show(self):
+        cam_renderer()
         """
         추론된 결과를 GUI로 볼 수 있게
         """

@@ -103,6 +103,7 @@ class CameraNode(Node):
         self._swap_buffer = LatestFrameBuffer()
         self._inference = None
         self._infer_thread = None
+        self._render_thread = None
         if params['enable_inference']:
             self._inference = self._build_inference()
             self._inference.load_model()    # 워커 시작 전에 1회 (무거운 초기화)
@@ -110,7 +111,9 @@ class CameraNode(Node):
             # daemon=True: 메인이 끝날 때 이 스레드가 남아 있어도 같이 죽는다.
             #              False 면 무한 루프인 워커 때문에 프로세스가 안 죽는다.
             self._infer_thread = threading.Thread(target=self._infer_loop, daemon=True)
+            self._render_thread = threading.Thread(target=self._render_loop, daemon=True)
             self._infer_thread.start()
+            self._render_thread.start()
 
         # ── 타이머 2개 ───────────────────────────────────────────────────
         self._timer = self.create_timer(1.0 / params['fps'], self._on_timer)
@@ -209,7 +212,13 @@ class CameraNode(Node):
         if self._swap_buffer.put_latest(frame):
             self._metrics.record_drop()
 
+
     # ------------------------------------------------------ 워커 스레드 (추론)
+
+    def _render_loop(self):
+        """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 '렌더링'만 한다."""
+        while not self._stop_event.is_set():
+            self._inference.show()
 
     def _infer_loop(self):
         """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 추론하고 라벨을 발행한다."""
