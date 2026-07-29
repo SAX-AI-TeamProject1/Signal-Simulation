@@ -5,15 +5,12 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
-                            SetEnvironmentVariable)
-from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (Command, LaunchConfiguration, PathJoinSubstitution,
-                                  PythonExpression)
+from launch.actions import (DeclareLaunchArgument, ExecuteProcess,
+                            SetEnvironmentVariable, Shutdown)
+from launch.conditions import IfCondition, UnlessCondition
+from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -116,19 +113,25 @@ def generate_launch_description():
         )
         robot_nodes += [rsp, spawn, twist_mux]
 
-    # 2) Gazebo(gz sim) 실행. ros_gz_sim 이 제공하는 표준 런치를 include.
-    #    gz_args: 월드 파일 + '-r'(즉시 시뮬 시작). headless 면 '-s'(서버 전용) 추가.
-
-    gz_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution([FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'])
-        ),  # ros_gz_sim 패키지 안에 gz sim 해주는 그런게 있다네요
-        launch_arguments={
-            # headless=true 면 ' -s'(서버 전용, GUI 없음)를 뒤에 붙인다.
-            'gz_args': [world, ' -r -v 4 --render-engine ogre',
-                        PythonExpression(["' -s' if '", headless, "' == 'true' else ''"])],
-            'on_exit_shutdown': 'true',
-        }.items(),
+    # 2) Gazebo(gz sim) 실행.
+    #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
+    #    'ruby <gz경로> sim <gz_args> --force-version 8' 을 shell=True 로 감싸 돌리는
+    #    래퍼인데, 이 래퍼를 통해 실행하면 이 월드(mesh 수백 개)에서 몇 초 뒤 gz sim 이
+    #    크래시(SIGSEGV 등) 없이 조용히 종료돼 버리는 문제가 있었다 — camera_node 유무,
+    #    -v 4 유무와 무관하게 재현됐다. 반면 태스크 2(run_gazebo.sh)처럼 'gz sim' 을
+    #    ExecuteProcess 로 직접 부르면(ruby/shell 래핑 없이) 문제없이 계속 돈다. 그래서
+    #    여기서도 태스크 2와 동일한 방식으로 직접 실행한다.
+    gz_sim_gui = ExecuteProcess(
+        condition=UnlessCondition(headless),
+        cmd=['gz', 'sim', '--render-engine', 'ogre', world, '-r'],
+        output='screen',
+        on_exit=Shutdown(),
+    )
+    gz_sim_headless = ExecuteProcess(
+        condition=IfCondition(headless),
+        cmd=['gz', 'sim', '-s', '--render-engine', 'ogre', world, '-r'],
+        output='screen',
+        on_exit=Shutdown(),
     )
 
     # 4) ros_gz_bridge: ROS 2 ↔ Gazebo 메시지 변환.
@@ -182,7 +185,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim, ground, bridge, camera])
+                             [gz_sim_gui, gz_sim_headless, ground, bridge, camera])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
