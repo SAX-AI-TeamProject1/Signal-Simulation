@@ -12,21 +12,19 @@ doc/design.md: 카메라 기반 이미지 프로세싱은 별도 리포지토리
 node.py 의 _build_inference() 에서 만들어 주면 된다.
 """
 
-import time
-
 # 2026-07-28-JaeSeong
 # package install 은 setup_infer_env.py 를 실행
 # ===================================================================================
 from collections import deque, namedtuple
 from pathlib import Path
+import time
 
 import numpy as np
+from robot_control.vision_hand.capture.extractor import FeatureExtractor, HAND_DIM
+from robot_control.vision_hand.inference.predict import load_model as load_signal_model
+from robot_control.vision_hand.inference.predict import SignalStabilizer
+from robot_control.vision_hand.inference.ui import Hud
 import torch
-
-from src.capture.extractor import HAND_DIM, FeatureExtractor   # + 신규
-from src.inference.predict import SignalStabilizer             # + 신규
-from src.inference.predict import load_model as load_signal_model  # 이름 충돌 회피용 alias
-from src.inference.ui import Hud                               # HUD 렌더러(cv2 창)
 
 # 추론 스레드 → 렌더 스레드로 넘기는 한 프레임분 결과.
 #
@@ -145,6 +143,10 @@ class InferenceBase:
 
         인자:
             payload: take_render_payload() 의 반환값. None 이 올 수 있다.
+
+        반환:
+            True  — 사용자가 창에서 종료를 요청했다(q/ESC). 호출부가 노드를 내린다.
+            False/None — 계속 진행.
 
         스레드 계약: 이 메서드만 렌더 스레드에서 불린다. load_model()/infer() 이
             쓰는 객체(MediaPipe 추출기, 모델, 안정화 필터)를 **절대 건드리면 안 된다** —

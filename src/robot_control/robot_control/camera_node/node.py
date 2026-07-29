@@ -15,6 +15,7 @@ cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 
 
     [렌더 워커 1개]  _render_loop
         _render_cv 에서 대기 → GestureInference.show(payload) → 다시 대기
+        show() 가 True 를 주면(HUD 창에서 q/ESC) 노드 종료를 요청한다
 
 추론 워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
 라벨은 이벤트가 아니라 상태(STOP/FORWARD/...)라서, 낡은 라벨이 최신 라벨을 덮으면
@@ -271,11 +272,29 @@ class CameraNode(Node):
             # show() 는 락 **밖에서** 부른다. GUI 갱신은 느린데, 락을 쥔 채 그리면
             # 추론 워커가 notify 하려고 락을 기다리다 그만큼 멈춘다.
             try:
-                self._inference.show(payload)
+                quit_requested = self._inference.show(payload)
             except Exception as exc:                                 # noqa: BLE001
                 # 렌더 예외로 이 스레드가 죽어도 추론/발행은 계속돼야 한다.
                 # (GUI 코드는 외부 리포지토리 소관이라 어떤 예외가 올지 모른다)
                 self.get_logger().error(f'show() 예외: {exc}', throttle_duration_sec=1.0)
+                continue
+
+            if quit_requested:
+                # HUD 창에서 q/ESC 를 눌렀다. 창만 닫으면 창 없이 계속 도는 좀비가 되므로
+                # 노드째 내린다. 발행이 끊기면 twist_mux 가 0.5초 뒤 gesture 소스를
+                # 버리고 로봇을 세우므로, 이 종료 자체는 안전한 쪽으로 떨어진다.
+                self.get_logger().info('HUD 창에서 q/ESC 입력 — 노드를 종료합니다.')
+                self._request_shutdown()
+                break
+
+    def _request_shutdown(self):
+        """워커 스레드에서 노드 종료를 요청한다."""
+        self._stop_event.set()
+        # stop_event 만으로는 부족하다. rclpy.spin() 은 그 플래그를 보지 않으므로
+        # 컨텍스트를 내려야 spin 이 ExternalShutdownException 으로 빠져나오고,
+        # main 의 finally 가 destroy_node 까지 돌린다.
+        if rclpy.ok():
+            rclpy.shutdown()
 
     def _infer_loop(self):
         """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 추론하고 라벨을 발행한다."""
