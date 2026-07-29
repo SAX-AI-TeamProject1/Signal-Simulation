@@ -26,6 +26,7 @@ from robot_control.vision_hand.inference.predict import SignalStabilizer
 from robot_control.vision_hand.inference.ui import Hud
 import torch
 
+
 # 추론 스레드 → 렌더 스레드로 넘기는 한 프레임분 결과.
 #
 # 왜 튜플로 묶어서 넘기는가:
@@ -251,6 +252,7 @@ class GestureInference(InferenceBase):
         """infer() 의 실제 본문. 계약과 주의사항은 infer() 독스트링 참고."""
         timestamp_ms = int((time.monotonic() - self._t0) * 1000)
         hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
+        draw_detections(frame, hand_result, pose_result)   # 렌더용 — 손/포즈 랜드마크를 프레임에 직접 그린다
         self._window.append(FeatureExtractor.vector(hand_result, pose_result))
 
         if len(self._window) < self._num_frames:

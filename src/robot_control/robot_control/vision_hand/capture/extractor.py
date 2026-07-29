@@ -33,7 +33,7 @@ import mediapipe as mp # 손/포즈 랜드마크 추출 프레임워크
 from mediapipe.tasks import python as mp_tasks # Tasks API 공통 옵션(BaseOptions 등)
 from mediapipe.tasks.python import vision # HandLandmarker, PoseLandmarker 등 비전 태스크
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 HAND_MODEL_URL = (
     "https://storage.googleapis.com/mediapipe-models/hand_landmarker/"
