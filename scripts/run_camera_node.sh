@@ -3,31 +3,35 @@
 # Unit check for the webcam -> gesture inference -> /gesture + cmd_vel_gesture path.
 # Used by VS Code task "6. camera node 단독 실행 (웹캠 + 제스처 추론만)".
 #
-# Why a script instead of a single task command: this needs 3 steps in one shell —
-# ROS 2 env, workspace overlay, then the .venv-infer interpreter.
-#
-# Why .venv-infer and NOT .venv-perception:
-#   camera_node/inference.py imports src.capture.extractor and src.inference.predict.
-#   Those live in Signal-Vision (.venv-infer, task 4). Signal-transport-perception
-#   (.venv-perception, task 5) only ships src/infer.py (YOLO) — different API.
-#   .venv-infer also pins numpy 1.26.4, matching the numpy that ROS Jazzy's
-#   cv_bridge boost extension was compiled against; .venv-perception's numpy 2.3.5
-#   makes `from cv_bridge import CvBridge` fail outright.
+# Why system python3.12 and NOT .venv-infer/.venv-perception:
+#   camera_node/inference.py imports robot_control.vision_hand.capture.extractor and
+#   robot_control.vision_hand.inference.predict — a vendored copy of Signal-Vision's
+#   src/ living inside this package (see scripts/setup_infer_env.py), not the pip
+#   package itself. So the only runtime requirement is that system python3.12 has
+#   torch/mediapipe/numpy/opencv-contrib-python installed directly (see that script's
+#   header comment for the install command) — no venv needed, and none would help:
+#   colcon always builds/runs ament_python console scripts with system python3.12
+#   regardless of which venv is active, so `ros2 run` / this script could never reach
+#   a venv's site-packages anyway.
+#   .venv-perception is a dead end here on top of that: Signal-transport-perception
+#   needs opencv-python, mediapipe needs opencv-contrib-python — different pip
+#   packages that both install to `cv2/`, so they can't share one environment.
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-VENV_PY="$REPO_ROOT/.venv-infer/bin/python"
-if [ ! -x "$VENV_PY" ]; then
-    echo "[run_camera_node] .venv-infer 가 없습니다." >&2
-    echo "[run_camera_node] 먼저 태스크 '4. Vision 패키지 설치' 를 실행하세요." >&2
-    exit 1
-fi
-
 if [ ! -f "$REPO_ROOT/install/setup.bash" ]; then
     echo "[run_camera_node] install/setup.bash 가 없습니다." >&2
     echo "[run_camera_node] 먼저 태스크 '1. 워크스페이스 빌드' 를 실행하세요." >&2
+    exit 1
+fi
+
+if ! python3 -c "import torch, mediapipe" >/dev/null 2>&1; then
+    echo "[run_camera_node] 시스템 python3.12에 torch/mediapipe가 없습니다." >&2
+    echo "[run_camera_node] 태스크 '4. Vision 패키지 설치'를 실행해 robot_control/vision_hand를 최신화한 뒤," >&2
+    echo "[run_camera_node] torch/mediapipe/numpy==1.26.4/opencv-contrib-python을 시스템 python3.12에 pip 설치하세요" >&2
+    echo "[run_camera_node] (scripts/setup_infer_env.py 헤더 주석 참고)." >&2
     exit 1
 fi
 
@@ -51,4 +55,4 @@ fi
 
 # 인자는 그대로 넘긴다. 예: 토픽 리맵을 걸어 bringup 과 같은 배선으로 확인
 #   ./scripts/run_camera_node.sh --ros-args -r cmd_vel_gesture:=/robot1/cmd_vel_gesture
-exec "$VENV_PY" -m robot_control.camera_node.node "${EXTRA_ARGS[@]}" "$@"
+exec ros2 run robot_control camera_node "${EXTRA_ARGS[@]}" "$@"
