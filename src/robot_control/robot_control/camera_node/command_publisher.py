@@ -8,8 +8,8 @@ config/twist_mux.yaml 은 이 변환을 별도 command_node 가 맡는 것으로
 """
 
 from geometry_msgs.msg import Twist
-from robot_control.camera_node_division.labels import LABEL_MOTION, LABELS
-from robot_control.camera_node_division.shutdown import is_shutting_down
+from robot_control.camera_node.labels import LABEL_MOTION, LABELS
+from robot_control.camera_node.shutdown import is_shutting_down
 from std_msgs.msg import String
 
 

@@ -8,7 +8,7 @@
 
 from cv_bridge import CvBridge
 from rclpy.qos import qos_profile_sensor_data
-from robot_control.camera_node_division.shutdown import is_shutting_down
+from robot_control.camera_node.shutdown import is_shutting_down
 from sensor_msgs.msg import Image
 
 
@@ -42,6 +42,7 @@ class ImagePublisher:
             frame_id: Image 헤더의 frame_id (tf 프레임 이름)
             enabled: False 면 publish() 가 아무 일도 하지 않는다
         """
+
         self._node = node
         self._stop_event = stop_event
         self._frame_id = frame_id
