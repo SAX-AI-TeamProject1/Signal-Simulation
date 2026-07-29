@@ -16,17 +16,23 @@ fi
 source /opt/ros/jazzy/setup.bash
 source "$REPO_ROOT/install/setup.bash"
 
-# bringup 의 camera_node 는 launch_ros 가 시스템 python3 로 띄우므로, 그 상태로는
-# src.capture / src.inference (Signal-Vision) 를 import 하지 못한다.
-# .venv-infer 의 site-packages 를 PYTHONPATH 앞에 붙여 import 가능하게 만든다.
-# .venv-perception 이 아니라 .venv-infer 인 이유는 run_camera_node.sh 주석 참고.
-# venv 가 없으면 그냥 건너뛴다 — enable_camera:=false 로 시뮬만 돌릴 수 있어야 하므로.
-VENV_SP=$(echo "$REPO_ROOT"/.venv-infer/lib/python3.*/site-packages)
-if [ -d "$VENV_SP" ]; then
-    export PYTHONPATH="$VENV_SP${PYTHONPATH:+:$PYTHONPATH}"
-else
-    echo "[run_bringup] .venv-infer 없음 → camera_node 는 실패할 수 있습니다." >&2
-    echo "[run_bringup] 시뮬만 볼 거면 enable_camera:=false 로 실행하세요." >&2
+# twist_mux 는 자작 노드가 아니라 apt 설치 패키지다(ros-jazzy-twist-mux). build_workspace.sh는
+# ros2가 이미 PATH에 있는(=이미 한 번 셋업된) 머신에서는 apt install 블록 전체를 건너뛰므로,
+# 이 패키지가 나중에 목록에 추가돼도 기존 머신엔 소급 적용이 안 된다 — 그래서 bringup이
+# 직접 쓰는 시점에 없으면 여기서 바로 설치한다. (sudo 비밀번호가 필요할 수 있다)
+if ! ros2 pkg prefix twist_mux >/dev/null 2>&1; then
+    echo "[run_bringup] twist_mux 패키지가 없습니다 — 설치합니다 (sudo 비밀번호 필요할 수 있음)." >&2
+    sudo apt-get install -y ros-jazzy-twist-mux
+    source /opt/ros/jazzy/setup.bash   # ament 인덱스 갱신 반영
+fi
+
+# bringup 의 camera_node 는 launch_ros 가 시스템 python3 로 띄운다. camera_node/inference.py 는
+# robot_control/vision_hand(벤더 복사본)를 import하므로 PYTHONPATH 조작은 필요 없다 — 다만
+# torch/mediapipe 같은 실제 라이브러리는 시스템 python3.12에 설치돼 있어야 한다
+# (scripts/setup_infer_env.py, 태스크 4가 자동으로 설치한다).
+if ! python3 -c "import torch, mediapipe" >/dev/null 2>&1; then
+    echo "[run_bringup] 시스템 python3.12에 torch/mediapipe가 없습니다 → camera_node는 실패할 수 있습니다." >&2
+    echo "[run_bringup] 태스크 '4. Vision 패키지 설치'를 먼저 실행하거나, 시뮬만 볼 거면 enable_camera:=false로 실행하세요." >&2
 fi
 
 # 이전 실행의 gz 서버가 남아 있으면 월드가 두 번 뜨므로 정리 (run_gazebo.sh 와 동일)

@@ -118,13 +118,14 @@ def generate_launch_description():
 
     # 2) Gazebo(gz sim) 실행. ros_gz_sim 이 제공하는 표준 런치를 include.
     #    gz_args: 월드 파일 + '-r'(즉시 시뮬 시작). headless 면 '-s'(서버 전용) 추가.
+
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'])
         ),  # ros_gz_sim 패키지 안에 gz sim 해주는 그런게 있다네요
         launch_arguments={
             # headless=true 면 ' -s'(서버 전용, GUI 없음)를 뒤에 붙인다.
-            'gz_args': [world, ' -r -v 4',
+            'gz_args': [world, ' -r -v 4 --render-engine ogre',
                         PythonExpression(["' -s' if '", headless, "' == 'true' else ''"])],
             'on_exit_shutdown': 'true',
         }.items(),

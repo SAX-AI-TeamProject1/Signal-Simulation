@@ -21,7 +21,7 @@ if ! command -v ros2 >/dev/null 2>&1; then
 
     sudo apt-get update
     sudo apt-get upgrade -y
-    sudo apt-get install -y ros-jazzy-desktop ros-dev-tools ros-jazzy-ros-gz ros-jazzy-rosbridge-suite
+    sudo apt-get install -y ros-jazzy-desktop ros-dev-tools ros-jazzy-ros-gz ros-jazzy-rosbridge-suite ros-jazzy-twist-mux
 fi
 
 source /opt/ros/jazzy/setup.bash
