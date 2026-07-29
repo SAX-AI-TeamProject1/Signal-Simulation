@@ -107,6 +107,41 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "6. camera node 단독 실행 (웹캠 + 제스처 추론만)",
+            "detail": "robot_control 의 camera_node 하나만 실행합니다(단위 확인). Gazebo·로봇·브릿지는 안 뜹니다. 스크립트가 ROS 2 환경 → 워크스페이스 오버레이 → .venv-infer 파이썬 순서로 알아서 잡습니다. 사전조건: 태스크 1(빌드), 태스크 4(.venv-infer).",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/run_camera_node.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "7. bringup 실행 (로봇 + Gazebo + 브릿지)",
+            "detail": "robot_control 의 bringup.launch.py 를 실행합니다 — robot_state_publisher, gz sim(navi_factory), 로봇 스폰, flat_ground, ros_gz_bridge, twist_mux, camera_node 를 한 번에. 카메라 없이 시뮬만 보려면 scripts/run_bringup.sh 에 enable_camera:=false 를 넘기면 됩니다. 사전조건: 태스크 1(빌드).",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/run_bringup.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
         }
     ]
 }

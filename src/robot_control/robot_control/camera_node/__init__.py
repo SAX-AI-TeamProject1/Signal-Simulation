@@ -20,13 +20,13 @@ camera_node_refactory.py 는 네 가지 책임을 "클래스"로 나눴지만 �
 │                                                                             │
 │  image_publisher.py    ImagePublisher                 2. 이미지 발행        │
 │                                                                             │
-│  inference.py          GestureInference               3. 추론 인터페이스    │
-│                        StubGestureInference              (rclpy 안 씀)      │
+│  inference.py          InferenceBase                  3. 추론 인터페이스    │
+│                        GestureInference                  (rclpy 안 씀)      │
 │                                                                             │
 │  command_publisher.py  GestureCommandPublisher        4. 라벨 → Twist       │
 │                                                                             │
 │  shutdown.py           is_shutting_down()             배관: 종료 판단       │
-│  frame_queue.py        LatestFrameQueue               배관: 깊이 1 큐       │
+│  swap_frame.py         LatestFrameBuffer              배관: 한 칸 버퍼      │
 │                                                                             │
 │  node.py               CameraNode, main()             조립자                │
 │                                                                             │
@@ -39,17 +39,17 @@ camera_node_refactory.py 는 네 가지 책임을 "클래스"로 나눴지만 �
       ├─▶ image_publisher.py ──┐
       ├─▶ inference.py         ├─▶ shutdown.py
       ├─▶ command_publisher.py ┘        └─▶ labels.py
-      ├─▶ frame_queue.py
+      ├─▶ swap_frame.py
       └─▶ robot_control.metrics (패키지 밖, 기존 모듈 그대로 사용)
 
 실행:
-    ros2 run robot_control camera_node_division
-    ros2 run robot_control camera_node_division --ros-args -p device_id:=1
+    ros2 run robot_control camera_node
+    ros2 run robot_control camera_node --ros-args -p device_id:=1
 
 이 패키지를 직접 import 해서 쓸 때는 각 모듈에서 가져온다. 여기서 재수출하지 않는
 이유는, 이 __init__.py 가 cv2 와 rclpy 를 전부 끌어오게 되어 "ROS 없이 FrameSource 만
 테스트한다"는 분리의 목적이 무너지기 때문이다:
 
-    from robot_control.camera_node_division.frame_source import FrameSource
-    from robot_control.camera_node_division.labels import LABELS
+    from robot_control.camera_node.frame_source import FrameSource
+    from robot_control.camera_node.labels import LABELS
 """

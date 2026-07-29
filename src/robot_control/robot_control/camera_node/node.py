@@ -20,9 +20,9 @@ STOP 다음에 FORWARD 가 나가는 사고가 된다.
       cmd_vel_gesture (geometry_msgs/Twist)
 
 실행:
-    ros2 run robot_control camera_node_division
-    ros2 run robot_control camera_node_division --ros-args -p device_id:=1
-    ros2 run robot_control camera_node_division --ros-args -p enable_inference:=false
+    ros2 run robot_control camera_node
+    ros2 run robot_control camera_node --ros-args -p device_id:=1
+    ros2 run robot_control camera_node --ros-args -p enable_inference:=false
 """
 
 import threading
@@ -31,12 +31,12 @@ import time
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from robot_control.camera_node_division.command_publisher import GestureCommandPublisher
-from robot_control.camera_node_division.frame_queue import LatestFrameQueue
-from robot_control.camera_node_division.frame_source import FrameSource
-from robot_control.camera_node_division.image_publisher import ImagePublisher
-from robot_control.camera_node_division.inference import StubGestureInference
-from robot_control.camera_node_division.shutdown import is_shutting_down
+from robot_control.camera_node.command_publisher import GestureCommandPublisher
+from robot_control.camera_node.frame_source import FrameSource
+from robot_control.camera_node.image_publisher import ImagePublisher
+from robot_control.camera_node.inference import GestureInference
+from robot_control.camera_node.shutdown import is_shutting_down
+from robot_control.camera_node.swap_frame import LatestFrameBuffer
 from robot_control.metrics import InferenceMetrics
 
 
@@ -54,7 +54,7 @@ class CameraNode(Node):
 
         params = self._declare_and_read_parameters()
 
-        # 종료 신호. 네 부품이 공유한다(누구든 컨텍스트가 죽은 걸 발견하면 set).
+        # **종료 신호. 네 부품이 공유한다(누구든 컨텍스트가 죽은 걸 발견하면 set).**
         self._stop_event = threading.Event()
 
         # 통계 수집은 robot_control/metrics.py 로 분리돼 있다(이 패키지 밖).
@@ -69,7 +69,8 @@ class CameraNode(Node):
             width=params['frame_width'],
             height=params['frame_height'],
             fps=params['fps'],
-            backend=params['capture_backend'])
+            backend=params['capture_backend'])  # 어차피 linux 환경에서 할 거라 v4l2 고정
+
         # 카메라가 요청 해상도를 거절하는 일은 흔하다. 조용히 넘어가면 나중에
         # "모델 입력 크기가 왜 다르지?" 로 시간을 버린다 → 여기서 바로 알린다.
         # (FrameSource 는 로그를 찍지 않으므로 판단은 조립자인 여기가 한다)
@@ -81,6 +82,8 @@ class CameraNode(Node):
                 f'실제 {act_w}x{act_h}. 모델 입력 크기를 실제값 기준으로 맞추세요.')
 
         # ── 부품 2: 이미지 발행 (image_publisher.py) ────────────────────
+        # 하지만, 이 퍼블리셔는 안 쓸거 같음.
+        # 추후에 pub해서 다른 프로세스에 render하게 되는 경우에 쓰기 위해 존재
         self._image_pub = ImagePublisher(
             node=self,
             stop_event=self._stop_event,
@@ -97,7 +100,7 @@ class CameraNode(Node):
             angular_speed=params['angular_speed'])
 
         # ── 부품 3: 추론 (inference.py) + 워커 스레드 ───────────────────
-        self._queue = LatestFrameQueue()
+        self._swap_buffer = LatestFrameBuffer()
         self._inference = None
         self._infer_thread = None
         if params['enable_inference']:
@@ -173,7 +176,7 @@ class CameraNode(Node):
         외부 리포지토리 모델이 준비되면 이 한 줄만 바꾼다:
             return MyHandGesture(self.get_logger())
         """
-        return StubGestureInference(self.get_logger())
+        return GestureInference(self.get_logger())
 
     # ------------------------------------------------- 실행기 스레드 (캡처)
 
@@ -203,7 +206,7 @@ class CameraNode(Node):
         if self._inference is None:
             return      # 추론 off — 순수 카메라 노드로 동작 중
 
-        if self._queue.put_latest(frame):
+        if self._swap_buffer.put_latest(frame):
             self._metrics.record_drop()
 
     # ------------------------------------------------------ 워커 스레드 (추론)
@@ -211,7 +214,7 @@ class CameraNode(Node):
     def _infer_loop(self):
         """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 추론하고 라벨을 발행한다."""
         while not self._stop_event.is_set():
-            frame = self._queue.get(timeout=self.WORKER_POLL_SEC)
+            frame = self._swap_buffer.get(timeout=self.WORKER_POLL_SEC)
             if frame is None:
                 continue    # 프레임이 안 왔다. 위에서 종료 플래그를 다시 확인한다.
 

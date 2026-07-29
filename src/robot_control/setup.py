@@ -42,11 +42,9 @@ setup(
         # ros2 run robot_control <이름> 으로 실행될 노드들.
         # twist_mux 는 여기 없다 — 설치 패키지(ros-jazzy-twist-mux)를 쓰므로 config/launch 만 담당.
         'console_scripts': [
-            'camera_node = robot_control.camera_node:main',
-            # 리팩토링본(클래스 분리, 단일 파일). 원본과 나란히 두어 A/B 비교가 가능하게 했다.
-            'camera_node_refactory = robot_control.camera_node_refactory:main',
-            # 위와 내용은 같고 책임별 파일로 쪼갠 것. 어느 하나만 남길 예정.
-            'camera_node_division = robot_control.camera_node_division.node:main',
+            # 원본 camera_node.py 와 단일 파일 리팩토링본 camera_node_refactory.py 는
+            # 책임별 파일 분리가 끝나서 삭제했다. 필요하면 git 이력에서 꺼낸다.
+            'camera_node = robot_control.camera_node.node:main',
         ],
     },
 )

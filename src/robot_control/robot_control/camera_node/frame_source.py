@@ -31,7 +31,7 @@ class FrameSource:
     호출자(CameraNode)가 정한다. 로거를 주입받으면 다시 ROS 에 묶이기 때문이다.
     """
 
-    def __init__(self, device_id, width, height, fps, backend):
+    def __init__(self, device_id, width, height, fps, backend='v4l2'):
         """
         장치를 열고 해상도/FPS 를 설정한다. 열지 못하면 RuntimeError.
 
@@ -43,7 +43,7 @@ class FrameSource:
         """
         if width <= 0 or height <= 0:
             raise ValueError(f'해상도는 0 보다 커야 합니다 (받은 값: {width}x{height})')
-        if backend not in CAPTURE_BACKENDS:
+        if backend not in CAPTURE_BACKENDS: # keys 대상으로 확인
             raise ValueError(
                 f'알 수 없는 캡처 백엔드: {backend!r} (가능: {list(CAPTURE_BACKENDS)})')
 
@@ -110,7 +110,9 @@ class FrameSource:
         ok, frame = self._cap.read()
         # cv2 의 read() 는 호출마다 새 배열을 반환한다. 그래서 이 프레임을 워커에게
         # 넘겨도 다음 read() 가 덮어쓰지 않는다(별도 복사 불필요).
-        return frame if ok else None
+        if ok:
+            return frame
+        return None
 
     def release(self):
         """장치를 반납한다. 여러 번 불러도 안전하다."""
