@@ -1,7 +1,7 @@
 # os, glob: 아래 data_files 에서 launch/urdf/worlds 폴더의 파일 목록을 자동으로 긁어오려고 추가함.
 # (ros2 pkg create 기본 setup.py 에는 없던 import — 데이터 파일 설치를 위해 직접 넣음)
-import os
 from glob import glob
+import os
 
 from setuptools import find_packages, setup
 
@@ -39,7 +39,12 @@ setup(
         ],
     },
     entry_points={
+        # ros2 run robot_control <이름> 으로 실행될 노드들.
+        # twist_mux 는 여기 없다 — 설치 패키지(ros-jazzy-twist-mux)를 쓰므로 config/launch 만 담당.
         'console_scripts': [
+            # 원본 camera_node.py 와 단일 파일 리팩토링본 camera_node_refactory.py 는
+            # 책임별 파일 분리가 끝나서 삭제했다. 필요하면 git 이력에서 꺼낸다.
+            'camera_node = robot_control.camera_node.node:main',
         ],
     },
 )

@@ -1,5 +1,16 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:pip",
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+    // 인터프리터: 시스템 python3(3.12.3). ROS 2 Jazzy 가 쓰는 것과 같은 버전이다.
+    // 이전 값(${workspaceFolder}/.venv/bin/python)은 존재하지 않는 venv 를 가리켜
+    // Pylance 가 어떤 import 도 해석하지 못했다(정의 이동 실패의 원인).
+    "python.defaultInterpreterPath": "/usr/bin/python3",
+
+    // 정의 이동/자동완성용 import 경로.
+    // - 첫 줄: rclpy, sensor_msgs, std_msgs, cv_bridge 등 ROS 2 파이썬 패키지 위치
+    // - 둘째 줄: 이 워크스페이스의 패키지(robot_control.camera_node 등)
+    // 주의: ROS 배포판 경로가 절대경로로 박혀 있다. Jazzy 가 아닌 배포판을 쓰면 여기를 바꿔야 한다.
+    "python.analysis.extraPaths": [
+        "/opt/ros/jazzy/lib/python3.12/site-packages",
+        "${workspaceFolder}/src/robot_control"
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

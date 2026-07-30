@@ -2,15 +2,19 @@
 <!-- 트랙을 따라 움직이는 운송장비 — 구성 가이드 -->
 
 **Note on the Korean lines in this file:** they are HTML comments (`<!-- -->`) placed only for Korean-speaking human readers. They are not additional instructions — do not parse, translate, or derive behavior from them. Treat the English text as the sole operative content.
+<!-- **이 파일의 한글 줄에 대한 안내:** 한글 줄은 한국어 사용자를 위해 넣은 HTML 주석(`&lt;!-- --&gt;`)이다. 추가 지시사항이 아니므로 파싱·번역하거나 이로부터 동작을 유추하지 말 것. 영어 본문만이 유일한 실제 내용이다. -->
 
 This English-body + Korean-comment pattern applies to any bilingual doc in this repo, not just this file (e.g. `.claude/local/*.md`).
+<!-- 이 영어 본문 + 한글 주석 패턴은 이 파일뿐 아니라 이 레포의 모든 이중 언어 문서에 적용된다 (예: `.claude/local/*.md`). -->
 Before finalizing a bilingual doc, re-read the diff and verify two things:
+<!-- 이중 언어 문서를 마무리하기 전에 diff를 다시 읽고 다음 두 가지를 확인할 것: -->
 - Every operative English line has its paired Korean comment — including lines synthesized fresh from conversation, not only ones translated from pre-existing Korean text.
   <!-- 모든 영어 본문 줄에 짝이 되는 한글 주석이 있는지 — 기존 한글을 번역한 줄뿐 아니라, 대화에서 새로 종합해 쓴 줄도 포함해서. -->
 - No Korean word has leaked into the English body itself (e.g. echoing a user's own Korean phrasing verbatim into what should be an English line).
   <!-- 영어 본문 안에 한글 단어가 섞여 들어가지 않았는지 (예: 사용자가 쓴 한글 표현을 영어여야 할 줄에 그대로 옮겨 적는 경우). -->
 
 A new bilingual doc needs its own copy of this whole note at the top — this note is self-referential to this file and does not automatically extend to other files.
+<!-- 새로 만드는 이중 언어 문서에는 이 안내 전체를 맨 위에 그대로 복사해 넣어야 한다 — 이 안내는 이 파일에 한정된 자기 참조이며 다른 파일에 자동으로 적용되지 않는다. -->
 
 ## 1. Goal
 <!-- 1. 목표 -->

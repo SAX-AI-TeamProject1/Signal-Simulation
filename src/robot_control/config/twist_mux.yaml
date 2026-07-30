@@ -1,0 +1,55 @@
+# twist_mux 설정 (여러 속도 명령 소스 중 하나만 골라 /cmd_vel 로 내보냄)
+#
+# 왜 필요한가: 여러 노드가 /cmd_vel 에 직접 쓰면 마지막에 쓴 값이 이겨서
+#             비상정지가 수신호에 덮일 수 있다(race). 우선순위 아비터로 막는다.
+#             핸드오프 §10 참고.
+#
+# twist_mux 는 명령 "내용"을 만들지 않는다. 어느 소스를 통과시킬지만 고른다.
+# "멈춰야 한다"는 판단은 estop_node 몫.
+#
+# 문법 근거: 설치 패키지 ros-jazzy-twist-mux 4.5.0 의
+#           share/twist_mux/config/twist_mux_topics.yaml 형식을 그대로 따랐다.
+#   - topic   : 구독할 입력 토픽 (geometry_msgs/Twist)
+#   - timeout : 이 시간(초) 동안 새 메시지가 없으면 그 소스를 버리고 속도 0 으로 본다
+#   - priority: 0~255. 클수록 우선. 동시에 살아 있으면 높은 쪽이 통과
+#
+# 최상위 키가 '/**' 인 이유: 이 노드를 로봇 네임스페이스(/robot1) 안에서 띄우므로
+# 노드의 전체 이름이 /robot1/twist_mux 가 된다. 'twist_mux:' 로 적으면 네임스페이스가
+# 안 맞아 파라미터가 적용되지 않는다. '/**' 는 네임스페이스와 무관하게 매칭된다.
+/**:
+  ros__parameters:
+    # false = geometry_msgs/Twist 로 발행(TwistStamped 아님).
+    # bridge.yaml 이 /robot1/cmd_vel 을 Twist 로 브리지하므로 반드시 false 여야 한다.
+    use_stamped: false
+
+    topics:
+      # 비상정지 — 항상 최우선. 안전이 이긴다(핸드오프 §6 주의).
+      # timeout 을 짧게 잡아 정지 명령이 필요 이상으로 오래 남지 않게 한다.
+      estop:
+        topic: cmd_vel_estop
+        timeout: 0.3
+        priority: 100
+
+      # 수신호(P0 핵심) — AI 라벨을 command_node 가 Twist 로 바꿔 발행할 자리.
+      # 아직 command_node 가 없어 이 토픽에는 발행자가 없다.
+      gesture:
+        topic: cmd_vel_gesture
+        timeout: 0.5
+        priority: 50
+
+      # 수동 조작(검증용) — teleop_twist_keyboard 를 여기로 리맵해서 쓴다.
+      # 자율주행보다 위: 사람이 개입하면 자율주행을 덮어써야 하므로.
+      teleop:
+        topic: cmd_vel_teleop
+        timeout: 0.5
+        priority: 20
+
+      # 자율주행(P1, Nav2) — 아직 없음. 가장 낮은 우선순위.
+      auto:
+        topic: cmd_vel_auto
+        timeout: 0.5
+        priority: 10
+
+    # locks: 특정 우선순위 이하를 통째로 막는 std_msgs/Bool 스위치.
+    # 지금은 쓰지 않는다(비상정지를 lock 이 아니라 최우선 topic 으로 처리하기 때문).
+    # 필요해지면 twist_mux 패키지의 twist_mux_locks.yaml 형식을 참고해 추가.
