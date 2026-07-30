@@ -4,20 +4,24 @@
 이 파일은 cv2 도 모델도 Twist 도 직접 다루지 않는다. 그래서 import 목록에
 cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 보인다.
 
-세 개의 실행 흐름:
+두 개의 실행 흐름:
 
-    [실행기 스레드]  1/fps 마다 _on_timer
-        FrameSource.read() → ImagePublisher.publish() → LatestFrameQueue.put_latest()
-
-    [추론 워커 1개]  _infer_loop
-        LatestFrameQueue.get() → GestureInference.infer() → GestureCommandPublisher.publish()
+    [캡처+추론 워커 1개]  _capture_infer_loop
+        FrameSource.read() → ImagePublisher.publish() → GestureInference.infer()
+        → GestureCommandPublisher.publish()
         → take_render_payload() 로 결과를 꺼내 렌더 워커에게 넘기고 깨운다
 
     [렌더 워커 1개]  _render_loop
         _render_cv 에서 대기 → GestureInference.show(payload) → 다시 대기
         show() 가 True 를 주면(HUD 창에서 q/ESC) 노드 종료를 요청한다
 
-추론 워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
+(실행기 스레드에는 통계 타이머만 남는다. 캡처는 타이머가 아니라 위 워커가 한다)
+
+캡처와 추론을 한 스레드에 둔 이유: 추론이 병목이라 둘을 나눠도 처리율이 안 오른다.
+실측(추론 79ms 기준) — 분리 14.2회/초, 병합 14.1회/초. 나누면 스레드와 전달 버퍼만
+늘고 얻는 게 없다. 블로킹 read() 가 루프를 카메라 속도에 묶어 주므로 주기 관리도 없다.
+
+워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
 라벨은 이벤트가 아니라 상태(STOP/FORWARD/...)라서, 낡은 라벨이 최신 라벨을 덮으면
 STOP 다음에 FORWARD 가 나가는 사고가 된다.
 
@@ -54,7 +58,6 @@ from robot_control.camera_node.frame_source import FrameSource
 from robot_control.camera_node.image_publisher import ImagePublisher
 from robot_control.camera_node.inference import GestureInference
 from robot_control.camera_node.shutdown import is_shutting_down
-from robot_control.camera_node.swap_frame import LatestFrameBuffer
 from robot_control.metrics import InferenceMetrics
 
 
@@ -65,6 +68,10 @@ class CameraNode(Node):
     WORKER_POLL_SEC = 0.1
     # 종료 시 진행 중인 infer() 한 번이 끝나기를 기다려 주는 시간(초).
     WORKER_JOIN_TIMEOUT_SEC = 2.0
+    # 프레임 읽기에 실패했을 때 캡처+추론 워커가 쉬는 시간(초).
+    # 타이머 시절에는 실패해도 다음 발화까지 저절로 쉬었지만, 이제는 루프라서
+    # 장치가 빠지면(read 가 즉시 None) 이게 없으면 코어 하나를 100% 태운다.
+    CAPTURE_RETRY_SEC = 0.1
 
     def __init__(self):
         """파라미터를 읽고, 부품 넷을 만들고, 워커와 타이머를 띄운다."""
@@ -118,12 +125,11 @@ class CameraNode(Node):
             angular_speed=params['angular_speed'])
 
         # ── 부품 3: 추론 (inference.py) + 워커 스레드 ───────────────────
-        self._swap_buffer = LatestFrameBuffer()
         self._inference = None
-        self._infer_thread = None
+        self._worker_thread = None
         self._render_thread = None
 
-        # 추론 워커 → 렌더 워커로 결과를 넘기는 한 칸짜리 슬롯 + 그 신호.
+        # 캡처+추론 워커 → 렌더 워커로 결과를 넘기는 한 칸짜리 슬롯 + 그 신호.
         #
         # 슬롯이 따로 필요한 이유: notify() 는 대기 중인 스레드가 없으면 그냥 사라진다.
         # 렌더가 아직 이전 화면을 그리는 중에 온 notify 를 놓치지 않으려면 "그릴 게
@@ -131,24 +137,26 @@ class CameraNode(Node):
         # (None 이 아니면 그릴 게 있다).
         #
         # 한 칸인 이유: 렌더가 밀린 동안 추론이 3번 돌았어도 그릴 것은 최신 결과
-        # 하나뿐이다. LatestFrameBuffer 가 프레임을 다루는 방식과 같다.
-        # 낡은 payload 를 덮어써도 안전하다 — 렌더가 이미 꺼내 간 것은 자기 지역
-        # 변수로 참조를 들고 있어서 살아 있다.
+        # 하나뿐이다. 낡은 payload 를 덮어써도 안전하다 — 렌더가 이미 꺼내 간 것은
+        # 자기 지역 변수로 참조를 들고 있어서 살아 있다.
         self._render_cv = threading.Condition()
         self._render_payload = None
         if params['enable_inference']:
             self._inference = self._build_inference()
             self._inference.load_model()    # 워커 시작 전에 1회 (무거운 초기화)
-            # 워커는 정확히 1개. 늘리면 완료 순서가 뒤바뀐다(파일 상단 설명 참고).
             # daemon=True: 메인이 끝날 때 이 스레드가 남아 있어도 같이 죽는다.
             #              False 면 무한 루프인 워커 때문에 프로세스가 안 죽는다.
-            self._infer_thread = threading.Thread(target=self._infer_loop, daemon=True)
             self._render_thread = threading.Thread(target=self._render_loop, daemon=True)
-            self._infer_thread.start()
             self._render_thread.start()
 
-        # ── 타이머 2개 ───────────────────────────────────────────────────
-        self._timer = self.create_timer(1.0 / params['fps'], self._on_timer)
+        # ── 캡처+추론 워커 ──────────────────────────────────────────────
+        # 워커는 정확히 1개. 늘리면 완료 순서가 뒤바뀐다(파일 상단 설명 참고).
+        # 추론이 off 여도 띄운다 — 그래야 순수 카메라 노드로 동작한다.
+        # 렌더 워커보다 나중에 시작한다: 반대면 첫 payload 를 받을 상대가 없다.
+        self._worker_thread = threading.Thread(target=self._capture_infer_loop, daemon=True)
+        self._worker_thread.start()
+
+        # ── 타이머 ───────────────────────────────────────────────────────
         if params['stats_period'] > 0.0:
             # 통계 flush 타이머. 매 프레임 찍으면 로그가 폭발하니 모아서 한 줄로 낸다.
             # stats_period=1.0 이면 출력 숫자가 그대로 Hz 로 읽힌다.
@@ -157,7 +165,7 @@ class CameraNode(Node):
         act_w, act_h = self._source.actual_size
         self.get_logger().info(
             f'웹캠 시작: /dev/video{self._source.device_id} {act_w}x{act_h} '
-            f'@{params["fps"]}Hz (추론 {"on" if self._inference else "off"}, '
+            f'@{params["fps"]}Hz 요청 (추론 {"on" if self._inference else "off"}, '
             f'이미지 발행 {"on" if self._image_pub.enabled else "off"})')
 
     # ------------------------------------------------------------------ 설정
@@ -174,9 +182,13 @@ class CameraNode(Node):
         self.declare_parameter('device_id', 0)              # /dev/video<N> 의 N
         self.declare_parameter('frame_width', 640)
         self.declare_parameter('frame_height', 480)
-        # 캡처/발행 주기(Hz). 추론 처리율보다 높으면 그 차이만큼 프레임을 버린다.
-        # 추론 50ms 기준: 처리 한계 20장/초.  fps 30 → 유실 10/초(33%),  fps 20 → 유실 0.
-        self.declare_parameter('fps', 20.0)
+        # 카메라에 요청할 프레임레이트(CAP_PROP_FPS). 소프트웨어 주기가 아니다 —
+        # 캡처는 타이머가 아니라 워커의 블로킹 read() 가 페이싱한다.
+        #
+        # 추론(약 79ms → 12.5회/초)보다 높게 두는 것이 맞다. 낮추면 처리율은 그대로인데
+        # 프레임만 낡는다. 실측: fps 20 → 프레임 나이 73ms,  fps 30 → 18ms.
+        # 카메라 하드웨어 상한이 30 이라 그 위로 올려도 30 으로 잘린다.
+        self.declare_parameter('fps', 30.0)
         self.declare_parameter('frame_id', 'webcam')        # Image 헤더의 frame_id
         # 캡처 백엔드. 실배포는 Linux 라 v4l2 가 기본. 개발 머신에 맞춰 바꾼다.
         # 가능한 값은 frame_source.CAPTURE_BACKENDS 참고.
@@ -217,38 +229,7 @@ class CameraNode(Node):
         """
         return GestureInference(self.get_logger())
 
-    # ------------------------------------------------- 실행기 스레드 (캡처)
-
-    def _on_timer(self):
-        """
-        프레임 한 장 캡처 → 이미지 발행 → 추론 큐에 넣기.
-
-        여기서 무거운 일을 하면 안 된다. spin() 은 단일 스레드라서 이 콜백이
-        길어지면 통계 타이머와 (앞으로 추가될) 구독 콜백이 통째로 밀린다.
-        """
-        if not self._source.is_open or is_shutting_down(self._stop_event):
-            return      # 종료 중(장치 반납됐거나 컨텍스트가 이미 내려감)
-
-        frame = self._source.read()
-        if frame is None:
-            # read() 가 도는 동안 종료가 시작됐을 수 있다. 그 상태로 로그를 남기면
-            # rcl 이 "Failed to publish log message to rosout" 를 찍는다 → 다시 확인.
-            if not is_shutting_down(self._stop_event):
-                self.get_logger().warn('프레임 읽기 실패 — 이번 주기는 건너뜁니다.',
-                                       throttle_duration_sec=1.0)
-            return
-        self._metrics.record_capture()
-
-        if not self._image_pub.publish(frame):
-            return      # 종료 감지. 큐에 더 넣을 이유가 없다.
-
-        if self._inference is None:
-            return      # 추론 off — 순수 카메라 노드로 동작 중
-
-        if self._swap_buffer.put_latest(frame):
-            self._metrics.record_drop()
-
-    # ------------------------------------------------- 워커 스레드 (추론/렌더)
+    # ------------------------------------------------ 캡처+추론 워커
 
     def _render_loop(self):
         """렌더 워커 본체. 추론 워커가 깨울 때만 한 번 그리고 다시 잠든다."""
@@ -300,12 +281,40 @@ class CameraNode(Node):
         if rclpy.ok():
             rclpy.shutdown()
 
-    def _infer_loop(self):
-        """워커 스레드 본체. 큐에서 최신 프레임을 꺼내 추론하고 라벨을 발행한다."""
+    def _capture_infer_loop(self):
+        """
+        워커 본체. 프레임을 읽어 그 자리에서 추론하고 라벨을 발행한다.
+
+        주기를 관리하지 않는 이유: read() 가 다음 프레임까지 블로킹이라 이 루프가
+        저절로 카메라 속도에 맞춰진다. 추론이 그보다 느리면 그만큼 드라이버가
+        프레임을 버리는데, 그건 속도 차이라 어느 구조로도 못 막는다.
+
+        이 루프는 카메라(30fps)보다 느리게(약 12.5회/초) 읽으므로, 드라이버 버퍼에
+        프레임이 쌓이고 read() 는 그중 가장 오래된 것을 돌려준다. 즉 버퍼 장수가
+        곧 지연이다 — 그 절충의 근거는 frame_source.py 의 BUFFERSIZE 주석에 있다.
+        """
         while not self._stop_event.is_set():
-            frame = self._swap_buffer.get(timeout=self.WORKER_POLL_SEC)
+            if not self._source.is_open or is_shutting_down(self._stop_event):
+                break       # 종료 중(장치 반납됐거나 컨텍스트가 이미 내려감)
+
+            frame = self._source.read()
             if frame is None:
-                continue    # 프레임이 안 왔다. 위에서 종료 플래그를 다시 확인한다.
+                # read() 가 도는 동안 종료가 시작됐을 수 있다. 그 상태로 로그를 남기면
+                # rcl 이 "Failed to publish log message to rosout" 를 찍는다 → 다시 확인.
+                if is_shutting_down(self._stop_event):
+                    break
+                self.get_logger().warn('프레임 읽기 실패 — 잠시 뒤 다시 시도합니다.',
+                                       throttle_duration_sec=1.0)
+                # sleep 이 아니라 Event.wait: 종료 신호가 오면 즉시 깨어난다.
+                self._stop_event.wait(self.CAPTURE_RETRY_SEC)
+                continue
+            self._metrics.record_capture()
+
+            if not self._image_pub.publish(frame):
+                break       # 종료 감지
+
+            if self._inference is None:
+                continue    # 추론 off — 순수 카메라 노드로 동작 중
 
             started = time.monotonic()
             try:
@@ -316,20 +325,21 @@ class CameraNode(Node):
                 self.get_logger().error(f'infer() 예외: {exc}', throttle_duration_sec=1.0)
                 label = None
             else:
+                # 기록은 infer() 바로 뒤에서 한다. 아래 렌더 인계·발행까지 넣으면
+                # "추론 median" 이 추론이 아닌 값이 된다.
                 # time.time() 이 아니라 monotonic: 시스템 시각이 뒤로 점프해도
                 # 음수 소요시간이 나오지 않는다.
                 self._metrics.record_inference((time.monotonic() - started) * 1000.0)
 
             # 예외가 났어도 넘긴다 — 마지막 상태라도 그려야 화면이 멈춘 것처럼 안 보인다.
-            # render스레드로 그래야 할 정보 던지기
-            # (inference객체 내에 저장된 pending정보를 가져온다{swap})
+            # (inference 객체 안에 저장된 pending 정보를 가져온다{swap})
             self._hand_off_render()
 
             if not self._command_pub.publish(label):
                 break       # 종료 감지
 
     def _hand_off_render(self):
-        """이번 프레임의 추론 결과를 렌더 워커에게 넘기고 깨운다. 추론 스레드 전용."""
+        """이번 프레임의 추론 결과를 렌더 워커에게 넘기고 깨운다. 워커 스레드 전용."""
         payload = self._inference.take_render_payload()
         if payload is None:
             return          # GUI 를 안 쓰는 구현체(기본 구현이 None 을 준다)
@@ -361,13 +371,15 @@ class CameraNode(Node):
         with self._render_cv:
             self._render_cv.notify_all()
 
-        if self._infer_thread is not None:
-            # 진행 중인 infer() 한 번(느려도 수백 ms)이 끝날 여유를 준다.
-            self._infer_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)
-            if self._infer_thread.is_alive():
+        # **_source.release() 보다 반드시 먼저 join 한다.** 이 워커는 read() 안에서
+        # 블로킹돼 있을 수 있는데, 장치를 먼저 반납하면 해제된 장치를 읽게 된다.
+        if self._worker_thread is not None:
+            # 진행 중인 read()+infer() 한 바퀴(느려도 수백 ms)가 끝날 여유를 준다.
+            self._worker_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)
+            if self._worker_thread.is_alive():
                 # daemon=True 라서 프로세스 종료를 막지는 않는다. 알리기만 한다.
-                self.get_logger().warn('추론 워커가 제때 끝나지 않아 그대로 종료합니다.')
-            self._infer_thread = None
+                self.get_logger().warn('캡처+추론 워커가 제때 끝나지 않아 그대로 종료합니다.')
+            self._worker_thread = None
 
         if self._render_thread is not None:
             self._render_thread.join(timeout=self.WORKER_JOIN_TIMEOUT_SEC)

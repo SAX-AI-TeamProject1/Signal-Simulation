@@ -18,6 +18,9 @@
            ODE 전용 코드 경로 자체를 피한다. -->
       <dart>
         <collision_detector>bullet</collision_detector>
+        <solver>
+          <solver_type>dantzig</solver_type>
+        </solver>
       </dart>
     </physics>
     <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
@@ -40,12 +43,6 @@
       <self_collide>false</self_collide>
       <link name='warehouse_base'>
         <pose>0 0 0 0 0 0</pose>
-        <!-- warehouse_collision(STL mesh) 제거: flat_ground(robot_control/config/flat_ground.sdf,
-             launch에서 스폰)가 바닥 충돌을 전담한다. 이 STL 메시가 살아있으면 flat_ground의
-             box 충돌체와 겹쳐서(box-vs-trimesh) ODE가 "assertion !bSafeNormalize3Fault failed
-             in dxNormalize3()"로 죽는다 — 이 STL 바닥 자체가 불안정해서 애초에 flat_ground를
-             추가했던 것이므로(주석 참고), 여기 collision은 완전히 빼는 게 맞다. visual은 그대로
-             둬서 외형은 안 바뀐다. -->
         <visual name='warehouse_visual'>
           <pose>0 0 0 0 0 0</pose>
           <geometry>
@@ -405,7 +402,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
         <sensor name='camera' type='camera'>
-          <pose>0.29999999999999999 0 0.29999999999999999 0 0.26180000000000042 0</pose>
+          <pose>0.29999999999999999 0 0.29999999999999999 0 0.26180000000000048 0</pose>
           <topic>amr_queue_1/camera</topic>
           <update_rate>30</update_rate>
           <enable_metrics>false</enable_metrics>
@@ -1235,7 +1232,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <static>true</static>
-      <pose>14.300000190734863 -10.300000190734863 0 0 0 -0.42517043385969105</pose>
+      <pose>14.300000190734863 -10.300000190734863 0 0 0 -0.42517043385969128</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='zone_se_shelfd_2'>
@@ -2739,7 +2736,7 @@
       <static>true</static>
     </model>
     <model name='shelf_big_east_2'>
-      <pose>27.283500671386719 7.6165299415588379 0 0 0 0.08900000005707677</pose>
+      <pose>27.283500671386719 7.6165299415588379 0 0 0 0.089000000057076867</pose>
       <self_collide>true</self_collide>
       <link name='shelf_big_base'>
         <pose>-0.5 0 0 0 0 0</pose>
@@ -2919,7 +2916,7 @@
       <static>true</static>
     </model>
     <model name='shelf_big_west_3'>
-      <pose>-26.866483688354492 30.637149810791016 0 0 0 -0.026000002004562432</pose>
+      <pose>-26.866483688354492 30.637149810791016 0 0 0 -0.026000002004562425</pose>
       <self_collide>true</self_collide>
       <link name='shelf_big_base'>
         <pose>-0.5 0 0 0 0 0</pose>
@@ -4588,7 +4585,7 @@
     </model>
     <model name='track_ne_dash_1'>
       <static>true</static>
-      <pose>12.300000000000001 13 0.059999999999999998 0 0 1.5708000000000009</pose>
+      <pose>12.300000000000001 13 0.059999999999999998 0 0 1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -4753,7 +4750,7 @@
     </model>
     <model name='track_ne_dash_6'>
       <static>true</static>
-      <pose>9.6999999999999993 13 0.059999999999999998 0 0 -1.5707853071795872</pose>
+      <pose>9.6999999999999993 13 0.059999999999999998 0 0 -1.5707853071795874</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -4852,7 +4849,7 @@
     </model>
     <model name='track_ne_dash_9'>
       <static>true</static>
-      <pose>11.401999999999999 11.763999999999999 0.059999999999999998 0 0 0.31411469282041304</pose>
+      <pose>11.401999999999999 11.763999999999999 0.059999999999999998 0 0 0.31411469282041299</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -4918,7 +4915,7 @@
     </model>
     <model name='track_ne_entry_1'>
       <static>true</static>
-      <pose>0 32.25 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 32.25 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -4951,7 +4948,7 @@
     </model>
     <model name='track_ne_entry_2'>
       <static>true</static>
-      <pose>0 29.75 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 29.75 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -4984,7 +4981,7 @@
     </model>
     <model name='track_ne_entry_3'>
       <static>true</static>
-      <pose>0 27.25 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 27.25 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -5017,7 +5014,7 @@
     </model>
     <model name='track_ne_entry_4'>
       <static>true</static>
-      <pose>0 22.25 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 22.25 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -5050,7 +5047,7 @@
     </model>
     <model name='track_ne_entry_5'>
       <static>true</static>
-      <pose>0 19.75 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 19.75 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -5083,7 +5080,7 @@
     </model>
     <model name='track_ne_entry_6'>
       <static>true</static>
-      <pose>0 17.25 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 17.25 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -5116,7 +5113,7 @@
     </model>
     <model name='track_ne_entry_7'>
       <static>true</static>
-      <pose>0 14.75 0.059999999999999998 0 0 -1.5708000000000009</pose>
+      <pose>0 14.75 0.059999999999999998 0 0 -1.5708000000000013</pose>
       <link name='link'>
         <visual name='visual'>
           <geometry>
@@ -5279,75 +5276,23 @@
       </link>
       <self_collide>false</self_collide>
     </model>
-    <model name='deco_bop_panel_west'>
-      <pose>-11 26.5 0 0 0 0</pose>
-      <link name='block'>
-        <inertial>
-          <mass>1000</mass>
-          <inertia>
-            <ixx>16083.333333332999</ixx>
-            <iyy>16083.333333332999</iyy>
-            <izz>8166.6666666669998</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='block_collision'>
+    <model name='deco_forklift_ogv'>
+      <static>true</static>
+      <link name='base_link'>
+        <visual name='base_visual'>
           <geometry>
             <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/VentilBlock.stl</uri>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='block_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/VentilBlock.obj</uri>
+              <uri>model://Forklift/base_visual.glb</uri>
             </mesh>
           </geometry>
         </visual>
-        <self_collide>false</self_collide>
-        <pose>0 0 0 0 0 0</pose>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='world_joint' type='fixed'>
-        <child>block</child>
-        <parent>world</parent>
-        <axis>
-          <xyz>0 1 0</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>1</damping>
-            <friction>0</friction>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>true</cfm_damping>
-          </ode>
-        </physics>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='april_tag_valve_1'>
-        <pose>3.31813 -0.42999999999999972 8.1300000000000008 0 0 0</pose>
-        <collision name='april_tag_valve_1_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
+        <collision name='base_collision'>
           <geometry>
             <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
+              <size>2.3999999999999999 1.3999999999999999 2.0600000000000001</size>
             </box>
           </geometry>
+          <pose>0 0 1.03 0 0 0</pose>
           <surface>
             <friction>
               <ode/>
@@ -5356,15 +5301,87 @@
             <contact/>
           </surface>
         </collision>
-        <visual name='april_tag_valve_1_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
+        <sensor name='camera' type='camera'>
+          <pose>1.2 0 1.2 0 0.2618000000000002 0</pose>
+          <topic>deco_forklift_ogv/camera</topic>
+          <update_rate>30</update_rate>
+          <enable_metrics>false</enable_metrics>
+          <camera name='__default__'>
+            <pose>0 0 0 0 0 0</pose>
+            <horizontal_fov>1.05</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>RGB_INT8</format>
+              <anti_aliasing>4</anti_aliasing>
+            </image>
+            <camera_info_topic>__default__</camera_info_topic>
+            <trigger_topic></trigger_topic>
+            <triggered>false</triggered>
+            <clip>
+              <near>0.10000000000000001</near>
+              <far>50</far>
+            </clip>
+            <save enabled='false'>
+              <path>__default__</path>
+            </save>
+            <visibility_mask>4294967295</visibility_mask>
+            <noise>
+              <type>none</type>
+              <mean>0</mean>
+              <stddev>0</stddev>
+            </noise>
+            <distortion>
+              <k1>0</k1>
+              <k2>0</k2>
+              <k3>0</k3>
+              <p1>0</p1>
+              <p2>0</p2>
+              <center>0.5 0.5</center>
+            </distortion>
+            <lens>
+              <type>stereographic</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707963267948966</cutoff_angle>
+              <env_texture_size>256</env_texture_size>
+            </lens>
+            <optical_frame_id></optical_frame_id>
+          </camera>
+        </sensor>
+        <sensor name='lidar' type='gpu_lidar'>
+          <pose>0 0 1.3999999999999999 0 0 0</pose>
+          <topic>deco_forklift_ogv/lidar</topic>
+          <update_rate>10</update_rate>
+          <enable_metrics>false</enable_metrics>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>360</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415899999999999</min_angle>
+                <max_angle>3.1415899999999999</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+                <resolution>1</resolution>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.10000000000000001</min>
+              <max>15</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>none</type>
+              <mean>0</mean>
+              <stddev>0</stddev>
+            </noise>
+            <visibility_mask>4294967295</visibility_mask>
+          </lidar>
+        </sensor>
+        <pose>0 0 0 0 0 0</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>1</mass>
@@ -5379,1026 +5396,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <joint name='marker_1_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_1</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_1'>
-        <pose>3.3127899999999997 0.00038699999999991519 8.2799999999999994 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_1_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_1_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_1_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_1</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_2'>
-        <pose>3.31813 -0.42999999999999972 7.7699999999999996 0 0 0</pose>
-        <collision name='april_tag_valve_2_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_2_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_2_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_2</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_2'>
-        <pose>3.3127899999999997 0.00038699999999991519 7.9199999999999999 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_2_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_2_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_2_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_2</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_3'>
-        <pose>3.31813 -0.42999999999999972 7.3399999999999999 0 0 0</pose>
-        <collision name='april_tag_valve_3_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_3_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_3_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_3</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_3'>
-        <pose>3.3127899999999997 0.00038699999999991519 7.4900000000000002 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_3_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_3_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_3_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_3</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_4'>
-        <pose>3.31813 -0.42999999999999972 6.9800000000000004 0 0 0</pose>
-        <collision name='april_tag_valve_4_collision'>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_4_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_4_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_4</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_4'>
-        <pose>3.3127899999999997 0.00038699999999991519 7.1299999999999999 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_4_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_4_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_4_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_4</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_5'>
-        <pose>3.31813 -0.42999999999999972 6.6299999999999999 0 0 0</pose>
-        <collision name='april_tag_valve_5_collision'>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_5_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_5_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_5</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_5'>
-        <pose>3.3127899999999997 0.00038699999999991519 6.7800000000000002 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_5_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_5_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_5_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_5</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <static>false</static>
-      <self_collide>false</self_collide>
-    </model>
-    <model name='deco_bop_panel_east'>
-      <pose>11 26.5 0 0 0 3.1415899999999999</pose>
-      <link name='block'>
-        <inertial>
-          <mass>1000</mass>
-          <inertia>
-            <ixx>16083.333333332999</ixx>
-            <iyy>16083.333333332999</iyy>
-            <izz>8166.6666666669998</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='block_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/VentilBlock.stl</uri>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='block_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/VentilBlock.obj</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <self_collide>false</self_collide>
-        <pose>0 0 0 0 0 0</pose>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='world_joint' type='fixed'>
-        <child>block</child>
-        <parent>world</parent>
-        <axis>
-          <xyz>0 1 0</xyz>
-          <limit>
-            <lower>0</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>1</damping>
-            <friction>0</friction>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <cfm_damping>true</cfm_damping>
-          </ode>
-        </physics>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='april_tag_valve_1'>
-        <pose>3.3181300000000054 -0.42999999999999616 8.1300000000000026 0 0 0</pose>
-        <collision name='april_tag_valve_1_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_1_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_1_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_1</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_1'>
-        <pose>3.312790000000005 0.00038700000000702062 8.2799999999999994 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_1_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_1_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_1_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_1</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_2'>
-        <pose>3.3181300000000054 -0.42999999999999616 7.7699999999999996 0 0 0</pose>
-        <collision name='april_tag_valve_2_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_2_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_2_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_2</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_2'>
-        <pose>3.312790000000005 0.00038700000000702062 7.9199999999999999 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_2_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_2_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_2_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_2</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_3'>
-        <pose>3.3181300000000054 -0.42999999999999616 7.3399999999999999 0 0 0</pose>
-        <collision name='april_tag_valve_3_collision'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_3_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_3_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_3</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_3'>
-        <pose>3.312790000000005 0.00038700000000702062 7.4899999999999993 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_3_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_3_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_3_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_3</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_4'>
-        <pose>3.3181300000000054 -0.42999999999999616 6.9800000000000004 0 0 0</pose>
-        <collision name='april_tag_valve_4_collision'>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_4_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_4_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_4</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_4'>
-        <pose>3.312790000000005 0.00038700000000702062 7.1299999999999999 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_4_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_4_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_4_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_4</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <link name='april_tag_valve_5'>
-        <pose>3.3181300000000054 -0.42999999999999616 6.6300000000000008 0 0 0</pose>
-        <collision name='april_tag_valve_5_collision'>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <visual name='april_tag_valve_5_visual'>
-          <pose>0 0 0 0 1.5700000000001271 0</pose>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>0.14000000000000001 0.14000000000000001 0.001</size>
-            </box>
-          </geometry>
-        </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='marker_5_joint' type='fixed'>
-        <parent>block</parent>
-        <child>april_tag_valve_5</child>
-        <pose>0 0 0 0 0 0</pose>
-      </joint>
-      <link name='valve_5'>
-        <pose>3.312790000000005 0.00038700000000702062 6.7800000000000002 0 0 0</pose>
-        <inertial>
-          <mass>0.5</mass>
-          <inertia>
-            <ixx>0.0017520833333333331</ixx>
-            <iyy>0.0017520833333333331</iyy>
-            <izz>0.0017520833333333331</izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
-          </inertia>
-          <pose>0 0 0 0 0 0</pose>
-        </inertial>
-        <collision name='valve_5_collision'>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </collision>
-        <visual name='valve_5_visual'>
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://Blow-Out_Preventer_Panel/meshes/Valve.dae</uri>
-              <scale>1 1.2 1.2</scale>
-            </mesh>
-          </geometry>
-        </visual>
-        <enable_wind>false</enable_wind>
-      </link>
-      <joint name='valve_5_joint' type='revolute'>
-        <parent>block</parent>
-        <child>valve_5</child>
-        <pose>0 0 0 0 0 0</pose>
-        <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1.5700000000000001</lower>
-            <upper>0</upper>
-            <effort>inf</effort>
-            <velocity>inf</velocity>
-            <stiffness>100000000</stiffness>
-            <dissipation>1</dissipation>
-          </limit>
-          <dynamics>
-            <spring_reference>0</spring_reference>
-            <spring_stiffness>0</spring_stiffness>
-            <damping>0.20000000000000001</damping>
-            <friction>1</friction>
-          </dynamics>
-        </axis>
-      </joint>
-      <static>false</static>
+      <pose>4 34 0.12761291861534119 0 0 3.1415900000000754</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_north_1'>
@@ -6585,7 +5583,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 4.4408920985006262e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
         <pose>-1.5600000000000005 0.36749999999999972 -0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -6660,7 +5658,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
         <pose>0 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -6782,7 +5780,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-5.5511151231257827e-17 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
         <pose>0 0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7093,7 +6091,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 4.4408920985006262e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
         <pose>-1.5600000000000005 0.36749999999999972 -0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7168,7 +6166,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
         <pose>0 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7218,7 +6216,7 @@
         <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.060000000000000497 -0.36750000000000682 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.060000000000000497 -0.36750000000001393 -0.075000000000000011 0 0 1.5707963270000003</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -7290,7 +6288,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-1.1102230246251565e-16 1.1102230246251565e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
         <pose>0 0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7340,7 +6338,7 @@
         <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.060000000000000497 0.36749999999999261 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.060000000000000497 0.3674999999999855 -0.075000000000000011 0 0 1.5707963270000003</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -7412,7 +6410,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 -5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -7601,7 +6599,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 4.4408920985006262e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
         <pose>-1.5600000000000005 0.36749999999999972 -0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7676,7 +6674,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
         <pose>0 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -7798,7 +6796,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-5.5511151231257827e-17 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
         <pose>0 0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -8109,7 +7107,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 4.4408920985006262e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
         <pose>-1.5600000000000005 0.36749999999999972 -0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -8184,7 +7182,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
         <pose>0 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -8306,7 +7304,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-5.5511151231257827e-17 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
         <pose>0 0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -8428,7 +7426,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>5.5511151231257827e-17 -5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -8545,7 +7543,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='back_left'>
-        <pose>-1.5599999999999916 -0.36749999999999261 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-1.5599999999999881 -0.36749999999999261 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -8617,10 +7615,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>-2.2204460492503131e-16 2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
-        <pose>-1.5599999999999952 0.36749999999999616 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-1.5599999999999881 0.36749999999999616 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -8692,10 +7690,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
-        <pose>1.0658141036401503e-14 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>1.4210854715202004e-14 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -8739,10 +7737,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.059999999999988063 -0.36750000000000682 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.05999999999998451 -0.36750000000000327 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -8814,10 +7812,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-1.1102230246251565e-16 1.1102230246251565e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
-        <pose>1.4210854715202004e-14 0.36750000000000327 0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>2.4868995751603507e-14 0.36750000000000682 0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -8861,10 +7859,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.059999999999988063 0.36750000000000682 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.059999999999980957 0.36750000000000682 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -8936,7 +7934,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 -8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -9053,7 +8051,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='back_left'>
-        <pose>-1.5599999999999952 -0.36749999999998906 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-1.5599999999999952 -0.36749999999998195 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9125,10 +8123,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>3.3306690738754696e-16 2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
-        <pose>-1.5599999999999969 0.36750000000001037 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-1.5599999999999969 0.36750000000002103 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9203,7 +8201,7 @@
         <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
-        <pose>3.5527136788005009e-15 -0.36749999999999261 0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>3.5527136788005009e-15 -0.36749999999998195 0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -9247,10 +8245,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>-5.5511151231257827e-17 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.059999999999995168 -0.36749999999999616 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.060000000000002274 -0.36749999999998906 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9325,7 +8323,7 @@
         <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
-        <pose>7.1054273576010019e-15 0.36750000000001393 0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>7.1054273576010019e-15 0.36750000000002814 0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -9369,10 +8367,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 -8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.059999999999991616 0.36750000000001037 -0.075000000000000011 0 0 1.5707963270000003</pose>
+        <pose>-0.059999999999991616 0.36750000000001748 -0.075000000000000011 0 0 1.5707963270000005</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9444,7 +8442,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>5.5511151231257827e-17 0 0 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -9561,7 +8559,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='back_left'>
-        <pose>-1.5600000000000058 -0.36750000000000682 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-1.5600000000000094 -0.36750000000001393 -0.074999999999999983 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9633,10 +8631,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>0 2.2204460492503131e-16 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='back_right'>
-        <pose>-1.5600000000000023 0.36749999999998906 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-1.5600000000000094 0.36749999999998195 -0.074999999999999983 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9708,10 +8706,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 0 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
-        <pose>-3.5527136788005009e-15 -0.36750000000000682 0.075000000000000011 0 0 1.5707963269999998</pose>
+        <pose>-7.1054273576010019e-15 -0.36750000000001393 0.075000000000000011 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -9755,10 +8753,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.060000000000005826 -0.36750000000001037 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-0.060000000000012932 -0.36750000000001393 -0.074999999999999997 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9830,10 +8828,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-1.1102230246251565e-16 8.3266726846886741e-17 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
-        <pose>0 0.36749999999999616 0.075000000000000011 0 0 1.5707963269999998</pose>
+        <pose>0 0.36749999999999616 0.075000000000000011 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -9877,10 +8875,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.059999999999998721 0.36749999999999616 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-0.060000000000002274 0.36749999999998906 -0.074999999999999997 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -9952,7 +8950,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -10069,7 +9067,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='back_left'>
-        <pose>-1.5600000000000058 -0.36749999999999616 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-1.5600000000000076 -0.36749999999999261 -0.074999999999999983 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -10141,10 +9139,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>0 2.2204460492503131e-16 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='back_right'>
-        <pose>-1.5600000000000041 0.36749999999999972 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-1.5600000000000076 0.36750000000000682 -0.074999999999999983 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -10216,10 +9214,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>-1.1102230246251565e-16 -2.2204460492503131e-16 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
-        <pose>-1.7763568394002505e-15 -0.36749999999999972 0.075000000000000011 0 0 1.5707963269999998</pose>
+        <pose>-5.3290705182007514e-15 -0.36749999999999972 0.075000000000000011 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -10266,7 +9264,7 @@
         <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.060000000000002274 -0.36749999999999972 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-0.06000000000000405 -0.36749999999999972 -0.074999999999999997 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -10338,10 +9336,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-1.1102230246251565e-16 8.3266726846886741e-17 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
-        <pose>-1.7763568394002505e-15 0.36750000000000682 0.075000000000000011 0 0 1.5707963269999998</pose>
+        <pose>-3.5527136788005009e-15 0.36750000000001748 0.075000000000000011 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -10385,10 +9383,10 @@
             <friction>0</friction>
           </dynamics>
         </axis>
-        <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 -5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.060000000000000497 0.36750000000000682 -0.074999999999999997 0 0 1.5707963269999998</pose>
+        <pose>-0.060000000000002274 0.36750000000001037 -0.074999999999999997 0 0 1.5707963269999996</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -10460,7 +9458,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>0 0 -1.3877787807814457e-17 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -10649,7 +9647,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 4.4408920985006262e-16 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
         <pose>-1.5600000000000005 0.36749999999999972 -0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -10724,7 +9722,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>0 -2.2204460492503131e-16 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
         <pose>0 -0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -10846,7 +9844,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
+        <pose>-5.5511151231257827e-17 8.3266726846886741e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
         <pose>0 0.36749999999999972 0.075000000000000011 0 0 1.5707963270000003</pose>
@@ -11085,7 +10083,7 @@
         <enable_wind>false</enable_wind>
       </link>
       <link name='back_left'>
-        <pose>-1.5599999999999987 -0.3674999999999855 -0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>-1.5599999999999969 -0.36749999999997129 -0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -11157,10 +10155,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>0 2.2204460492503131e-16 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 0 0 0 0 0</pose>
       </joint>
       <link name='back_right'>
-        <pose>-1.5599999999999987 0.36750000000002103 -0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>-1.5599999999999969 0.36750000000004235 -0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -11232,10 +10230,10 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>-1.1102230246251565e-16 0 0 0 0 0</pose>
+        <pose>1.1102230246251565e-16 0 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_left'>
-        <pose>3.5527136788005009e-15 -0.36749999999999261 0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>7.1054273576010019e-15 -0.3674999999999855 0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -11282,7 +10280,7 @@
         <pose>0 2.7755575615628914e-17 0 0 0 0</pose>
       </joint>
       <link name='front_left'>
-        <pose>-0.059999999999996945 -0.36749999999999261 -0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>-0.059999999999993392 -0.3674999999999855 -0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -11357,7 +10355,7 @@
         <pose>-5.5511151231257827e-17 5.5511151231257827e-17 0 0 0 0</pose>
       </joint>
       <link name='wheel_sup_front_right'>
-        <pose>1.7763568394002505e-15 0.36750000000002103 0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>3.5527136788005009e-15 0.36750000000004235 0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.01</mass>
@@ -11404,7 +10402,7 @@
         <pose>0 -2.7755575615628914e-17 0 0 0 0</pose>
       </joint>
       <link name='front_right'>
-        <pose>-0.059999999999998721 0.36750000000001393 -0.075000000000000011 0 0 1.5707963270000005</pose>
+        <pose>-0.059999999999996945 0.36750000000002814 -0.075000000000000011 0 0 1.5707963270000009</pose>
         <inertial>
           <pose>0 0 0 0 1.5707963267948966 0</pose>
           <mass>0.01</mass>
@@ -11476,7 +10474,7 @@
             <friction>0.5</friction>
           </dynamics>
         </axis>
-        <pose>5.5511151231257827e-17 -2.7755575615628914e-17 0 0 0 0</pose>
+        <pose>5.5511151231257827e-17 0 0 0 0 0</pose>
       </joint>
       <static>false</static>
       <self_collide>false</self_collide>
@@ -11504,5 +10502,1131 @@
          robot2)이 cmd_vel 기반 웨이포인트 추종(waypoint_follower)으로 수행한다.
          이전엔 DiffDrive가 안 도는 줄 알고 액터로 우회했었는데, 원인이 물리 스텝
          크기였던 게 밝혀져 액터가 더 이상 필요 없어 제거했다. -->
+    <model name='deco_console_west_a'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ControlConsole/meshes/console.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 -0.225 1.95 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2.7 1.95 3.9</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 26.1 0 0 0 0</pose>
+    </model>
+    <model name='deco_console_west_b'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ControlConsole/meshes/console.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 -0.225 1.95 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2.7 1.95 3.9</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 26.9 0 0 0 3.14159</pose>
+    </model>
+    <model name='deco_console_east_a'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ControlConsole/meshes/console.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 -0.225 1.95 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2.7 1.95 3.9</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11 26.1 0 0 0 0</pose>
+    </model>
+    <model name='deco_console_east_b'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ControlConsole/meshes/console.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 -0.225 1.95 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>2.7 1.95 3.9</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11 26.9 0 0 0 3.14159</pose>
+    </model>
+    <model name='deco_panel_west_misc'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0 0 0 1.5707963267948966</pose>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ElectricalPanelBareModel/meshes/Underwater-Frame.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 1.71 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>3.0 4.5 3.45</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-7.85 26.5 0 0 0 0</pose>
+    </model>
+    <model name='deco_panel_east_misc'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0 0 0 1.5707963267948966</pose>
+          <geometry>
+            <mesh>
+              <scale>1.5 1.5 1.5</scale>
+              <uri>model://ElectricalPanelBareModel/meshes/Underwater-Frame.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 1.71 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>3.0 4.5 3.45</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>7.85 26.5 0 0 0 3.14159265358979</pose>
+    </model>
+    <model name='trash_nw_1_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 6.5 0 0 0 0.717</pose>
+    </model>
+    <model name='trash_nw_3_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 9.389 0 0 0 2.117</pose>
+    </model>
+    <model name='trash_nw_5_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 12.278 0 0 0 3.517</pose>
+    </model>
+    <model name='trash_nw_7_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 15.167 0 0 0 4.917</pose>
+    </model>
+    <model name='trash_nw_9_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 18.056 0 0 0 0.034</pose>
+    </model>
+    <model name='trash_ne_1_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 6.5 0 0 0 0.717</pose>
+    </model>
+    <model name='trash_ne_3_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 9.389 0 0 0 2.117</pose>
+    </model>
+    <model name='trash_ne_5_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>12.8 12.278 0 0 0 3.517</pose>
+    </model>
+    <model name='trash_ne_7_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 15.167 0 0 0 4.917</pose>
+    </model>
+    <model name='trash_ne_9_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>12.0 18.056 0 0 0 0.034</pose>
+    </model>
+    <model name='trash_sw_1_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 -19.5 0 0 0 4.0</pose>
+    </model>
+    <model name='trash_sw_3_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 -16.611 0 0 0 5.4</pose>
+    </model>
+    <model name='trash_sw_5_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-9.4 -13.722 0 0 0 0.517</pose>
+    </model>
+    <model name='trash_sw_7_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 -10.833 0 0 0 1.917</pose>
+    </model>
+    <model name='trash_sw_9_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-11 -7.944 0 0 0 3.317</pose>
+    </model>
+    <model name='trash_se_1_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 -19.5 0 0 0 2.0</pose>
+    </model>
+    <model name='trash_se_3_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 -16.611 0 0 0 3.4</pose>
+    </model>
+    <model name='trash_se_5_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>12.8 -13.722 0 0 0 4.8</pose>
+    </model>
+    <model name='trash_se_7_cardboardbox'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CardboardBox/meshes/cardboard_box.dae</uri>
+              <scale>1.25931896 1.007455168 0.755591376</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.4 0.3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>11.2 -10.833 0 0 0 6.2</pose>
+    </model>
+    <model name='trash_se_9_cokecan'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://CokeCan/meshes/coke_can.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.0575 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.033</radius>
+              <length>0.115</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <pose>12.8 -7.944 0 0 0 1.317</pose>
+    </model>
+    <model name='path_prop_1_toolbox_blue'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.1 0.25 0.7 1</ambient>
+            <diffuse>0.1 0.25 0.7 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>0.361 6.205 0.2497 0 0 0.95</pose>
+    </model>
+    <model name='path_prop_4_hammer'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Hammer/meshes/hammer.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.1 0.08</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-4.324 -10.845 0.2497 0 0 4.086</pose>
+    </model>
+    <model name='path_prop_5_toolbox_blue'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.1 0.25 0.7 1</ambient>
+            <diffuse>0.1 0.25 0.7 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>2.056 -3.157 0.2497 0 0 5.727</pose>
+    </model>
+    <model name='path_prop_7_toolbox_blue'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.1 0.25 0.7 1</ambient>
+            <diffuse>0.1 0.25 0.7 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-0.271 10.245 0.2497 0 0 1.333</pose>
+    </model>
+    <model name='path_prop_9_toolbox_blue'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.1 0.25 0.7 1</ambient>
+            <diffuse>0.1 0.25 0.7 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-3.862 1.924 0.2497 0 0 5.538</pose>
+    </model>
+    <model name='path_prop_10_wrench'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MonkeyWrench/meshes/monkey_wrench.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.35 0.08 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-1.429 -11.323 0.2497 0 0 3.044</pose>
+    </model>
+    <model name='path_prop_11_wrench'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MonkeyWrench/meshes/monkey_wrench.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.35 0.08 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>0.322 -6.656 0.2497 0 0 5.671</pose>
+    </model>
+    <model name='path_prop_12_wrench'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MonkeyWrench/meshes/monkey_wrench.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.35 0.08 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>4.091 0.046 0.2497 0 0 2.996</pose>
+    </model>
+    <model name='path_prop_13_hammer'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Hammer/meshes/hammer.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.1 0.08</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-1.638 -0.498 0.2497 0 0 0.872</pose>
+    </model>
+    <model name='path_prop_14_toolbox_red'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>4.342 -15.909 0.2497 0 0 3.697</pose>
+    </model>
+    <model name='path_prop_15_toolbox_red'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>0.2 2.289 0.2497 0 0 4.827</pose>
+    </model>
+    <model name='path_prop_16_toolbox_red'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-1.509 8.379 0.2497 0 0 2.402</pose>
+    </model>
+    <model name='path_prop_18_wrench'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MonkeyWrench/meshes/monkey_wrench.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.35 0.08 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-2.982 13.54 0.2497 0 0 0.148</pose>
+    </model>
+    <model name='path_prop_19_hammer'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Hammer/meshes/hammer.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.1 0.08</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-2.934 -2.281 0.2497 0 0 3.73</pose>
+    </model>
+    <model name='path_prop_22_hammer'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Hammer/meshes/hammer.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.1 0.08</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>3.18 5.07 0.2497 0 0 3.672</pose>
+    </model>
+    <model name='path_prop_24_toolbox_red'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://Toolbox/meshes/Toolbox.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.55 0.3 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>1.309 -11.324 0.2497 0 0 2.548</pose>
+    </model>
+    <model name='path_prop_2_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://StandingPerson/meshes/standing.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>3.495 9.0 0.2497 0 0 0.0</pose>
+    </model>
+    <model name='path_prop_3_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://StandingPerson/meshes/standing.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-3.704 9.876 0.2497 0 0 0.877</pose>
+    </model>
+    <model name='path_prop_6_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://StandingPerson/meshes/standing.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-3.14 5.283 0.2497 0 0 0.178</pose>
+    </model>
+        <actor name='path_prop_8_person'>
+      <skin>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='walking'>
+          <waypoint>
+            <time>0</time>
+            <pose>3.577 15.642 0.2497 0 0 4.996</pose>
+          </waypoint>
+          <waypoint>
+            <time>1.5</time>
+            <pose>3.661 15.354 0.2497 0 0 4.996</pose>
+          </waypoint>
+          <waypoint>
+            <time>3.0</time>
+            <pose>3.577 15.642 0.2497 0 0 4.996</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <model name='path_prop_17_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://CasualFemale/meshes/casual_female.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>3.867 -8.136 0.2497 0 0 5.994</pose>
+    </model>
+    <model name='path_prop_20_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://CasualFemale/meshes/casual_female.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-3.061 -14.826 0.2497 0 0 4.045</pose>
+    </model>
+    <model name='path_prop_21_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://WalkingPerson/meshes/walking.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>0.765 -15.126 0.2497 0 0 5.351</pose>
+    </model>
+    <model name='path_prop_23_person'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://WalkingPerson/meshes/walking.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.5 0.35 1.8</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <pose>-4.187 -8.045 0.2497 0 0 1.616</pose>
+    </model>
   </world>
 </sdf>

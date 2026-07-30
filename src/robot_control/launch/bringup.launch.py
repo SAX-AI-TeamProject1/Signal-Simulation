@@ -44,6 +44,11 @@ def generate_launch_description():
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
 
+    # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
+    # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
+    # 확인: ls /dev/video*  (scripts/run_camera_node.sh 는 스스로 골라 준다)
+    camera_device_id = LaunchConfiguration('camera_device_id')
+
     # 실제로 채워 놓은 값, 기본값만
     declare_args = [
         DeclareLaunchArgument('use_sim_time', default_value='true'),
@@ -53,6 +58,9 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
                               description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
+        DeclareLaunchArgument('camera_device_id', default_value='0',
+                              description='웹캠 장치 번호(/dev/video<N> 의 N). '
+                                          'ls /dev/video* 로 확인'),
         DeclareLaunchArgument('enable_patrol', default_value='true',
                                       description='true 면 트랙 왕복 노드(waypoint_follower)를 함께 띄운다'),
         DeclareLaunchArgument('enable_flat_ground', default_value='true',
@@ -218,11 +226,16 @@ def generate_launch_description():
     #    /cmd_vel_gesture 가 된다. 반면 twist_mux 는 로봇 네임스페이스 안에서 돌기 때문에
     #    /robot1/cmd_vel_gesture 를 구독한다. 둘을 여기서 이어준다.
     #    (로봇이 여러 대가 되면 어느 로봇에 수신호를 보낼지 여기서 정하게 된다)
+    #    device_id 를 넘기는 이유: 노드 기본값은 0 인데 /dev/video0 이 늘 있는 건 아니다.
+    #    USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매기고, 그러면
+    #    camera_node 가 장치를 못 열어 RuntimeError 로 죽는다.
+    #      ros2 launch robot_control bringup.launch.py camera_device_id:=1
     camera = Node(
         package='robot_control',
         executable='camera_node',
         condition=IfCondition(enable_camera),
-        remappings=[('cmd_vel_gesture', '/robot2/cmd_vel_gesture')],
+        parameters=[{'device_id': ParameterValue(camera_device_id, value_type=int)}],
+        remappings=[('cmd_vel_gesture', '/robot1/cmd_vel_gesture')],
         output='screen',
     )
 
