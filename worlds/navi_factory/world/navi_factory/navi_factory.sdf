@@ -13545,65 +13545,82 @@
       </link>
       <pose>0 40 0.2497 0 0 0</pose>
     </model>
-    <model name='path_prop_3_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+    <actor name='path_prop_2_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://StandingPerson/meshes/standing.dae</uri>
-            </mesh>
+            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>-3.704 9.876 0.2497 0 0 0.877</pose>
-    </model>
-    <model name='path_prop_6_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>3.495 9.0 0.2497 0 0 0.0</pose></waypoint>
+          <waypoint><time>3.75</time><pose>6.495 9.0 0.2497 0 0 0.0</pose></waypoint>
+          <waypoint><time>7.5</time><pose>3.495 9.0 0.2497 0 0 0.0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name='path_prop_3_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://StandingPerson/meshes/standing.dae</uri>
-            </mesh>
+            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>-3.14 5.283 0.2497 0 0 0.178</pose>
-    </model>
-        <actor name='path_prop_8_person'>
-      <skin>
-        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
-        <scale>1.0</scale>
-      </skin>
-      <animation name='walking'>
-        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
-        <scale>1.0</scale>
-        <interpolate_x>true</interpolate_x>
-      </animation>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>-3.704 9.876 0.2497 0 0 0.877</pose></waypoint>
+          <waypoint><time>3.75</time><pose>-1.787 12.184 0.2497 0 0 0.877</pose></waypoint>
+          <waypoint><time>7.5</time><pose>-3.704 9.876 0.2497 0 0 0.877</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name='path_prop_6_person'>
+      <link name="body">
+        <visual name="visual">
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
+          </geometry>
+        </visual>
+      </link>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>-3.14 5.283 0.2497 0 0 0.178</pose></waypoint>
+          <waypoint><time>3.75</time><pose>-0.187 5.814 0.2497 0 0 0.178</pose></waypoint>
+          <waypoint><time>7.5</time><pose>-3.14 5.283 0.2497 0 0 0.178</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+        <!-- 리깅(스켈레톤) 애니메이션 제거: MaleVisitorWalk.dae 스킨+걷기 클립은 매 스텝
+             본 보간이 필요해서 이 무거운 월드(이미 RTF ~0.5%)에서 부하가 컸다. 뼈대 없는
+             정적 메시(다른 static person 소품들과 동일한 standing.dae)를 그대로 두고
+             trajectory로 몸체 pose만 옮기는 방식(tools/tracks_to_actors.py와 동일 패턴)으로
+             바꿔 애니메이션 보간 비용 없이 이동만 하게 했다. -->
+    <actor name='path_prop_8_person'>
+      <link name="body">
+        <visual name="visual">
+          <pose>0 0 0.02 0.04 0 0</pose>
+          <geometry>
+            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
+          </geometry>
+        </visual>
+      </link>
       <script>
         <loop>true</loop>
         <delay_start>0.0</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='walking'>
+        <trajectory id='0' type='square'>
           <waypoint>
             <time>0</time>
             <pose>3.577 15.642 0.2497 0 0 4.996</pose>
@@ -13619,94 +13636,81 @@
         </trajectory>
       </script>
     </actor>
-
-    <model name='path_prop_17_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+    <actor name='path_prop_17_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://CasualFemale/meshes/casual_female.dae</uri>
-            </mesh>
+            <mesh><uri>model://CasualFemale/meshes/casual_female.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>3.867 -8.136 0.2497 0 0 5.994</pose>
-    </model>
-    <model name='path_prop_20_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>3.867 -8.136 0.2497 0 0 5.994</pose></waypoint>
+          <waypoint><time>3.75</time><pose>6.743 -8.991 0.2497 0 0 5.994</pose></waypoint>
+          <waypoint><time>7.5</time><pose>3.867 -8.136 0.2497 0 0 5.994</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name='path_prop_20_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://CasualFemale/meshes/casual_female.dae</uri>
-            </mesh>
+            <mesh><uri>model://CasualFemale/meshes/casual_female.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>-3.061 -14.826 0.2497 0 0 4.045</pose>
-    </model>
-    <model name='path_prop_21_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>-3.061 -14.826 0.2497 0 0 4.045</pose></waypoint>
+          <waypoint><time>3.75</time><pose>-4.916 -17.184 0.2497 0 0 4.045</pose></waypoint>
+          <waypoint><time>7.5</time><pose>-3.061 -14.826 0.2497 0 0 4.045</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name='path_prop_21_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://WalkingPerson/meshes/walking.dae</uri>
-            </mesh>
+            <mesh><uri>model://WalkingPerson/meshes/walking.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>0.765 -15.126 0.2497 0 0 5.351</pose>
-    </model>
-    <model name='path_prop_23_person'>
-      <static>true</static>
-      <link name='link'>
-        <visual name='visual'>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>0.765 -15.126 0.2497 0 0 5.351</pose></waypoint>
+          <waypoint><time>3.75</time><pose>2.558 -17.532 0.2497 0 0 5.351</pose></waypoint>
+          <waypoint><time>7.5</time><pose>0.765 -15.126 0.2497 0 0 5.351</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+    <actor name='path_prop_23_person'>
+      <link name="body">
+        <visual name="visual">
           <pose>0 0 0.02 0.04 0 0</pose>
           <geometry>
-            <mesh>
-              <uri>model://WalkingPerson/meshes/walking.dae</uri>
-            </mesh>
+            <mesh><uri>model://WalkingPerson/meshes/walking.dae</uri></mesh>
           </geometry>
         </visual>
-        <collision name='collision'>
-          <pose>0 0 0.9 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.5 0.35 1.8</size>
-            </box>
-          </geometry>
-        </collision>
       </link>
-      <pose>-4.187 -8.045 0.2497 0 0 1.616</pose>
-    </model>
+      <script>
+        <loop>true</loop>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='square'>
+          <waypoint><time>0</time><pose>-4.187 -8.045 0.2497 0 0 1.616</pose></waypoint>
+          <waypoint><time>3.75</time><pose>-4.322 -5.048 0.2497 0 0 1.616</pose></waypoint>
+          <waypoint><time>7.5</time><pose>-4.187 -8.045 0.2497 0 0 1.616</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
   </world>
 </sdf>

@@ -12,13 +12,23 @@
 
   <xacro:arg name="ns" default="robot2"/>
 
-  <!-- ===== 외형 메시 (mecanum_lift) ===== -->
-  <!-- 원본 model.sdf의 visual pose(0 0 -0.084, roll 90도)를 그대로 재사용 —
-       이 메시는 원래부터 이 오프셋으로 정렬해서 쓰도록 만들어진 애셋이다. -->
-  <xacro:property name="lift_mesh" value="model://mecanum_lift/meshes/MecanumLift.dae"/>
-  <xacro:property name="lift_scale" value="0.6 0.6 0.6"/>
-  <xacro:property name="mesh_roll" value="1.5708"/>
-  <xacro:property name="mesh_z_offset" value="-0.084"/>
+  <!-- ===== 외형 메시 (deco_forklift 재사용) ===== -->
+  <!-- worlds/navi_factory 의 deco_forklift_ogv 소품과 같은 glb를 그대로 쓴다. 그 소품은
+       scale/offset 없이(즉 1:1 실척, 원점=바닥) 배치돼 있었으므로 여기서도 동일하게
+       회전·오프셋 없이 얹는다. 실제 지게차 실척(길이 2.4 x 폭 1.4 x 높이 2.06m)이라
+       지금 chassis collision(2.0x0.9x0.6)/바퀴 배치보다 눈에 띄게 크고 높다 — 요청은
+       "메시 교체"까지라 물리 치수(collision/wheel_sep 등)는 안 건드렸고, 시각적으로
+       안 맞으면 후속으로 chassis 치수도 지게차 실척에 맞춰 키우는 작업이 필요하다. -->
+  <xacro:property name="lift_mesh" value="model://Forklift/base_visual.glb"/>
+  <xacro:property name="lift_scale" value="1 1 1"/>
+  <xacro:property name="mesh_roll" value="0"/>
+  <xacro:property name="mesh_z_offset" value="0"/>
+  <!-- base_visual.glb 안에 Y축 +90도 회전이 이미 baked돼 있어(Blender glTF export 축변환
+       추정), 이 mesh_yaw 하나만으로는 정면이 로봇의 실제 전진(+X, DiffDrive/바퀴 기준)과
+       맞는다는 보장이 없다. Gazebo에서 정지 스폰해 포크가 향하는 쪽과 +X 전진 방향을
+       비교해 0/1.5708/3.1416/-1.5708 중 맞는 값으로 채워야 한다(로봇.urdf.xacro의
+       mesh_yaw 패턴과 동일). -->
+  <xacro:property name="mesh_yaw" value="0"/>
 
   <!-- ===== 구동 파라미터 ===== -->
   <xacro:property name="wheel_radius" value="0.15"/>
@@ -68,7 +78,7 @@
   <!-- ===== chassis (지면 기준, 원점 z=0) ===== -->
   <link name="chassis">
     <visual>
-      <origin xyz="0 0 ${mesh_z_offset}" rpy="${mesh_roll} 0 0"/>
+      <origin xyz="0 0 ${mesh_z_offset}" rpy="${mesh_roll} 0 ${mesh_yaw}"/>
       <geometry>
         <mesh filename="${lift_mesh}" scale="${lift_scale}"/>
       </geometry>
