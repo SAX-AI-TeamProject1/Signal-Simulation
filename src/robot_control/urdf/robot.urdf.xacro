@@ -59,8 +59,23 @@
     </inertial>
   </xacro:macro>
 
-  <!-- ===== base_link (지면 기준, 원점 z=0) ===== -->
-  <link name="base_link">
+  <!-- ===== base_link: 질량 없는 루트(참조 프레임 전용) =====
+       KDL이 "root link에 inertia가 있으면 안 된다"고 경고하던 걸 계기로,
+       root에 질량을 직접 두지 않는 표준 ROS 관례(base_link → 실제 바디는
+       자식 링크)로 바꿨다. 질량/충돌/외형은 전부 chassis로 옮기고, base_link는
+       고정 조인트로 chassis에 붙는 참조 프레임으로만 남긴다.
+       (DiffDrive의 child_frame_id는 base_link로 그대로 둬도 된다 — 관례상
+       odom→base_link tf가 이 참조 프레임을 가리키는 게 정상이다.) -->
+  <link name="base_link"/>
+
+  <joint name="base_to_chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===== chassis (지면 기준, 원점 z=0) ===== -->
+  <link name="chassis">
     <!-- 외형: OGV 메시 (시각 전용, 충돌엔 안 씀) -->
     <visual>
       <origin xyz="0 0 0" rpy="0 0 ${mesh_yaw}"/>
@@ -85,11 +100,25 @@
       </collision>
       <xacro:cyl_inertia m="${wheel_mass}" r="${wheel_radius}" l="${wheel_width}"/>
     </link>
+    <gazebo reference="${prefix}_wheel">
+      <collision>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+    </gazebo>
     <joint name="${prefix}_wheel_joint" type="continuous">
-      <parent link="base_link"/>
+      <parent link="chassis"/>
       <child  link="${prefix}_wheel"/>
-      <!-- 좌우로 벌리고, 바닥 접점이 z=0 이 되도록 중심을 wheel_radius 높이에 -->
-      <origin xyz="0 ${side_y} ${wheel_radius}" rpy="0 0 0"/>
+      <!-- 좌우로 벌리고, 바닥 접점이 z=0 이 되도록 중심을 wheel_radius 높이에.
+           접지가 정확히 tangent(겹침 0)라 접촉이 불안정해 미끄러지는 문제가 있어
+           1cm 겹치게 살짝 낮춤(wheel_radius - 0.01) → 안정적인 접촉/마찰 확보. -->
+      <origin xyz="0 ${side_y} ${wheel_radius - 0.01}" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
     </joint>
   </xacro:macro>
@@ -105,9 +134,14 @@
       <xacro:sphere_inertia m="0.5" r="${caster_radius}"/>
     </link>
     <joint name="${prefix}_caster_joint" type="fixed">
-      <parent link="base_link"/>
+      <parent link="chassis"/>
       <child  link="${prefix}_caster"/>
-      <origin xyz="${px} 0 ${caster_radius}" rpy="0 0 0"/>
+      <!-- 캐스터·구동바퀴 밑면이 둘 다 base_link 기준 z=0로 설계되어 4점이 완전히
+           동일 평면 위에 놓인다 → 물리 솔버가 하중을 캐스터 쪽에 몰아줘 구동바퀴
+           접지력(따라서 마찰력)이 거의 사라지는 문제가 있었다. 평평한 바닥에서는
+           캐스터가 아예 안 닿게 2cm 띄워 하중이 구동바퀴 2개에만 실리게 한다
+           (전복 방지용 지지는 기울어질 때만 필요하므로 이 정도 여유는 안전). -->
+      <origin xyz="${px} 0 ${caster_radius + 0.02}" rpy="0 0 0"/>
     </joint>
     <gazebo reference="${prefix}_caster">
       <mu1>0.0</mu1><mu2>0.0</mu2>
@@ -121,7 +155,7 @@
     <xacro:box_inertia m="0.05" x="0.02" y="0.06" z="0.02"/>
   </link>
   <joint name="camera_joint" type="fixed">
-    <parent link="base_link"/>
+    <parent link="chassis"/>
     <child  link="camera_link"/>
     <origin xyz="0.5 0 0.5" rpy="0 0 0"/>
   </joint>

@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!--
+  mecanum_lift 로봇: mecanum_lift 메시를 "외형"으로 쓰고, 구동은 robot.urdf.xacro와
+  동일한 자체 diff-drive 구조를 얹는다. robot.urdf.xacro(OGV 버전)에서 밤새 검증된
+  chassis/바퀴/캐스터/DiffDrive 구조를 그대로 재사용하고 외형 메시만 교체했다.
+  라이다 + 카메라 센서 포함 (Method B — 실제 물리 모델 + 실제 센서).
+
+  치수는 worlds/navi_factory/models/mecanum_lift/model.sdf 의 collision(scissor
+  박스 2.04x0.936x0.6)을 참고해 대략적인 비율로 잡았다.
+-->
+<robot name="mecanum_lift_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="ns" default="robot2"/>
+
+  <!-- ===== 외형 메시 (mecanum_lift) ===== -->
+  <!-- 원본 model.sdf의 visual pose(0 0 -0.084, roll 90도)를 그대로 재사용 —
+       이 메시는 원래부터 이 오프셋으로 정렬해서 쓰도록 만들어진 애셋이다. -->
+  <xacro:property name="lift_mesh" value="model://mecanum_lift/meshes/MecanumLift.dae"/>
+  <xacro:property name="lift_scale" value="0.6 0.6 0.6"/>
+  <xacro:property name="mesh_roll" value="1.5708"/>
+  <xacro:property name="mesh_z_offset" value="-0.084"/>
+
+  <!-- ===== 구동 파라미터 ===== -->
+  <xacro:property name="wheel_radius" value="0.15"/>
+  <xacro:property name="wheel_width"  value="0.12"/>
+  <!-- 고속 코너링 시 전복 방지: 바퀴/캐스터 간격을 넓혀 안정성 확보 -->
+  <xacro:property name="wheel_sep"    value="1.3"/>
+  <xacro:property name="caster_radius" value="0.07"/>
+  <xacro:property name="caster_x"      value="0.95"/>
+
+  <xacro:property name="base_mass"   value="25.0"/>
+  <xacro:property name="wheel_mass"  value="1.5"/>
+
+  <!-- ===== 관성 매크로 ===== -->
+  <xacro:macro name="box_inertia" params="m x y z">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${m*(y*y+z*z)/12.0}" ixy="0" ixz="0"
+               iyy="${m*(x*x+z*z)/12.0}" iyz="0"
+               izz="${m*(x*x+y*y)/12.0}"/>
+    </inertial>
+  </xacro:macro>
+  <xacro:macro name="cyl_inertia" params="m r l">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${m*(3*r*r+l*l)/12.0}" ixy="0" ixz="0"
+               iyy="${m*(3*r*r+l*l)/12.0}" iyz="0"
+               izz="${m*r*r/2.0}"/>
+    </inertial>
+  </xacro:macro>
+  <xacro:macro name="sphere_inertia" params="m r">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${2*m*r*r/5.0}" ixy="0" ixz="0"
+               iyy="${2*m*r*r/5.0}" iyz="0" izz="${2*m*r*r/5.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- ===== base_link: 질량 없는 루트(참조 프레임 전용) ===== -->
+  <link name="base_link"/>
+
+  <joint name="base_to_chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===== chassis (지면 기준, 원점 z=0) ===== -->
+  <link name="chassis">
+    <visual>
+      <origin xyz="0 0 ${mesh_z_offset}" rpy="${mesh_roll} 0 0"/>
+      <geometry>
+        <mesh filename="${lift_mesh}" scale="${lift_scale}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.45" rpy="0 0 0"/>
+      <geometry><box size="2.0 0.9 0.6"/></geometry>
+    </collision>
+    <xacro:box_inertia m="${base_mass}" x="2.0" y="0.9" z="0.6"/>
+  </link>
+
+  <!-- ===== 구동 바퀴 매크로 ===== -->
+  <xacro:macro name="drive_wheel" params="prefix side_y">
+    <link name="${prefix}_wheel">
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      </collision>
+      <xacro:cyl_inertia m="${wheel_mass}" r="${wheel_radius}" l="${wheel_width}"/>
+    </link>
+    <gazebo reference="${prefix}_wheel">
+      <collision>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+    </gazebo>
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="chassis"/>
+      <child  link="${prefix}_wheel"/>
+      <origin xyz="0 ${side_y} ${wheel_radius - 0.01}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:drive_wheel prefix="left"  side_y="${ wheel_sep/2}"/>
+  <xacro:drive_wheel prefix="right" side_y="${-wheel_sep/2}"/>
+
+  <!-- ===== 캐스터 매크로 (앞/뒤 지지, 마찰 0) ===== -->
+  <xacro:macro name="caster" params="prefix px">
+    <link name="${prefix}_caster">
+      <collision>
+        <geometry><sphere radius="${caster_radius}"/></geometry>
+      </collision>
+      <xacro:sphere_inertia m="0.5" r="${caster_radius}"/>
+    </link>
+    <joint name="${prefix}_caster_joint" type="fixed">
+      <parent link="chassis"/>
+      <child  link="${prefix}_caster"/>
+      <origin xyz="${px} 0 ${caster_radius + 0.02}" rpy="0 0 0"/>
+    </joint>
+    <gazebo reference="${prefix}_caster">
+      <mu1>0.0</mu1><mu2>0.0</mu2>
+    </gazebo>
+  </xacro:macro>
+  <xacro:caster prefix="front" px="${ caster_x}"/>
+  <xacro:caster prefix="back"  px="${-caster_x}"/>
+
+  <!-- ===== 카메라 링크 ===== -->
+  <link name="camera_link">
+    <xacro:box_inertia m="0.05" x="0.02" y="0.06" z="0.02"/>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <parent link="chassis"/>
+    <child  link="camera_link"/>
+    <origin xyz="1.0 0 1.0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===== 라이다 링크 ===== -->
+  <link name="lidar_link">
+    <xacro:box_inertia m="0.1" x="0.05" y="0.05" z="0.05"/>
+  </link>
+  <joint name="lidar_joint" type="fixed">
+    <parent link="chassis"/>
+    <child  link="lidar_link"/>
+    <origin xyz="0.3 0 1.1" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_sep}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+      <odom_publish_frequency>30</odom_publish_frequency>
+      <max_linear_acceleration>1.5</max_linear_acceleration>
+      <topic>$(arg ns)/cmd_vel</topic>
+      <odom_topic>$(arg ns)/odom</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <tf_topic>$(arg ns)/tf</tf_topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+      <topic>$(arg ns)/joint_states</topic>
+    </plugin>
+    <!-- odom(바퀴 적산치)은 슬립이 있으면 실제 위치와 어긋난다. 웨이포인트
+         추종은 절대 좌표(월드 프레임) 기준이라야 하므로, 적산 오차 없는
+         진짜(ground-truth) pose를 별도로 발행해 그걸 쓴다. -->
+    <plugin filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+      <publish_model_pose>true</publish_model_pose>
+      <publish_link_pose>false</publish_link_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_sensor_pose>false</publish_sensor_pose>
+      <use_pose_vector_msg>false</use_pose_vector_msg>
+      <static_publisher>false</static_publisher>
+      <update_frequency>30</update_frequency>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <publish_pose>true</publish_pose>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="sim_camera" type="camera">
+      <always_on>1</always_on>
+      <update_rate>15</update_rate>
+      <topic>camera/image</topic>
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov>
+        <image><width>640</width><height>480</height></image>
+        <clip><near>0.1</near><far>100.0</far></clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- update_rate/samples를 낮게: gpu_lidar는 스캔마다 씬을 렌더링해서 GPU 가속
+       없이는 부하가 크다 (docs/gazebo-control-guide.md §7 권장값). -->
+  <!-- 라이다가 real-time factor 저하의 주범인지 확인해봤는데 아니었다(꺼도 배속
+       그대로) — 병목은 월드의 소품 개수(충돌 계산량) 쪽으로 보인다. -->
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <topic>$(arg ns)/scan</topic>
+      <update_rate>5</update_rate>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>180</samples>
+            <min_angle>-3.1416</min_angle>
+            <max_angle>3.1416</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>
+          <max>10.0</max>
+        </range>
+      </lidar>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+</robot>

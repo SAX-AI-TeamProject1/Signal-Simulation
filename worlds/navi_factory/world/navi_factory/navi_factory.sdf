@@ -2,9 +2,13 @@
   <world name='warehouse_fuel'>
     <gravity>0 0 -9.8000000000000007</gravity>
     <physics name='default_physics' default='false' type='ode'>
-      <max_step_size>0.001</max_step_size>
+      <!-- 이 무거운 월드(소품 메시 수백 개)에서 실시간 배속이 실제 시간의
+           ~0.5% 수준으로 떨어지는 문제가 있어, 스텝 크기를 10배 늘려(계산량은
+           스텝 개수에 비례하지 stepsize 자체엔 크게 안 늘어나므로) 물리
+           정밀도를 조금 희생하고 실시간 배속을 개선한다. -->
+      <max_step_size>0.05</max_step_size>
       <real_time_factor>1</real_time_factor>
-      <real_time_update_rate>1000</real_time_update_rate>
+      <real_time_update_rate>20</real_time_update_rate>
       <!-- 실제로 로드되는 physics 플러그인은 dartsim(gz-physics-dartsim)이고, 이 world의
            type='ode'는 DART가 기본으로 쓰는 충돌 검출기 백엔드를 ODE로 고른다는 뜻이다.
            box(flat_ground) vs trimesh(창고 소품 메시들) 충돌에서 ODE의 dCollideBTL이
@@ -11496,5 +11500,9 @@
         <falloff>0</falloff>
       </spot>
     </light>
+    <!-- 왕복 순찰은 이제 액터(스크립트)가 아니라 실제 물리 로봇(mecanum_lift_robot,
+         robot2)이 cmd_vel 기반 웨이포인트 추종(waypoint_follower)으로 수행한다.
+         이전엔 DiffDrive가 안 도는 줄 알고 액터로 우회했었는데, 원인이 물리 스텝
+         크기였던 게 밝혀져 액터가 더 이상 필요 없어 제거했다. -->
   </world>
 </sdf>

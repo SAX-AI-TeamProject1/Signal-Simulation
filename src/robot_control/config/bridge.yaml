@@ -33,3 +33,39 @@
   ros_type_name: "tf2_msgs/msg/TFMessage"
   gz_type_name: "gz.msgs.Pose_V"
   direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/cmd_vel"        # mecanum_lift_robot (Method B, 라이다+카메라)
+  gz_topic_name: "/robot2/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/robot2/odom"
+  gz_topic_name: "/robot2/odom"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/joint_states"
+  gz_topic_name: "/robot2/joint_states"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/tf"
+  gz_topic_name: "/robot2/tf"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/scan"           # 라이다 (gz → ROS)
+  gz_topic_name: "/robot2/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/pose_gt"        # 진짜(ground-truth) 월드 좌표 — odom
+  gz_topic_name: "/model/mecanum_lift_robot/pose"  # 슬립으로 어긋나는 문제 회피용.
+  ros_type_name: "geometry_msgs/msg/Pose"          # gz 토픽명은 모델 이름 기준이라
+  gz_type_name: "gz.msgs.Pose"                     # ns가 아니라 model name을 씀.
+  direction: GZ_TO_ROS

@@ -41,6 +41,8 @@ def generate_launch_description():
     # 인식 파이프라인은 실물 웹캠이 필요해서 기본 off.
     # 웹캠 없는 머신에서 bringup 이 실패하지 않도록 기존 시뮬 경로의 동작을 그대로 유지한다.
     enable_camera = LaunchConfiguration('enable_camera')
+    enable_patrol = LaunchConfiguration('enable_patrol')    # +
+    enable_flat_ground = LaunchConfiguration('enable_flat_ground')
 
     # 실제로 채워 놓은 값, 기본값만
     declare_args = [
@@ -51,18 +53,30 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
                               description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
+        DeclareLaunchArgument('enable_patrol', default_value='true',
+                                      description='true 면 트랙 왕복 노드(waypoint_follower)를 함께 띄운다'),
+        DeclareLaunchArgument('enable_flat_ground', default_value='true',
+                              description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
+                                          '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
+                                          '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
     # @우진 - 이거 최초 위치 정보도 세팅 가능한데, 해주면 좋을듯?
+    # 4번째 값은 스폰 pose (x, y, z, yaw) — 로봇마다 겹치지 않게 각자 지정.
+    # robot1(knavi_robot, 센서 없음)은 물리 검증이 끝나서 제거 — 물리 로봇 2대를
+    # 같이 돌리면 이 무거운 월드에서 성능 부담이 커진다. 센서(라이다+카메라) 있는
+    # mecanum_lift_robot만 남긴다.
     robot_info = [
-        ('robot.urdf.xacro', 'robot1', 'knavi_robot')
+        ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
+         ('0.0', '32.25', '0.3', '-1.5708')),  # entry 트랙 진행 방향(남쪽)으로 정렬
     ]
     robot_nodes = []
     for info in robot_info:
         model_info = info[0]  # 어떤 모델 urdf를 읽을지
         namespace = info[1]   # 이 로봇의 식별 정보
         name = info[2]        # 이 로봇의 이름(가제보 GUI)
+        spawn_x, spawn_y, spawn_z, spawn_yaw = info[3]
         # xacro 를 실행 시점에 펼쳐 URDF 문자열을 만든다(파일에 미리 펼쳐두지 않음 → 파라미터 바뀌면 자동 반영).
         xacro_file = os.path.join(pkg_share, 'urdf', model_info)  # 3번 인자의 객체의 urdf 파일
         # ns 인자를 xacro 에 넘겨 gz 토픽을 /robot1/... 으로 분리(bridge.yaml 과 일치).
@@ -83,16 +97,27 @@ def generate_launch_description():
         )
 
         # 3) 로봇 스폰: robot_state_publisher 가 발행하는 robot_description 토픽에서 모델을 읽어 월드에 생성.
+        # spawn = Node(
+        #     package='ros_gz_sim',
+        #     executable='create',
+        #     arguments=['-topic', namespace+'/robot_description',
+        #                '-name', name,
+        #                # 창고 바닥 범위: x[-15~15], y[-25~25], 바닥 z≈0.1.
+        #                # 이 범위 밖에 스폰하면 허공 낙하하니 반드시 안쪽으로.
+        #                '-x', '-10',
+        #                '-y', '-10',
+        #                '-z', '0.3'],   # 바닥(0.1) 살짝 위에서 떨궈 안착
+        #     output='screen',
+        # )
         spawn = Node(
             package='ros_gz_sim',
             executable='create',
             arguments=['-topic', namespace+'/robot_description',
-                       '-name', name,
-                       # 창고 바닥 범위: x[-15~15], y[-25~25], 바닥 z≈0.1.
-                       # 이 범위 밖에 스폰하면 허공 낙하하니 반드시 안쪽으로.
-                       '-x', '-10',
-                       '-y', '-10',
-                       '-z', '0.3'],   # 바닥(0.1) 살짝 위에서 떨궈 안착
+                    '-name', name,
+                    '-x', spawn_x,
+                    '-y', spawn_y,
+                    '-z', spawn_z,
+                    '-Y', spawn_yaw],
             output='screen',
         )
 
@@ -111,7 +136,17 @@ def generate_launch_description():
             remappings=[('cmd_vel_out', 'cmd_vel')],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux]
+
+        # 5) 왕복 트랙 팔로워 : odom 보고 cmd_vel_auto 발행 (twist_mux 최하위 우선순위로 들어감).
+        patrol = Node(
+            package = 'robot_control',
+            executable='waypoint_follower',
+            namespace= namespace,
+            condition = IfCondition(enable_patrol),
+            parameters = [{'use_sim_time':use_sim_time}],
+            output = 'screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
@@ -151,10 +186,17 @@ def generate_launch_description():
     # 안정용 평평한 바닥판 스폰 (창고 STL 바닥 접촉 불안정 회피용).
     # STL 바닥(z≈0.2)보다 살짝 위(0.25)에 깔아 로봇이 flat_ground 에 먼저 닿게 함 → 결함 STL 바닥 무시.
     # (벽 충돌은 STL 유지, 바닥만 이 평면이 대신)
+    #
+    # 주의: 이 얇은 박스가 이 월드의 물리 설정(DART+Bullet 충돌 검출기)과 만나면
+    # 바퀴 접지가 사실상 고정돼(뒤틀린 접촉 해석으로 추정) 로봇이 cmd_vel 을 받아도
+    # 전혀 전진하지 못하는 문제가 있었다 — 빈 월드/이 월드의 STL 바닥에 직접 스폰했을
+    # 때는 정상 이동함을 확인. DiffDrive로 실제 굴러가야 하는 로봇(Method B)에는
+    # enable_flat_ground:=false 로 꺼서 STL 바닥에 직접 놓는다.
     ground_sdf = os.path.join(pkg_share, 'config', 'flat_ground.sdf')
     ground = Node(
         package='ros_gz_sim',
         executable='create',
+        condition=IfCondition(enable_flat_ground),
         arguments=['-file', ground_sdf, '-name', 'flat_ground', '-z', '0.25'],
         output='screen',
     )
@@ -180,7 +222,7 @@ def generate_launch_description():
         package='robot_control',
         executable='camera_node',
         condition=IfCondition(enable_camera),
-        remappings=[('cmd_vel_gesture', '/robot1/cmd_vel_gesture')],
+        remappings=[('cmd_vel_gesture', '/robot2/cmd_vel_gesture')],
         output='screen',
     )
 

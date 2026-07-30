@@ -42,19 +42,43 @@ fi
 # ros2 launch 자체에 SIGINT 를 보내면(강제 kill 이 아니라) launch 가 자기 자식들에게
 # 알아서 순서대로 SIGINT 를 돌려 정상 종료시킨다 — bridge_node 가 강제 종료보다
 # 정상 종료일 때 훨씬 안정적으로 죽는다(그냥 kill -9 하면 segfault 로 죽는 걸 본 적 있음).
-OLD_PID=$(pgrep -f "ros2 launch robot_control bringup.launch.py" | head -1)
-if [ -n "$OLD_PID" ]; then
-    echo "[run_bringup] 이전 bringup(pid $OLD_PID)이 아직 돌고 있어 정상 종료시킵니다..." >&2
-    kill -INT "$OLD_PID" 2>/dev/null || true
+#
+# 부모(ros2 launch) 하나만 찾아 죽이는 것만으로는 부족하다는 게 실측으로 드러났다
+# (2026-07-30): launch 부모가 먼저 죽어버리는 경우(태스크 패널을 정지 버튼이 아닌
+# 다른 방식으로 끊는 등) twist_mux/bridge_node/waypoint_follower/robot_state_publisher
+# 자식들이 orphan 으로 남는데, 그러면 "ros2 launch ..." 패턴이 더 이상 안 잡혀 아래
+# 정리 블록 전체가 스킵되고 좀비가 무한정(관측상 8세대까지) 쌓인다. 그래서 부모
+# 생사와 무관하게 이 launch 가 띄우는 노드들을 이름으로 직접, 매번 정리한다.
+OLD_PIDS=$(pgrep -f "ros2 launch robot_control bringup.launch.py" || true)
+if [ -n "$OLD_PIDS" ]; then
+    echo "[run_bringup] 이전 bringup(pid: $(echo $OLD_PIDS | tr '\n' ' '))이 아직 돌고 있어 정상 종료시킵니다..." >&2
+    kill -INT $OLD_PIDS 2>/dev/null || true
     for _ in $(seq 1 20); do   # 최대 10초 대기
-        kill -0 "$OLD_PID" 2>/dev/null || break
+        pgrep -f "ros2 launch robot_control bringup.launch.py" >/dev/null 2>&1 || break
         sleep 0.5
     done
-    kill -0 "$OLD_PID" 2>/dev/null && kill -KILL "$OLD_PID" 2>/dev/null || true
+    pkill -KILL -f "ros2 launch robot_control bringup.launch.py" 2>/dev/null || true
 fi
-# gz 서버는 launch 의 자식이 아니라 IncludeLaunchDescription 이 띄운 별도 그룹이라
-# 위 SIGINT 캐스케이드로도 안 죽는 경우가 있어 별도로 한 번 더 정리 (run_gazebo.sh 와 동일).
-pkill -TERM -f "gz sim server" 2>/dev/null || true
+
+# gz 서버/GUI 와, 부모 없이 orphan 으로 남을 수 있는 이 launch 전용 노드들
+# (bridge_node, twist_mux, waypoint_follower, robot_state_publisher)을 이름으로
+# 한 번 더 확실히 정리한다 — 위 부모 kill 로 이미 죽었으면 아무 것도 안 걸린다.
+# 먼저 정상 종료(TERM)를 시도해 bridge_node 강제종료 크래시를 피하고, 잠깐 기다린 뒤
+# 그래도 살아있으면 KILL 로 마무리한다.
+ORPHAN_PATTERNS=(
+    "gz sim"
+    "bridge_node"
+    "twist_mux"
+    "robot_control/lib/robot_control/waypoint_follower"
+    "robot_state_publisher.*robot_description"
+)
+for pattern in "${ORPHAN_PATTERNS[@]}"; do
+    pkill -TERM -f "$pattern" 2>/dev/null || true
+done
+sleep 2
+for pattern in "${ORPHAN_PATTERNS[@]}"; do
+    pkill -KILL -f "$pattern" 2>/dev/null || true
+done
 sleep 1
 
 # 인자는 그대로 launch 로 넘긴다. 예:
