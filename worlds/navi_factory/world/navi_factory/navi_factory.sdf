@@ -37,7 +37,7 @@
           <geometry>
             <mesh>
               <scale>2 2 2</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
+              <uri>model://warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -46,7 +46,7 @@
           <geometry>
             <mesh>
               <scale>2 2 2</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
+              <uri>model://warehouse_mohamedazimal27_2x/meshes/warehouse.dae</uri>
               <submesh>
                 <name>drop1</name>
                 <center>true</center>
@@ -109,7 +109,7 @@
         <visual name='Body_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>Body</name>
@@ -128,7 +128,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -139,7 +139,7 @@
         <visual name='AxelFR_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>AxelFR</name>
@@ -158,7 +158,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -169,7 +169,7 @@
         <visual name='WheelFR_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>WheelFR</name>
@@ -188,7 +188,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -199,7 +199,7 @@
         <visual name='AxelBR_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>AxelBR</name>
@@ -218,7 +218,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -229,7 +229,7 @@
         <visual name='WheelBR_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>WheelBR</name>
@@ -248,7 +248,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -259,7 +259,7 @@
         <visual name='AxelFL_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>AxelFL</name>
@@ -278,7 +278,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -289,7 +289,7 @@
         <visual name='WheelFL_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>WheelFL</name>
@@ -308,7 +308,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -319,7 +319,7 @@
         <visual name='AxelBL_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>AxelBL</name>
@@ -338,7 +338,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -349,7 +349,7 @@
         <visual name='WheelBL_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/meshes/ogv.dae</uri>
+              <uri>model://OGV/meshes/ogv.dae</uri>
               <scale>9 9 9</scale>
               <submesh>
                 <name>WheelBL</name>
@@ -368,7 +368,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/OGV/materials/scripts/</uri>
+              <uri>model://OGV/materials/scripts/</uri>
               <uri>model://OGV/materials/textures/</uri>
               <name>UrbanTile/OGV_Diffuse</name>
               <scale>9 9 9</scale>
@@ -491,7 +491,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -510,7 +510,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -541,7 +541,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -560,7 +560,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -591,7 +591,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -610,7 +610,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -641,7 +641,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -660,7 +660,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -691,7 +691,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -710,7 +710,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -741,7 +741,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -760,7 +760,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -791,7 +791,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -810,7 +810,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -841,7 +841,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -860,7 +860,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -891,7 +891,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -910,7 +910,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -941,7 +941,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -960,7 +960,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -991,7 +991,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1010,7 +1010,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1041,7 +1041,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1060,7 +1060,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1091,7 +1091,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1110,7 +1110,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1141,7 +1141,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1160,7 +1160,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfE_01/meshes/aws_robomaker_warehouse_ShelfE_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1191,7 +1191,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1210,7 +1210,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1241,7 +1241,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1260,7 +1260,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ShelfD_01/meshes/aws_robomaker_warehouse_ShelfD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1291,7 +1291,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1319,7 +1319,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1350,7 +1350,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1378,7 +1378,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1409,7 +1409,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1437,7 +1437,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1468,7 +1468,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1496,7 +1496,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1527,7 +1527,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1555,7 +1555,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1586,7 +1586,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1614,7 +1614,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1645,7 +1645,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1673,7 +1673,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1704,7 +1704,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1732,7 +1732,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1763,7 +1763,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1791,7 +1791,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1822,7 +1822,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1850,7 +1850,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1881,7 +1881,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1909,7 +1909,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1940,7 +1940,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -1968,7 +1968,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -1999,7 +1999,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2027,7 +2027,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2058,7 +2058,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2086,7 +2086,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2117,7 +2117,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2145,7 +2145,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2176,7 +2176,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2204,7 +2204,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2235,7 +2235,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2263,7 +2263,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2294,7 +2294,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2322,7 +2322,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringC_01/meshes/aws_robomaker_warehouse_ClutteringC_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2353,7 +2353,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2381,7 +2381,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringD_01/meshes/aws_robomaker_warehouse_ClutteringD_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2412,7 +2412,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_collision.DAE</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -2440,7 +2440,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_ClutteringA_01/meshes/aws_robomaker_warehouse_ClutteringA_01_visual.DAE</uri>
             </mesh>
           </geometry>
           <meta>
@@ -2479,7 +2479,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2524,7 +2524,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2569,7 +2569,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2614,7 +2614,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2659,7 +2659,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2704,7 +2704,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2749,7 +2749,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2794,7 +2794,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2839,7 +2839,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2884,7 +2884,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2929,7 +2929,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/shelf_big/meshes/shelf_big_movai.dae</uri>
+              <uri>model://shelf_big/meshes/shelf_big_movai.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -2955,7 +2955,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_red/meshes/cone.stl</uri>
+              <uri>model://cone_red/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2967,7 +2967,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_red/meshes/cone.stl</uri>
+              <uri>model://cone_red/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -2996,7 +2996,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_orange/meshes/cone.stl</uri>
+              <uri>model://cone_orange/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3008,7 +3008,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_orange/meshes/cone.stl</uri>
+              <uri>model://cone_orange/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3037,7 +3037,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_yellow/meshes/cone.stl</uri>
+              <uri>model://cone_yellow/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3049,7 +3049,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_yellow/meshes/cone.stl</uri>
+              <uri>model://cone_yellow/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3078,7 +3078,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_blue/meshes/cone.stl</uri>
+              <uri>model://cone_blue/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3090,7 +3090,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cone_blue/meshes/cone.stl</uri>
+              <uri>model://cone_blue/meshes/cone.stl</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -3119,7 +3119,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3127,7 +3127,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3156,7 +3156,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3164,7 +3164,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3193,7 +3193,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3201,7 +3201,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3230,7 +3230,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3238,7 +3238,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/fire_extinguisher/meshes/extinguisher.dae</uri>
+              <uri>model://fire_extinguisher/meshes/extinguisher.dae</uri>
               <scale>3.3332999999999999 3.3332999999999999 3.3332999999999999</scale>
             </mesh>
           </geometry>
@@ -3278,7 +3278,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3297,7 +3297,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3329,7 +3329,7 @@
         <collision name='collision'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_collision.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3348,7 +3348,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
+              <uri>model://aws_robomaker_warehouse_PalletJackB_01_x15/meshes/aws_robomaker_warehouse_PalletJackB_01_visual.DAE</uri>
               <scale>1.5 1.5 1.5</scale>
             </mesh>
           </geometry>
@@ -3462,7 +3462,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -3478,7 +3478,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
+              <uri>model://mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -3522,7 +3522,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3569,7 +3569,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3616,7 +3616,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3663,7 +3663,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3865,7 +3865,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -3881,7 +3881,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
+              <uri>model://mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -3925,7 +3925,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -3972,7 +3972,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4019,7 +4019,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4066,7 +4066,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4268,7 +4268,7 @@
           <geometry>
             <mesh>
               <scale>0.59999999999999998 0.59999999999999998 0.59999999999999998</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/MecanumLift.dae</uri>
+              <uri>model://mecanum_lift/meshes/MecanumLift.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -4284,7 +4284,7 @@
               </metal>
             </pbr>
             <script>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/materials/scripts/</uri>
+              <uri>model://mecanum_lift/materials/scripts/</uri>
               <uri>materials/textures/</uri>
               <name>UrbanTile/Forklift_Diffuse</name>
             </script>
@@ -4328,7 +4328,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4375,7 +4375,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4422,7 +4422,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_left.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -4469,7 +4469,7 @@
         <visual name='visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
+              <uri>model://mecanum_lift/meshes/mecanum_wheel_right.STL</uri>
               <scale>0.0035999999999999999 0.0035999999999999999 0.0035999999999999999</scale>
             </mesh>
           </geometry>
@@ -5271,7 +5271,7 @@
         <visual name='base_visual'>
           <geometry>
             <mesh>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/Forklift/base_visual.glb</uri>
+              <uri>model://Forklift/base_visual.glb</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5409,7 +5409,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -5436,7 +5436,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -5449,7 +5449,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -5462,7 +5462,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5471,7 +5471,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5480,7 +5480,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -5546,7 +5546,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5621,7 +5621,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5668,7 +5668,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5743,7 +5743,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5790,7 +5790,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5865,7 +5865,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5917,7 +5917,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -5944,7 +5944,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -5957,7 +5957,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -5970,7 +5970,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5979,7 +5979,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -5988,7 +5988,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -6054,7 +6054,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6129,7 +6129,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6176,7 +6176,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6251,7 +6251,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6298,7 +6298,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6373,7 +6373,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6425,7 +6425,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -6452,7 +6452,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -6465,7 +6465,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -6478,7 +6478,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6487,7 +6487,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6496,7 +6496,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -6562,7 +6562,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6637,7 +6637,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6684,7 +6684,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6759,7 +6759,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6806,7 +6806,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6881,7 +6881,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6933,7 +6933,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -6960,7 +6960,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -6973,7 +6973,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -6986,7 +6986,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -6995,7 +6995,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7004,7 +7004,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -7070,7 +7070,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7145,7 +7145,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7192,7 +7192,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7267,7 +7267,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7314,7 +7314,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7389,7 +7389,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7441,7 +7441,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -7468,7 +7468,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -7481,7 +7481,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -7494,7 +7494,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7503,7 +7503,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7512,7 +7512,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -7578,7 +7578,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7653,7 +7653,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7700,7 +7700,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7775,7 +7775,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7822,7 +7822,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7897,7 +7897,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -7949,7 +7949,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -7976,7 +7976,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -7989,7 +7989,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -8002,7 +8002,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8011,7 +8011,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8020,7 +8020,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -8086,7 +8086,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8161,7 +8161,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8208,7 +8208,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8283,7 +8283,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8330,7 +8330,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8405,7 +8405,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8457,7 +8457,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -8484,7 +8484,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -8497,7 +8497,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -8510,7 +8510,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8519,7 +8519,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8528,7 +8528,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -8594,7 +8594,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8669,7 +8669,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8716,7 +8716,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8791,7 +8791,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8838,7 +8838,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8913,7 +8913,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -8965,7 +8965,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -8992,7 +8992,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -9005,7 +9005,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -9018,7 +9018,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9027,7 +9027,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9036,7 +9036,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -9102,7 +9102,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9177,7 +9177,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9224,7 +9224,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9299,7 +9299,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9346,7 +9346,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9421,7 +9421,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9473,7 +9473,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -9500,7 +9500,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -9513,7 +9513,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -9526,7 +9526,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9535,7 +9535,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9544,7 +9544,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -9610,7 +9610,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9685,7 +9685,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9732,7 +9732,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9807,7 +9807,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9854,7 +9854,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9929,7 +9929,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -9981,7 +9981,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base_collision.stl</uri>
+              <uri>model://cart_model_2/meshes/cart_base_collision.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>5</max_contacts>
@@ -10008,7 +10008,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_metal</name>
                 <center>false</center>
@@ -10021,7 +10021,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>base_shelf</name>
                 <center>false</center>
@@ -10034,7 +10034,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10043,7 +10043,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10052,7 +10052,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/cart_base.dae</uri>
+              <uri>model://cart_model_2/meshes/cart_base.dae</uri>
               <submesh>
                 <name>tag</name>
                 <center>false</center>
@@ -10118,7 +10118,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10193,7 +10193,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10240,7 +10240,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10315,7 +10315,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10362,7 +10362,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/sup_wheels.dae</uri>
+              <uri>model://cart_model_2/meshes/sup_wheels.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -10437,7 +10437,7 @@
           <geometry>
             <mesh>
               <scale>1.5 1.5 1.5</scale>
-              <uri>file:///home/vboxuser/TP1/Signal-Simulation/worlds/navi_factory/models/cart_model_2/meshes/wheel.dae</uri>
+              <uri>model://cart_model_2/meshes/wheel.dae</uri>
             </mesh>
           </geometry>
         </visual>
