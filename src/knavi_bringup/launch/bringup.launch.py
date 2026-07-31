@@ -71,7 +71,7 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
                               description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
-        DeclareLaunchArgument('camera_device_id', default_value='1',
+        DeclareLaunchArgument('camera_device_id', default_value='2',
                               description='첫 번째 로봇의 웹캠 장치 번호(/dev/video<N> 의 N)를 '
                                           '덮어쓴다. ls /dev/video* 로 확인. 비워 두면 '
                                           '모든 로봇이 robot_info 에 적힌 자기 값을 쓴다'),

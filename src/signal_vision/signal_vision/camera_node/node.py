@@ -188,7 +188,7 @@ class CameraNode(Node):
         # 추론(약 79ms → 12.5회/초)보다 높게 두는 것이 맞다. 낮추면 처리율은 그대로인데
         # 프레임만 낡는다. 실측: fps 20 → 프레임 나이 73ms,  fps 30 → 18ms.
         # 카메라 하드웨어 상한이 30 이라 그 위로 올려도 30 으로 잘린다.
-        self.declare_parameter('fps', 30.0)
+        self.declare_parameter('fps', 20.0)
         self.declare_parameter('frame_id', 'webcam')        # Image 헤더의 frame_id
         # 캡처 백엔드. 실배포는 Linux 라 v4l2 가 기본. 개발 머신에 맞춰 바꾼다.
         # 가능한 값은 frame_source.CAPTURE_BACKENDS 참고.
