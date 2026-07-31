@@ -35,6 +35,13 @@ if ! python3 -c "import torch, mediapipe" >/dev/null 2>&1; then
     echo "[run_bringup] 태스크 '4. Vision 패키지 설치'를 먼저 실행하거나, 시뮬만 볼 거면 enable_camera:=false로 실행하세요." >&2
 fi
 
+# marker_vision(TrackMarker 감속 노드)도 camera_node와 같은 이유로 시스템 python3에
+# ultralytics가 있어야 한다. enable_marker_vision 기본값이 false라 대부분은 해당 없음.
+if ! python3 -c "import ultralytics" >/dev/null 2>&1; then
+    echo "[run_bringup] 시스템 python3.12에 ultralytics가 없습니다 → enable_marker_vision:=true 로 켜면 marker_vision이 실패합니다." >&2
+    echo "[run_bringup] pip install ultralytics 로 설치하거나, 기본값(false)대로 꺼두세요." >&2
+fi
+
 # 이전 bringup 실행이 아직 돌고 있으면 (예: 태스크를 정지 안 하고 다시 실행) gz 서버가
 # 두 번 뜨거나, 이전 camera_node 가 웹캠을 물고 있어서 새 인스턴스가 못 여는 등 꼬인다.
 # VS Code 태스크 패널을 재사용하는 것만으로는 launch 가 띄운 자식 프로세스(bridge_node,

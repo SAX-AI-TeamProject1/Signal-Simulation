@@ -85,7 +85,7 @@
         },
         {
             "label": "5. PERCEPTION 패키지 설치 (.venv-perception)",
-            "detail": "Signal-Vision을 pip으로 설치한 .venv-perception를 만듭니다", 
+            "detail": "Signal-transport-perception을 .venv-perception에 임시로 설치해 track_follow.py를 robot_control/patrol/로 vendor 복사하고, .env의 KAGGLE_USERNAME/KAGGLE_KEY로 obstacle 탐지 모델(best.pt)을 models/obstacle_detector.pt로 받아온 뒤, ultralytics를 시스템 python3.12에 설치하고 venv는 지웁니다. 태그 버전을 바꾸려면 인자로 전달 (기본: origin 최신 v*.*.* 태그).",
             "type": "shell",
             "osx": {
                 "command": "python3",

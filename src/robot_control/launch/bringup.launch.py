@@ -43,6 +43,8 @@ def generate_launch_description():
     enable_camera = LaunchConfiguration('enable_camera')
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
+    enable_marker_vision = LaunchConfiguration('enable_marker_vision')
+    marker_weights = LaunchConfiguration('marker_weights')
 
     # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
     # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
@@ -67,6 +69,16 @@ def generate_launch_description():
                               description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
                                           '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
                                           '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
+        # 기본 false: TrackMarker 가중치가 아직 학습 전이라(Signal-transport-perception
+        # 쪽 capture+train 미실행), 켜면 marker_vision 생성자가 바로 에러를 낸다.
+        # 학습이 끝나면 true로 켜고 marker_weights 에 나온 best.pt 경로를 넘기면 된다.
+        DeclareLaunchArgument('enable_marker_vision', default_value='false',
+                              description='true 면 코너 표지(TrackMarker) 인식 기반 '
+                                          '감속 노드(marker_vision)를 함께 띄운다 — '
+                                          '가중치 학습 전엔 꺼둘 것'),
+        DeclareLaunchArgument('marker_weights', default_value='',
+                              description='TrackMarker YOLO 가중치(.pt) 절대경로 '
+                                          '(Signal-transport-perception train_kaggle.sh 결과물)'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
@@ -154,7 +166,17 @@ def generate_launch_description():
             parameters = [{'use_sim_time':use_sim_time}],
             output = 'screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol]
+        # 6) 코너 표지(TrackMarker) 감속 — 카메라로 마커를 보고 waypoint의 cmd_vel_auto를
+        #    줄여 cmd_vel_marker_slow로 재발행(twist_mux가 auto보다 우선 통과시킴).
+        marker_vision = Node(
+            package='robot_control',
+            executable='marker_vision',
+            namespace=namespace,
+            condition=IfCondition(enable_marker_vision),
+            parameters=[{'use_sim_time': use_sim_time, 'weights_path': marker_weights}],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건

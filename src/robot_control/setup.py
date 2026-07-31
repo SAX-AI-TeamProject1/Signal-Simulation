@@ -46,6 +46,7 @@ setup(
             # 책임별 파일 분리가 끝나서 삭제했다. 필요하면 git 이력에서 꺼낸다.
             'camera_node = robot_control.camera_node.node:main',
             'waypoint_follower = robot_control.patrol.waypoint_follower:main',
+            'marker_vision = robot_control.patrol.marker_vision:main',
         ],
     },
 )

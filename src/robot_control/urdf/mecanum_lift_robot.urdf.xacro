@@ -23,12 +23,12 @@
   <xacro:property name="lift_scale" value="1 1 1"/>
   <xacro:property name="mesh_roll" value="0"/>
   <xacro:property name="mesh_z_offset" value="0"/>
-  <!-- base_visual.glb 안에 Y축 +90도 회전이 이미 baked돼 있어(Blender glTF export 축변환
-       추정), 이 mesh_yaw 하나만으로는 정면이 로봇의 실제 전진(+X, DiffDrive/바퀴 기준)과
-       맞는다는 보장이 없다. Gazebo에서 정지 스폰해 포크가 향하는 쪽과 +X 전진 방향을
-       비교해 0/1.5708/3.1416/-1.5708 중 맞는 값으로 채워야 한다(로봇.urdf.xacro의
-       mesh_yaw 패턴과 동일). -->
-  <xacro:property name="mesh_yaw" value="0"/>
+  <!-- base_visual.glb 안에 Y축 +90도 회전이 이미 baked돼 있다(glTF 노드 rotation
+       [0, 0.7071, 0, 0.7071] 확인됨). 노드 rotation+scale을 반영해 정점을 직접
+       변환해보면 mesh_yaw=0일 때 포크(바닥 근처 저-z 밴드가 몸통보다 튀어나온 방향)가
+       로컬 +Y를 향한다 — 로봇 전진(+X, DiffDrive)과 90도 어긋난다. -1.5708(-90도)을
+       주면 포크가 +X를 향하도록 검증했다. -->
+  <xacro:property name="mesh_yaw" value="-1.5708"/>
 
   <!-- ===== 구동 파라미터 ===== -->
   <xacro:property name="wheel_radius" value="0.15"/>
