@@ -241,7 +241,8 @@ def generate_launch_description():
         executable='bridge_node',
         parameters=[{'config_file': bridge_config,
                      'use_sim_time': use_sim_time}],
-        output='screen',
+        # output='screen',
+        output='log',
     )
 
     # 안정용 평평한 바닥판 스폰 (창고 STL 바닥 접촉 불안정 회피용).
@@ -259,7 +260,8 @@ def generate_launch_description():
         executable='create',
         condition=IfCondition(enable_flat_ground),
         arguments=['-file', ground_sdf, '-name', 'flat_ground', '-z', '0.25'],
-        output='screen',
+        # output='screen',
+        output='log',
     )
 
     # navi_factory 월드의 model:// 참조(바닥 충돌 STL·창고·모델들·OGV 메시)를 gz 가 찾게 리소스 경로 등록.
