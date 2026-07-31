@@ -8,7 +8,7 @@ from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, ExecuteProcess,
                             SetEnvironmentVariable, Shutdown)
 from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -51,6 +51,15 @@ def generate_launch_description():
     # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
     # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
     # 확인: ls /dev/video*  (scripts/run_camera_node.sh 는 스스로 골라 준다)
+    #
+    # 카메라는 로봇당 1대(1:1)이므로 장치 번호도 로봇당 하나여야 한다 — 그래서 실제
+    # 값은 아래 robot_info 의 5번째 필드에 로봇별로 적는다. 이 인자는 그 중 첫 로봇의
+    # 값만 덮어쓴다. 이 인자가 생긴 이유 자체가 "로봇 한 대인데 웹캠 번호가 바뀌었다"는
+    # 상황이고, 로봇이 여러 대면 스칼라 인자 하나로는 어차피 표현할 수 없기 때문이다.
+    #
+    # 기본값이 '0' 이 아니라 빈 문자열인 이유: '0' 으로 두면 인자를 안 줘도 첫 로봇은
+    # 항상 이 값이 이겨서 robot_info 의 5번째 필드가 읽히지 않는 죽은 값이 된다.
+    # 빈 문자열을 "안 줬음"으로 쓰면 두 자리 중 어느 쪽이 유효한지가 뒤섞이지 않는다.
     camera_device_id = LaunchConfiguration('camera_device_id')
 
     # 실제로 채워 놓은 값, 기본값만
@@ -62,9 +71,10 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
                               description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
-        DeclareLaunchArgument('camera_device_id', default_value='0',
-                              description='웹캠 장치 번호(/dev/video<N> 의 N). '
-                                          'ls /dev/video* 로 확인'),
+        DeclareLaunchArgument('camera_device_id', default_value='1',
+                              description='첫 번째 로봇의 웹캠 장치 번호(/dev/video<N> 의 N)를 '
+                                          '덮어쓴다. ls /dev/video* 로 확인. 비워 두면 '
+                                          '모든 로봇이 robot_info 에 적힌 자기 값을 쓴다'),
         DeclareLaunchArgument('enable_patrol', default_value='true',
                               description='true 면 트랙 왕복 노드(waypoint_follower)를 함께 띄운다'),
         DeclareLaunchArgument('enable_flat_ground', default_value='true',
@@ -76,19 +86,30 @@ def generate_launch_description():
     # 이부분은 로봇이 여러대면 여러개 작성해야함
     # @우진 - 이거 최초 위치 정보도 세팅 가능한데, 해주면 좋을듯?
     # 4번째 값은 스폰 pose (x, y, z, yaw) — 로봇마다 겹치지 않게 각자 지정.
+    # 5번째 값은 그 로봇을 지휘하는 웹캠의 장치 번호(/dev/video<N> 의 N).
     # robot1(knavi_robot, 센서 없음)은 물리 검증이 끝나서 제거 — 물리 로봇 2대를
     # 같이 돌리면 이 무거운 월드에서 성능 부담이 커진다. 센서(라이다+카메라) 있는
     # mecanum_lift_robot만 남긴다.
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
-         ('0.0', '32.25', '0.3', '-1.5708')),  # entry 트랙 진행 방향(남쪽)으로 정렬
+         ('0.0', '32.25', '0.3', '-1.5708'),  # entry 트랙 진행 방향(남쪽)으로 정렬
+         0),
     ]
     robot_nodes = []
-    for info in robot_info:
+    for index, info in enumerate(robot_info):
         model_info = info[0]  # 어떤 모델 urdf를 읽을지
         namespace = info[1]   # 이 로봇의 식별 정보
         name = info[2]        # 이 로봇의 이름(가제보 GUI)
         spawn_x, spawn_y, spawn_z, spawn_yaw = info[3]
+        # 첫 로봇만 launch 인자로 덮어쓸 수 있게 한다(위 camera_device_id 주석 참고).
+        # 인자 값이 substitution 이라 launch 파일을 만드는 시점엔 내용을 볼 수 없다. 그래서
+        # 파이썬 if 가 아니라 PythonExpression 으로 "인자가 비었으면 robot_info 값"을
+        # 실행 시점에 고르게 한다 — 빈 문자열은 파이썬에서 거짓이라 or 가 그대로 동작한다.
+        if index == 0:
+            device_id = PythonExpression(
+                ["'", camera_device_id, "' or '", str(info[4]), "'"])
+        else:
+            device_id = str(info[4])
         # xacro 를 실행 시점에 펼쳐 URDF 문자열을 만든다(파일에 미리 펼쳐두지 않음 → 파라미터 바뀌면 자동 반영).
         xacro_file = os.path.join(robot_share, 'urdf', model_info)  # 3번 인자의 객체의 urdf 파일
         # ns 인자를 xacro 에 넘겨 gz 토픽을 /robot2/... 으로 분리(bridge.yaml 과 일치).
@@ -159,7 +180,34 @@ def generate_launch_description():
             output='screen',
         )
 
-        robot_nodes += [rsp, spawn, twist_mux, patrol]
+        # 6) 웹캠 노드 (P0 입력) : 로봇 1대에 카메라 1대. 그래서 로봇 루프 안에 있다.
+        #    로봇마다 자기를 지휘하는 신호수를 자기 카메라로 본다는 뜻이고, 그 대응은
+        #    robot_info 의 5번째 필드(장치 번호)가 정한다.
+        #
+        #    리맵이 없는 이유: 네임스페이스를 붙였으니 이 노드가 발행하는 cmd_vel_gesture 는
+        #    자동으로 <ns>/cmd_vel_gesture 가 되고, 같은 네임스페이스의 twist_mux 가 그대로
+        #    구독한다. 예전에는 이 노드가 로봇 밖에 있어서 '/robot1/cmd_vel_gesture' 로
+        #    리맵했는데, robot1 을 robot_info 에서 빼면서 그 리맵이 아무도 구독하지 않는
+        #    토픽을 가리키게 됐다 — 수신호를 인식해도 로봇이 안 움직였다. 네임스페이스로
+        #    묶으면 그런 식으로 어긋날 자리가 없어진다.
+        #
+        #    use_sim_time 을 주지 않는 이유: 실물 카메라는 Gazebo 시계가 아니라 실제 시간으로 돈다.
+        #
+        #    device_id 를 넘기는 이유: 노드 기본값은 0 인데 /dev/video0 이 늘 있는 건 아니다.
+        #    USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매기고, 그러면
+        #    camera_node 가 장치를 못 열어 RuntimeError 로 죽는다.
+        #      ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
+        #    주의: 로봇 수만큼 실물 웹캠이 꽂혀 있어야 한다. 장치가 모자라면 그 로봇의
+        #    camera_node 만 못 뜨고, 나머지 로봇과 시뮬레이션은 그대로 돈다.
+        camera = Node(
+            package='signal_vision',
+            executable='camera_node',
+            namespace=namespace,
+            condition=IfCondition(enable_camera),
+            parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol, camera]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
@@ -223,37 +271,17 @@ def generate_launch_description():
         models_path + (os.pathsep + _existing if _existing else ''),
     )
 
-    # 5) 웹캠 노드 (P0 입력). 실물 웹캠 1대를 여러 로봇이 공유하는 구조라
-    #    로봇 루프 밖에 두고 네임스페이스도 붙이지 않는다(/image_webcam, /gesture 전역).
-    #    use_sim_time 을 주지 않는 이유: 실물 카메라는 Gazebo 시계가 아니라 실제 시간으로 돈다.
-    #
-    #    리맵이 필요한 이유: 이 노드는 네임스페이스가 없어 cmd_vel_gesture 를 그냥 발행하면
-    #    /cmd_vel_gesture 가 된다. 반면 twist_mux 는 로봇 네임스페이스 안에서 돌기 때문에
-    #    /robot1/cmd_vel_gesture 를 구독한다. 둘을 여기서 이어준다.
-    #    (로봇이 여러 대가 되면 어느 로봇에 수신호를 보낼지 여기서 정하게 된다)
-    #    device_id 를 넘기는 이유: 노드 기본값은 0 인데 /dev/video0 이 늘 있는 건 아니다.
-    #    USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매기고, 그러면
-    #    camera_node 가 장치를 못 열어 RuntimeError 로 죽는다.
-    #      ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
-    camera = Node(
-        package='signal_vision',
-        executable='camera_node',
-        condition=IfCondition(enable_camera),
-        parameters=[{'device_id': ParameterValue(camera_device_id, value_type=int)}],
-        remappings=[('cmd_vel_gesture', '/robot1/cmd_vel_gesture')],
-        output='screen',
-    )
-
+    # 웹캠 노드는 로봇당 1개라서 위 robot_info 루프 안에서 만들어진다(robot_nodes 에 포함).
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim_gui, gz_sim_headless, ground, bridge, camera])
+                             [gz_sim_gui, gz_sim_headless, ground, bridge])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
 # twist_mux → 로봇당 1개 (명령 소스 중재)
 # patrol → 로봇당 1개 (자기 트랙을 따라감)
+# camera → 로봇당 1개 (로봇 1대에 웹캠 1대, 네임스페이스로 분리)
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
-# camera → 1개 공유 (웹캠 1대, 전역 토픽)
 #
 # 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot1/cmd_vel 에 직접 쓰지 않고
 # mux 입력(cmd_vel_teleop)으로 넣는다. 안 그러면 mux 출력과 충돌한다.
