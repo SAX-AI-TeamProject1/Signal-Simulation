@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Runs robot_control's camera_node alone — no Gazebo, no robot, no bridge.
+# Runs signal_vision's camera_node alone — no Gazebo, no robot, no bridge.
 # Unit check for the webcam -> gesture inference -> /gesture + cmd_vel_gesture path.
 # Used by VS Code task "6. camera node 단독 실행 (웹캠 + 제스처 추론만)".
 #
 # Why system python3.12 and NOT .venv-infer/.venv-perception:
-#   camera_node/inference.py imports robot_control.vision_hand.capture.extractor and
-#   robot_control.vision_hand.inference.predict — a vendored copy of Signal-Vision's
+#   camera_node/inference.py imports signal_vision.vision_hand.capture.extractor and
+#   signal_vision.vision_hand.inference.predict — a vendored copy of Signal-Vision's
 #   src/ living inside this package (see scripts/setup_infer_env.py), not the pip
 #   package itself. So the only runtime requirement is that system python3.12 has
 #   torch/mediapipe/numpy/opencv-contrib-python installed directly (see that script's
@@ -29,7 +29,7 @@ fi
 
 if ! python3 -c "import torch, mediapipe" >/dev/null 2>&1; then
     echo "[run_camera_node] 시스템 python3.12에 torch/mediapipe가 없습니다." >&2
-    echo "[run_camera_node] 태스크 '4. Vision 패키지 설치'를 실행해 robot_control/vision_hand를 최신화한 뒤," >&2
+    echo "[run_camera_node] 태스크 '4. Vision 패키지 설치'를 실행해 signal_vision/vision_hand를 최신화한 뒤," >&2
     echo "[run_camera_node] torch/mediapipe/numpy==1.26.4/opencv-contrib-python을 시스템 python3.12에 pip 설치하세요" >&2
     echo "[run_camera_node] (scripts/setup_infer_env.py 헤더 주석 참고)." >&2
     exit 1
@@ -55,4 +55,4 @@ fi
 
 # 인자는 그대로 넘긴다. 예: 토픽 리맵을 걸어 bringup 과 같은 배선으로 확인
 #   ./scripts/run_camera_node.sh --ros-args -r cmd_vel_gesture:=/robot1/cmd_vel_gesture
-exec ros2 run robot_control camera_node "${EXTRA_ARGS[@]}" "$@"
+exec ros2 run signal_vision camera_node "${EXTRA_ARGS[@]}" "$@"
