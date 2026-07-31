@@ -225,12 +225,19 @@
       <topic>$(arg ns)/scan</topic>
       <!-- 카메라와 같은 이유. 없으면 LaserScan 의 frame_id 가 gz 내부 스코프 이름이 되어
            Nav2 가 tf 조회에 실패한다. -->
-      <gz_frame_id>lidar_link</gz_frame_id>
-      <update_rate>5</update_rate>
+      <gz_frame_id>$(arg ns)/lidar_link</gz_frame_id>
+      <!-- 5Hz/180샘플에서 10Hz/360샘플로 올렸다. 이 스캔이 비상정지의 유일한
+           근거가 되면서 두 수치가 다 모자랐다:
+             - 5Hz 는 최악 200ms 지연이라 1m/s 로 달리면 20cm 를 눈 감고 간다.
+             - 180샘플을 360도에 뿌리면 2도 간격이라, 폭 0.4m 인 사람이 10m 에서
+               레이 1개에만 걸린다. 1도 간격이면 같은 거리에서 2개, 5m 에서 5개다.
+           라이다를 꺼도 real-time factor 가 그대로였다는 실측이 있어(병목은 월드의
+           소품 충돌 계산) 이 정도 증량은 감당 가능하다고 판단했다. -->
+      <update_rate>10</update_rate>
       <lidar>
         <scan>
           <horizontal>
-            <samples>180</samples>
+            <samples>360</samples>
             <min_angle>-3.1416</min_angle>
             <max_angle>3.1416</max_angle>
           </horizontal>
