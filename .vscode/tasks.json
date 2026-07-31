@@ -59,8 +59,8 @@
             "problemMatcher": []
         },
         {
-            "label": "4. Vision 패키지 설치 (.venv-infer)",
-            "detail": "Signal-Vision을 pip으로 설치한 .venv-infer를 만듭니다 (--system-site-packages라 camera_node.py를 이 venv 파이썬으로 실행하면 rclpy/cv_bridge와 mediapipe/torch/signal-vision을 동시에 쓸 수 있음). 태그 버전을 바꾸려면 인자로 전달 (기본: origin 최신 v*.*.* 태그).",
+            "label": "4. Vision 패키지 설치 (vendor 복사 + 시스템 python3.12)",
+            "detail": "Signal-Vision 최신 태그를 얕게 clone 해서 그 src/ 를 src/signal_vision/signal_vision/vision_hand/ 로 vendor 복사하고(내부 src.* import 도 치환), torch/mediapipe/numpy/opencv 를 시스템 python3.12 에 설치합니다. venv 는 쓰지 않습니다 — colcon 이 만드는 실행파일의 shebang 이 /usr/bin/python3 로 고정이라 ros2 run 이 venv 에 닿지 못합니다. 태그 버전을 바꾸려면 인자로 전달 (기본: origin 최신 v*.*.* 태그).",
             "type": "shell",
             "osx": {
                 "command": "python3",
@@ -85,7 +85,7 @@
         },
         {
             "label": "5. PERCEPTION 패키지 설치 (.venv-perception)",
-            "detail": "Signal-Vision을 pip으로 설치한 .venv-perception를 만듭니다", 
+            "detail": "Signal-transport-perception 을 pip 으로 설치한 .venv-perception 을 만듭니다 (Signal-Vision 과 의존성이 충돌해서 별도 venv). 태그 버전을 바꾸려면 인자로 전달 (기본: origin 최신 v*.*.* 태그).",
             "type": "shell",
             "osx": {
                 "command": "python3",
@@ -110,7 +110,7 @@
         },
         {
             "label": "6. camera node 단독 실행 (웹캠 + 제스처 추론만)",
-            "detail": "robot_control 의 camera_node 하나만 실행합니다(단위 확인). Gazebo·로봇·브릿지는 안 뜹니다. 스크립트가 ROS 2 환경 → 워크스페이스 오버레이 → .venv-infer 파이썬 순서로 알아서 잡습니다. 사전조건: 태스크 1(빌드), 태스크 4(.venv-infer).",
+            "detail": "signal_vision 의 camera_node 하나만 실행합니다(단위 확인). Gazebo·로봇·브릿지는 안 뜹니다. 시스템 python3.12 로 실행됩니다 — venv 는 쓰지 않습니다(colcon 이 만드는 실행파일의 shebang 이 /usr/bin/python3 로 고정이라 venv 에 닿지 못합니다). 웹캠 번호는 스크립트가 /dev/video* 중에서 알아서 고릅니다. 사전조건: 태스크 1(빌드), 태스크 4(vision_hand 벤더 복사 + 시스템 python3.12 에 torch/mediapipe 설치).",
             "type": "shell",
             "command": "bash",
             "args": [
@@ -127,7 +127,7 @@
         },
         {
             "label": "7. bringup 실행 (로봇 + Gazebo + 브릿지)",
-            "detail": "robot_control 의 bringup.launch.py 를 실행합니다 — robot_state_publisher, gz sim(navi_factory), 로봇 스폰, flat_ground, ros_gz_bridge, twist_mux, camera_node 를 한 번에. 카메라 없이 시뮬만 보려면 scripts/run_bringup.sh 에 enable_camera:=false 를 넘기면 됩니다. 사전조건: 태스크 1(빌드).",
+            "detail": "knavi_bringup 의 bringup.launch.py 를 실행합니다 — robot_state_publisher, gz sim(navi_factory), 로봇 스폰, flat_ground, ros_gz_bridge, twist_mux, waypoint_follower(auto_drive), camera_node(signal_vision) 를 한 번에. 카메라 없이 시뮬만 보려면 scripts/run_bringup.sh 에 enable_camera:=false 를 넘기면 됩니다. 사전조건: 태스크 1(빌드).",
             "type": "shell",
             "command": "bash",
             "args": [
