@@ -1,0 +1,4 @@
+# 이 아래는 ROS 2 연습용 별도 워크스페이스다(pub_test, sub_test, custom_msg2).
+# 루트에서 colcon build 하면 여기까지 훑어서 같이 빌드되고, install/ 에 남아
+# AMENT_PREFIX_PATH 를 오염시킨다 — 실제 프로젝트 패키지가 아니므로 제외한다.
+# 연습 코드를 다시 빌드하려면 이 파일을 지우거나, examples/ 안에서 colcon build 를 돌린다.
