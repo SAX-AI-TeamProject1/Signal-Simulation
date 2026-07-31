@@ -28,6 +28,12 @@
   gz_type_name: "gz.msgs.Model"
   direction: GZ_TO_ROS
 
+- ros_topic_name: "/robot1/scan"           # 2D LiDAR (gz → ROS). Nav2/SLAM 의 유일한 기하 입력
+  gz_topic_name: "/robot1/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
 - ros_topic_name: "/robot1/tf"             # odom→base tf (gz → ROS)
   gz_topic_name: "/robot1/tf"
   ros_type_name: "tf2_msgs/msg/TFMessage"

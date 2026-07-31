@@ -197,6 +197,10 @@
       <!-- 다른 센서/플러그인(scan, cmd_vel, odom)과 동일하게 ns로 분리 — 이전엔 그냥
            camera/image로 전역 토픽이라 로봇이 여러 대면 충돌할 뻔했다. -->
       <topic>$(arg ns)/camera/image</topic>
+      <!-- gz_frame_id 를 반드시 넣는다: 없으면 ROS 로 넘어온 Image 의 frame_id 가
+           "mecanum_lift_robot/camera_link/sim_camera" 같은 gz 내부 스코프 이름이 되어
+           tf 조회(카메라 좌표 → base_link)가 실패한다. -->
+      <gz_frame_id>camera_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image><width>640</width><height>480</height></image>
@@ -212,6 +216,9 @@
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="gpu_lidar">
       <topic>$(arg ns)/scan</topic>
+      <!-- 카메라와 같은 이유. 없으면 LaserScan 의 frame_id 가 gz 내부 스코프 이름이 되어
+           Nav2 가 tf 조회에 실패한다. -->
+      <gz_frame_id>lidar_link</gz_frame_id>
       <update_rate>5</update_rate>
       <lidar>
         <scan>

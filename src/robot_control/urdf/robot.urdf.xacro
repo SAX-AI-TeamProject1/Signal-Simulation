@@ -160,6 +160,20 @@
     <origin xyz="0.5 0 0.5" rpy="0 0 0"/>
   </joint>
 
+  <!-- ===== 2D LiDAR 링크 (Nav2 입력: SLAM·AMCL·costmap 전부 이 스캔을 쓴다) =====
+       마운트 높이 0.65 m 의 근거: 차체 collision 박스가 z=0.15~0.55 라, 그보다 위여야
+       360° 스캔이 자기 몸통에 막히지 않는다. min range 0.3 도 같은 이유(자기 반사 배제).
+       한계: 2D 라이다는 이 높이의 수평 단면 한 장만 본다. 바닥의 팔레트처럼 낮은 물체,
+       머리 위로 튀어나온 물체는 안 잡힌다. 3D 커버는 나중에 깊이 카메라(voxel layer)로 보강. -->
+  <link name="lidar_link">
+    <xacro:box_inertia m="0.1" x="0.06" y="0.06" z="0.06"/>
+  </link>
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="lidar_link"/>
+    <origin xyz="0 0 0.65" rpy="0 0 0"/>
+  </joint>
+
   <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
   <gazebo>
     <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
@@ -185,12 +199,47 @@
     <sensor name="sim_camera" type="camera">
       <always_on>1</always_on>
       <update_rate>15</update_rate>
-      <topic>camera/image</topic>
+      <!-- ns 를 붙여 로봇이 여러 대여도 토픽이 안 겹치게. bridge.yaml 과 이름이 일치해야 한다. -->
+      <topic>$(arg ns)/camera/image</topic>
+      <gz_frame_id>camera_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image><width>640</width><height>480</height></image>
         <clip><near>0.1</near><far>100.0</far></clip>
       </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- LiDAR 센서 정의.
+       gz_frame_id 를 반드시 넣는다: 없으면 ROS 로 넘어온 LaserScan 의 frame_id 가
+       "knavi_robot/lidar_link/lidar" 같은 gz 내부 스코프 이름이 되어, Nav2 가 tf 조회에 실패한다. -->
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <always_on>1</always_on>
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <topic>$(arg ns)/scan</topic>
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>720</samples>          <!-- 360°/720 = 0.5° 해상도 -->
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.3</min>                    <!-- 차체 자기 반사 배제 -->
+          <max>20.0</max>                   <!-- slam_toolbox max_laser_range 와 맞춤 -->
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
     </sensor>
   </gazebo>
 
