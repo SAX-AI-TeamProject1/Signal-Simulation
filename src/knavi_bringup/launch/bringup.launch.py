@@ -47,10 +47,13 @@ def generate_launch_description():
     enable_camera = LaunchConfiguration('enable_camera')
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
+
     # 라이다 스캔을 눈으로 보는 뷰어. gz GUI 에서는 레이저가 로봇 주변 선으로만 보이고
     # ROS 쪽으로 실제로 넘어왔는지는 알 수 없어서, 스캔을 확인하려면 어차피 이게 필요하다.
     # 그래서 bringup 에 포함시킨다 — 창이 하나 더 뜨는 게 부담이면 enable_rviz:=false.
     enable_rviz = LaunchConfiguration('enable_rviz')
+    enable_marker_vision = LaunchConfiguration('enable_marker_vision')
+    marker_weights = LaunchConfiguration('marker_weights')
 
     # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
     # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
@@ -88,6 +91,16 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_rviz', default_value='true',
                               description='false 면 RViz2 를 띄우지 않는다 '
                                           '(라이다 스캔·tf 뷰어, config/knavi.rviz)'),
+        # 기본 false: TrackMarker 가중치가 아직 학습 전이라(Signal-transport-perception
+        # 쪽 capture+train 미실행), 켜면 marker_vision 생성자가 바로 에러를 낸다.
+        # 학습이 끝나면 true로 켜고 marker_weights 에 나온 best.pt 경로를 넘기면 된다.
+        DeclareLaunchArgument('enable_marker_vision', default_value='false',
+                              description='true 면 코너 표지(TrackMarker) 인식 기반 '
+                                          '감속 노드(marker_vision)를 함께 띄운다 — '
+                                          '가중치 학습 전엔 꺼둘 것'),
+        DeclareLaunchArgument('marker_weights', default_value='',
+                              description='TrackMarker YOLO 가중치(.pt) 절대경로 '
+                                          '(Signal-transport-perception train_kaggle.sh 결과물)'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
@@ -205,8 +218,18 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
+        # 6) 코너 표지(TrackMarker) 감속 — 카메라로 마커를 보고 waypoint의 cmd_vel_auto를
+        #    줄여 cmd_vel_marker_slow로 재발행(twist_mux가 auto보다 우선 통과시킴).
+        marker_vision = Node(
+            package='auto_drive',
+            executable='marker_vision',
+            namespace=namespace,
+            condition=IfCondition(enable_marker_vision),
+            parameters=[{'use_sim_time': use_sim_time, 'weights_path': marker_weights}],
+            output='screen',
+        )
 
-        # 6) 웹캠 노드 (P0 입력) : 로봇 1대에 카메라 1대. 그래서 로봇 루프 안에 있다.
+        # 7) 웹캠 노드 (P0 입력) : 로봇 1대에 카메라 1대. 그래서 로봇 루프 안에 있다.
         #    로봇마다 자기를 지휘하는 신호수를 자기 카메라로 본다는 뜻이고, 그 대응은
         #    robot_info 의 5번째 필드(장치 번호)가 정한다.
         #
@@ -233,7 +256,7 @@ def generate_launch_description():
             parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol, camera]
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건

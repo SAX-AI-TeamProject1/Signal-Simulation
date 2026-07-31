@@ -90,3 +90,9 @@
   ros_type_name: "geometry_msgs/msg/Pose"          # gz 토픽명은 모델 이름 기준이라
   gz_type_name: "gz.msgs.Pose"                     # ns가 아니라 model name을 씀.
   direction: GZ_TO_ROS
+
+- ros_topic_name: "/robot2/camera/image"   # 트랙 마커(YOLO) 인식용 시뮬 카메라 (gz → ROS)
+  gz_topic_name: "/robot2/camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
