@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>signal_vision</name>
+  <version>0.0.0</version>
+  <description>K-NAVI signal-worker gesture recognition: webcam capture, mediapipe landmarks, LSTM sign classification, gesture -&gt; cmd_vel</description>
+  <maintainer email="shp9826@naver.com">sho</maintainer>
+  <license>MIT</license>
+
+  <!--
+    robot_control 과 같은 방식으로 exec_depend 만 쓴다: 파이썬 노드뿐이라 빌드타임 코드가 없다.
+    mediapipe / torch 는 여기 적지 않는다 — rosdep(apt) 키가 없고, 태스크 4(setup_infer_env.py)가
+    pip 으로 시스템 python3.12 에 설치하는 것들이라 package.xml 이 관리할 수 없다.
+  -->
+  <exec_depend>rclpy</exec_depend>              <!-- ROS 2 파이썬 클라이언트 -->
+  <exec_depend>sensor_msgs</exec_depend>        <!-- Image(/image_webcam). 웹캠 프레임 발행 -->
+  <exec_depend>std_msgs</exec_depend>           <!-- String(/gesture). 인식된 수신호 라벨 -->
+  <exec_depend>geometry_msgs</exec_depend>      <!-- Twist(cmd_vel_gesture). 라벨을 속도 명령으로 -->
+  <exec_depend>cv_bridge</exec_depend>          <!-- sensor_msgs/Image ↔ OpenCV ndarray 변환 -->
+  <exec_depend>python3-opencv</exec_depend>     <!-- 웹캠 캡처(cv2.VideoCapture). rosdep 키(apt: python3-opencv) -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

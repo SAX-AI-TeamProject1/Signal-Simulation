@@ -3,28 +3,25 @@
 <package format="3">
   <name>robot_control</name>
   <version>0.0.0</version>
-  <description>K-NAVI robot driving: diff-drive URDF, Gazebo Harmonic bringup, ros_gz bridge</description>
+  <description>K-NAVI robot body and wiring: robot URDF (xacro) and the bridge/twist_mux/ground config the bringup consumes</description>
   <maintainer email="shp9826@naver.com">sho</maintainer>
   <license>MIT</license>
 
   <!--
     런타임 의존성 (exec_depend): "이 패키지를 실행할 때 이런 다른 패키지가 깔려 있어야 한다"는 선언.
-    ros2 pkg create 는 의존성을 비워 두므로, 로봇 구동에 실제로 쓰는 것만 아래에 직접 추가했다.
-    (exec_depend = 실행 의존성. 빌드타임 코드가 없고 launch/urdf 만 쓰므로 build_depend 는 불필요)
-    그냥 depend로 하면 컴파일/런타임 포괄 -> 파이썬은 컴파일이 없으니 exec_depend로 생성했다.
+    (exec_depend = 실행 의존성. 빌드타임 코드가 없으므로 build_depend 는 불필요)
+
+    이 패키지는 실행하는 게 없다 — 파이썬 노드도 없고, bringup.launch.py 도 knavi_bringup 으로
+    옮겼다. 남은 건 urdf 와 config(bridge.yaml, twist_mux.yaml, flat_ground.sdf)뿐이고, 그
+    파일들을 실제로 읽어 노드를 띄우는 건 knavi_bringup 이다. 그래서 노드를 띄우는 데 필요한
+    패키지(rclpy, robot_state_publisher, ros_gz_sim, ros_gz_bridge, twist_mux, 메시지 타입들)는
+    전부 knavi_bringup/package.xml 이 선언한다 — 여기 남겨 두면 실행하지도 않는 걸 요구하는
+    거짓 선언이 된다. cv_bridge / python3-opencv / std_msgs 는 같은 이유로 signal_vision 이 갖는다.
+
+    xacro 만 남기는 기준: 이 패키지가 가진 파일 자체가 xacro 문법이라, xacro 없이는 urdf 를
+    URDF 로 펼칠 수조차 없다. yaml/sdf 는 소비하는 쪽 도구가 읽는 평범한 데이터라 여기 안 적는다.
   -->
-  <exec_depend>rclpy</exec_depend>              <!-- ROS 2 파이썬 클라이언트. launch 안에서 노드/파라미터 다룰 때 필요 -->
-  <exec_depend>geometry_msgs</exec_depend>      <!-- Twist 메시지(/cmd_vel). 이걸로 로봇에 속도 명령을 준다 -->
-  <exec_depend>nav_msgs</exec_depend>           <!-- Odometry 메시지(/odom). diff-drive 가 발행하는 주행거리 -->
-  <exec_depend>sensor_msgs</exec_depend>        <!-- JointState(/joint_states). robot_state_publisher 가 tf 계산에 사용 -->
-  <exec_depend>robot_state_publisher</exec_depend> <!-- URDF+joint_states → 링크들의 tf 를 발행하는 표준 노드 -->
-  <exec_depend>xacro</exec_depend>              <!-- robot.urdf.xacro 를 순수 URDF 로 펼치는 도구(launch에서 호출) -->
-  <exec_depend>ros_gz_sim</exec_depend>         <!-- Gazebo(gz sim) 실행 + 로봇 스폰(create) 담당 -->
-  <exec_depend>ros_gz_bridge</exec_depend>      <!-- ROS 2 ↔ Gazebo 메시지 변환(/cmd_vel, /odom, /clock 브리지) -->
-  <exec_depend>cv_bridge</exec_depend>          <!-- sensor_msgs/Image ↔ OpenCV ndarray 변환 -->
-  <exec_depend>python3-opencv</exec_depend>     <!-- 웹캠 캡처(cv2.VideoCapture). rosdep 키(apt: python3-opencv) -->
-  <exec_depend>std_msgs</exec_depend>           <!-- String 메시지(/gesture). 추론 워커가 발행하는 수신호 라벨 -->
-  <exec_depend>twist_mux</exec_depend>          <!-- 속도 명령 우선순위 중재. 자작 아님, 설치 패키지 사용 -->
+  <exec_depend>xacro</exec_depend>              <!-- *.urdf.xacro 를 순수 URDF 로 펼치는 도구 -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

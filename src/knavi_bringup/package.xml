@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>knavi_bringup</name>
+  <version>0.0.0</version>
+  <description>K-NAVI system bringup: Gazebo world, ros_gz bridge, and the top-level launch that assembles robot_control / signal_vision / auto_drive</description>
+  <maintainer email="shp9826@naver.com">sho</maintainer>
+  <license>MIT</license>
+
+  <!--
+    이 패키지는 파이썬 코드가 없다 — launch 와 config 만 담는 "조립" 패키지다.
+    아래 세 패키지를 exec_depend 로 선언해 두면, 하나라도 빠졌을 때 이 패키지를
+    실행하기 전에 알 수 있다(launch 를 돌려 봐야 아는 상황을 피한다).
+  -->
+  <exec_depend>robot_control</exec_depend>      <!-- urdf, twist_mux 설정 -->
+  <exec_depend>signal_vision</exec_depend>      <!-- camera_node (수신호 인식) -->
+  <exec_depend>auto_drive</exec_depend>         <!-- waypoint_follower, 이후 YOLO 노드 -->
+
+  <exec_depend>ros_gz_sim</exec_depend>         <!-- Gazebo(gz sim) 실행 + 로봇 스폰(create) -->
+  <exec_depend>ros_gz_bridge</exec_depend>      <!-- ROS 2 ↔ Gazebo 메시지 변환 -->
+  <exec_depend>robot_state_publisher</exec_depend> <!-- URDF + joint_states → tf -->
+  <exec_depend>xacro</exec_depend>              <!-- *.urdf.xacro 를 URDF 로 펼치는 도구 -->
+  <exec_depend>twist_mux</exec_depend>          <!-- 속도 명령 우선순위 중재(설치 패키지) -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -6,11 +6,16 @@
 
     // 정의 이동/자동완성용 import 경로.
     // - 첫 줄: rclpy, sensor_msgs, std_msgs, cv_bridge 등 ROS 2 파이썬 패키지 위치
-    // - 둘째 줄: 이 워크스페이스의 패키지(robot_control.camera_node 등)
+    // - 나머지: 이 워크스페이스의 ROS 2 패키지 4개. 각 패키지 폴더(= 파이썬 패키지의 부모)를
+    //   넣어야 signal_vision.camera_node.node 같은 import 가 해석된다.
+    //   robot_control 한 줄만 있던 시절의 잔재를 정리한 것 — 패키지가 4개로 쪼개졌다.
+    //   (knavi_bringup 은 launch 만 담고 파이썬 모듈이 없어서 넣지 않는다)
     // 주의: ROS 배포판 경로가 절대경로로 박혀 있다. Jazzy 가 아닌 배포판을 쓰면 여기를 바꿔야 한다.
     "python.analysis.extraPaths": [
         "/opt/ros/jazzy/lib/python3.12/site-packages",
-        "${workspaceFolder}/src/robot_control"
+        "${workspaceFolder}/src/robot_control",
+        "${workspaceFolder}/src/signal_vision",
+        "${workspaceFolder}/src/auto_drive"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:system"
 }

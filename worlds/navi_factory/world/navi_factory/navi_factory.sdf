@@ -13602,25 +13602,21 @@
         </trajectory>
       </script>
     </actor>
-        <!-- 리깅(스켈레톤) 애니메이션 제거: MaleVisitorWalk.dae 스킨+걷기 클립은 매 스텝
-             본 보간이 필요해서 이 무거운 월드(이미 RTF ~0.5%)에서 부하가 컸다. 뼈대 없는
-             정적 메시(다른 static person 소품들과 동일한 standing.dae)를 그대로 두고
-             trajectory로 몸체 pose만 옮기는 방식(tools/tracks_to_actors.py와 동일 패턴)으로
-             바꿔 애니메이션 보간 비용 없이 이동만 하게 했다. -->
     <actor name='path_prop_8_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
         <delay_start>0.0</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
+        <trajectory id='0' type='walking'>
           <waypoint>
             <time>0</time>
             <pose>3.577 15.642 0.2497 0 0 4.996</pose>

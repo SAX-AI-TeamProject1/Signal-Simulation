@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs robot_control/launch/bringup.launch.py — rsp + gz sim + robot spawn +
+# Runs knavi_bringup/launch/bringup.launch.py — rsp + gz sim + robot spawn +
 # flat_ground + ros_gz_bridge + twist_mux (+ camera_node when enable_camera:=true).
 # Used by VS Code task "7. bringup 실행 (로봇 + Gazebo + 브릿지)".
 set -e
@@ -27,7 +27,7 @@ if ! ros2 pkg prefix twist_mux >/dev/null 2>&1; then
 fi
 
 # bringup 의 camera_node 는 launch_ros 가 시스템 python3 로 띄운다. camera_node/inference.py 는
-# robot_control/vision_hand(벤더 복사본)를 import하므로 PYTHONPATH 조작은 필요 없다 — 다만
+# signal_vision/vision_hand(벤더 복사본)를 import하므로 PYTHONPATH 조작은 필요 없다 — 다만
 # torch/mediapipe 같은 실제 라이브러리는 시스템 python3.12에 설치돼 있어야 한다
 # (scripts/setup_infer_env.py, 태스크 4가 자동으로 설치한다).
 if ! python3 -c "import torch, mediapipe" >/dev/null 2>&1; then
@@ -56,27 +56,36 @@ fi
 # 자식들이 orphan 으로 남는데, 그러면 "ros2 launch ..." 패턴이 더 이상 안 잡혀 아래
 # 정리 블록 전체가 스킵되고 좀비가 무한정(관측상 8세대까지) 쌓인다. 그래서 부모
 # 생사와 무관하게 이 launch 가 띄우는 노드들을 이름으로 직접, 매번 정리한다.
-OLD_PIDS=$(pgrep -f "ros2 launch robot_control bringup.launch.py" || true)
+OLD_PIDS=$(pgrep -f "ros2 launch knavi_bringup bringup.launch.py" || true)
 if [ -n "$OLD_PIDS" ]; then
     echo "[run_bringup] 이전 bringup(pid: $(echo $OLD_PIDS | tr '\n' ' '))이 아직 돌고 있어 정상 종료시킵니다..." >&2
     kill -INT $OLD_PIDS 2>/dev/null || true
     for _ in $(seq 1 20); do   # 최대 10초 대기
-        pgrep -f "ros2 launch robot_control bringup.launch.py" >/dev/null 2>&1 || break
+        pgrep -f "ros2 launch knavi_bringup bringup.launch.py" >/dev/null 2>&1 || break
         sleep 0.5
     done
-    pkill -KILL -f "ros2 launch robot_control bringup.launch.py" 2>/dev/null || true
+    pkill -KILL -f "ros2 launch knavi_bringup bringup.launch.py" 2>/dev/null || true
 fi
 
 # gz 서버/GUI 와, 부모 없이 orphan 으로 남을 수 있는 이 launch 전용 노드들
-# (bridge_node, twist_mux, waypoint_follower, robot_state_publisher)을 이름으로
-# 한 번 더 확실히 정리한다 — 위 부모 kill 로 이미 죽었으면 아무 것도 안 걸린다.
+# (bridge_node, twist_mux, waypoint_follower, robot_state_publisher, camera_node)을
+# 이름으로 한 번 더 확실히 정리한다 — 위 부모 kill 로 이미 죽었으면 아무 것도 안 걸린다.
 # 먼저 정상 종료(TERM)를 시도해 bridge_node 강제종료 크래시를 피하고, 잠깐 기다린 뒤
 # 그래도 살아있으면 KILL 로 마무리한다.
+#
+# camera_node 를 넣는 이유: 위 38행 주석이 정리의 동기로 든 증상("이전 camera_node 가
+# 웹캠을 물고 있어서 새 인스턴스가 못 연다")의 당사자인데 정작 목록에 빠져 있었다.
+# 부작용은 감수한다 — 태스크 6(run_camera_node.sh)으로 단독 실행 중인 camera_node 도
+# 같이 죽는다. 어차피 웹캠은 한 대뿐이라 둘이 동시에 살아 있어도 뒤에 뜬 쪽이 실패한다.
+# 패턴이 실행파일 경로 형태인 이유: launch_ros 가 띄우는 실체는
+# install/signal_vision/lib/signal_vision/camera_node 라서 "camera_node" 만 쓰면
+# 이 스크립트 자신이나 편집기 프로세스까지 걸릴 수 있다.
 ORPHAN_PATTERNS=(
     "gz sim"
     "bridge_node"
     "twist_mux"
-    "robot_control/lib/robot_control/waypoint_follower"
+    "auto_drive/lib/auto_drive/waypoint_follower"
+    "signal_vision/lib/signal_vision/camera_node"
     "robot_state_publisher.*robot_description"
 )
 for pattern in "${ORPHAN_PATTERNS[@]}"; do
@@ -90,4 +99,4 @@ sleep 1
 
 # 인자는 그대로 launch 로 넘긴다. 예:
 #   ./scripts/run_bringup.sh enable_camera:=false headless:=true
-exec ros2 launch robot_control bringup.launch.py "$@"
+exec ros2 launch knavi_bringup bringup.launch.py "$@"
