@@ -906,377 +906,6 @@
       </link>
       <self_collide>false</self_collide>
     </model>
-    <model name='amr_queue_1'>
-      <static>true</static>
-      <link name='base_link'>
-        <visual name='Body_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>Body</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='AxelFR_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>AxelFR</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='WheelFR_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>WheelFR</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='AxelBR_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>AxelBR</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='WheelBR_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>WheelBR</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='AxelFL_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>AxelFL</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='WheelFL_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>WheelFL</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='AxelBL_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>AxelBL</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <visual name='WheelBL_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://OGV/meshes/ogv.dae</uri>
-              <scale>9 9 9</scale>
-              <submesh>
-                <name>WheelBL</name>
-                <center>false</center>
-              </submesh>
-            </mesh>
-          </geometry>
-          <material>
-            <diffuse>1 1 1 1</diffuse>
-            <specular>1 1 1 1</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://OGV/materials/textures/OGV_Albedo.jpg</albedo_map>
-                <roughness_map>model://OGV/materials/textures/OGV_Roughness.jpg</roughness_map>
-                <metal_map>model://OGV/materials/textures/OGV_Metalness.jpg</metal_map>
-              </metal>
-            </pbr>
-            <script>
-              <uri>model://OGV/materials/scripts/</uri>
-              <uri>model://OGV/materials/textures/</uri>
-              <name>UrbanTile/OGV_Diffuse</name>
-              <scale>9 9 9</scale>
-              <scale>9 9 9</scale>
-            </script>
-          </material>
-        </visual>
-        <pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-        <sensor name='camera' type='camera'>
-          <pose>0.29999999999999999 0 0.29999999999999999 0 0.26180000000000048 0</pose>
-          <topic>amr_queue_1/camera</topic>
-          <update_rate>30</update_rate>
-          <enable_metrics>false</enable_metrics>
-          <camera name='__default__'>
-            <pose>0 0 0 0 0 0</pose>
-            <horizontal_fov>1.05</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-              <format>RGB_INT8</format>
-              <anti_aliasing>4</anti_aliasing>
-            </image>
-            <camera_info_topic>__default__</camera_info_topic>
-            <trigger_topic></trigger_topic>
-            <triggered>false</triggered>
-            <clip>
-              <near>0.10000000000000001</near>
-              <far>50</far>
-            </clip>
-            <save enabled='false'>
-              <path>__default__</path>
-            </save>
-            <visibility_mask>4294967295</visibility_mask>
-            <noise>
-              <type>none</type>
-              <mean>0</mean>
-              <stddev>0</stddev>
-            </noise>
-            <distortion>
-              <k1>0</k1>
-              <k2>0</k2>
-              <k3>0</k3>
-              <p1>0</p1>
-              <p2>0</p2>
-              <center>0.5 0.5</center>
-            </distortion>
-            <lens>
-              <type>stereographic</type>
-              <scale_to_hfov>true</scale_to_hfov>
-              <cutoff_angle>1.5707963267948966</cutoff_angle>
-              <env_texture_size>256</env_texture_size>
-            </lens>
-            <optical_frame_id></optical_frame_id>
-          </camera>
-        </sensor>
-        <sensor name='lidar' type='gpu_lidar'>
-          <pose>0 0 0.40000000000000002 0 0 0</pose>
-          <topic>amr_queue_1/lidar</topic>
-          <update_rate>10</update_rate>
-          <enable_metrics>false</enable_metrics>
-          <lidar>
-            <scan>
-              <horizontal>
-                <samples>360</samples>
-                <resolution>1</resolution>
-                <min_angle>-3.1415899999999999</min_angle>
-                <max_angle>3.1415899999999999</max_angle>
-              </horizontal>
-              <vertical>
-                <samples>1</samples>
-                <min_angle>0</min_angle>
-                <max_angle>0</max_angle>
-                <resolution>1</resolution>
-              </vertical>
-            </scan>
-            <range>
-              <min>0.10000000000000001</min>
-              <max>15</max>
-              <resolution>0.01</resolution>
-            </range>
-            <noise>
-              <type>none</type>
-              <mean>0</mean>
-              <stddev>0</stddev>
-            </noise>
-            <visibility_mask>4294967295</visibility_mask>
-          </lidar>
-        </sensor>
-      </link>
-      <pose>0 36 0.18572151660919189 0 0 3.1415900000000754</pose>
-      <self_collide>false</self_collide>
-    </model>
     <model name='zone_nw_shelfe_1'>
       <link name='link'>
         <inertial>
@@ -7355,130 +6984,8 @@
       </link>
       <self_collide>false</self_collide>
     </model>
-    <model name='deco_forklift_ogv'>
-      <static>true</static>
-      <link name='base_link'>
-        <visual name='base_visual'>
-          <geometry>
-            <mesh>
-              <uri>model://Forklift/base_visual.glb</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <collision name='base_collision'>
-          <geometry>
-            <box>
-              <size>2.3999999999999999 1.3999999999999999 2.0600000000000001</size>
-            </box>
-          </geometry>
-          <pose>0 0 1.03 0 0 0</pose>
-          <surface>
-            <friction>
-              <ode/>
-            </friction>
-            <bounce/>
-            <contact/>
-          </surface>
-        </collision>
-        <sensor name='camera' type='camera'>
-          <pose>1.2 0 1.2 0 0.2618000000000002 0</pose>
-          <topic>deco_forklift_ogv/camera</topic>
-          <update_rate>30</update_rate>
-          <enable_metrics>false</enable_metrics>
-          <camera name='__default__'>
-            <pose>0 0 0 0 0 0</pose>
-            <horizontal_fov>1.05</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-              <format>RGB_INT8</format>
-              <anti_aliasing>4</anti_aliasing>
-            </image>
-            <camera_info_topic>__default__</camera_info_topic>
-            <trigger_topic></trigger_topic>
-            <triggered>false</triggered>
-            <clip>
-              <near>0.10000000000000001</near>
-              <far>50</far>
-            </clip>
-            <save enabled='false'>
-              <path>__default__</path>
-            </save>
-            <visibility_mask>4294967295</visibility_mask>
-            <noise>
-              <type>none</type>
-              <mean>0</mean>
-              <stddev>0</stddev>
-            </noise>
-            <distortion>
-              <k1>0</k1>
-              <k2>0</k2>
-              <k3>0</k3>
-              <p1>0</p1>
-              <p2>0</p2>
-              <center>0.5 0.5</center>
-            </distortion>
-            <lens>
-              <type>stereographic</type>
-              <scale_to_hfov>true</scale_to_hfov>
-              <cutoff_angle>1.5707963267948966</cutoff_angle>
-              <env_texture_size>256</env_texture_size>
-            </lens>
-            <optical_frame_id></optical_frame_id>
-          </camera>
-        </sensor>
-        <sensor name='lidar' type='gpu_lidar'>
-          <pose>0 0 1.3999999999999999 0 0 0</pose>
-          <topic>deco_forklift_ogv/lidar</topic>
-          <update_rate>10</update_rate>
-          <enable_metrics>false</enable_metrics>
-          <lidar>
-            <scan>
-              <horizontal>
-                <samples>360</samples>
-                <resolution>1</resolution>
-                <min_angle>-3.1415899999999999</min_angle>
-                <max_angle>3.1415899999999999</max_angle>
-              </horizontal>
-              <vertical>
-                <samples>1</samples>
-                <min_angle>0</min_angle>
-                <max_angle>0</max_angle>
-                <resolution>1</resolution>
-              </vertical>
-            </scan>
-            <range>
-              <min>0.10000000000000001</min>
-              <max>15</max>
-              <resolution>0.01</resolution>
-            </range>
-            <noise>
-              <type>none</type>
-              <mean>0</mean>
-              <stddev>0</stddev>
-            </noise>
-            <visibility_mask>4294967295</visibility_mask>
-          </lidar>
-        </sensor>
-        <pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
-      </link>
-      <pose>4 34 0.12761291861534119 0 0 3.1415900000000754</pose>
-      <self_collide>false</self_collide>
-    </model>
     <model name='deco_cart_north_1'>
+      <static>true</static>
       <pose>-10 44 0.16500000000000001 0 0 0</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -7987,6 +7494,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_north_2'>
+      <static>true</static>
       <pose>10 44 0.16500000000000001 0 0 0</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -8495,6 +8003,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_south_1'>
+      <static>true</static>
       <pose>-8 -30 0.16500000000000001 0 0 0</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -9003,6 +8512,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_south_2'>
+      <static>true</static>
       <pose>8 -30 0.16500000000000001 0 0 0</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -9511,6 +9021,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_east_1'>
+      <static>true</static>
       <pose>23.202653884887699 -16.000005722045898 0.16500000655651093 0 0 1.570800035717502</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -10019,6 +9530,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_east_2'>
+      <static>true</static>
       <pose>23.135429382324215 16.999992370605469 0.16500000655651093 0 0 1.570800035717502</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -10527,6 +10039,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_west_1'>
+      <static>true</static>
       <pose>-22.717693328857415 -18.000007629394531 0.16500000655651093 0 0 -1.5708000357176288</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -11035,6 +10548,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_west_2'>
+      <static>true</static>
       <pose>-22.439706802368161 2.9999904632568355 0.16500000655651093 0 0 -1.5708000357176288</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -11543,6 +11057,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_center_west'>
+      <static>true</static>
       <pose>-11 37 0.16500000000000001 0 0 0</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
@@ -12051,6 +11566,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='deco_cart_center_east'>
+      <static>true</static>
       <pose>11 37 0.16500000000000001 0 0 3.1415899999999999</pose>
       <link name='base_link'>
         <pose>0 0 0 0 0 -1.57079632679</pose>
