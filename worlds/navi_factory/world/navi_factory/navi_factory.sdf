@@ -13597,7 +13597,7 @@
       <animation name='walking'>
         <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
         <scale>1.0</scale>
-        <interpolate_x>true</interpolate_x>
+        <interpolate_x>false</interpolate_x>
       </animation>
       <script>
         <loop>true</loop>
