@@ -10,35 +10,41 @@
   gz_type_name: "gz.msgs.Clock"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/robot1/cmd_vel"        # 속도 명령 (ROS → gz)
-  gz_topic_name: "/robot1/cmd_vel"
-  ros_type_name: "geometry_msgs/msg/Twist"
-  gz_type_name: "gz.msgs.Twist"
-  direction: ROS_TO_GZ
-
-- ros_topic_name: "/robot1/odom"           # 주행거리 (gz → ROS)
-  gz_topic_name: "/robot1/odom"
-  ros_type_name: "nav_msgs/msg/Odometry"
-  gz_type_name: "gz.msgs.Odometry"
-  direction: GZ_TO_ROS
-
-- ros_topic_name: "/robot1/joint_states"   # 바퀴 관절 상태 (gz → ROS)
-  gz_topic_name: "/robot1/joint_states"
-  ros_type_name: "sensor_msgs/msg/JointState"
-  gz_type_name: "gz.msgs.Model"
-  direction: GZ_TO_ROS
-
-- ros_topic_name: "/robot1/scan"           # 2D LiDAR (gz → ROS). Nav2/SLAM 의 유일한 기하 입력
-  gz_topic_name: "/robot1/scan"
-  ros_type_name: "sensor_msgs/msg/LaserScan"
-  gz_type_name: "gz.msgs.LaserScan"
-  direction: GZ_TO_ROS
-
-- ros_topic_name: "/robot1/tf"             # odom→base tf (gz → ROS)
-  gz_topic_name: "/robot1/tf"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS
+# --- robot1 (knavi_robot, 센서 없는 검증용 차체) 전체 주석 처리 ---
+# 이 로봇은 bringup.launch.py 의 robot_info 에서 빠졌다(물리 검증이 끝났고, 무거운
+# 월드에서 물리 로봇 2대는 부담). 스폰되지 않으므로 아래 항목들은 아무도 발행하지
+# 않는 죽은 브리지였다. "로봇은 한 대인데 왜 2번이냐"는 혼란의 원인이라 주석으로
+# 내린다 — 되살릴 때는 robot_info 에 항목을 추가하고 여기 주석만 풀면 된다.
+#
+# - ros_topic_name: "/robot1/cmd_vel"        # 속도 명령 (ROS → gz)
+#   gz_topic_name: "/robot1/cmd_vel"
+#   ros_type_name: "geometry_msgs/msg/Twist"
+#   gz_type_name: "gz.msgs.Twist"
+#   direction: ROS_TO_GZ
+#
+# - ros_topic_name: "/robot1/odom"           # 주행거리 (gz → ROS)
+#   gz_topic_name: "/robot1/odom"
+#   ros_type_name: "nav_msgs/msg/Odometry"
+#   gz_type_name: "gz.msgs.Odometry"
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: "/robot1/joint_states"   # 바퀴 관절 상태 (gz → ROS)
+#   gz_topic_name: "/robot1/joint_states"
+#   ros_type_name: "sensor_msgs/msg/JointState"
+#   gz_type_name: "gz.msgs.Model"
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: "/robot1/scan"           # 2D LiDAR (gz → ROS)
+#   gz_topic_name: "/robot1/scan"
+#   ros_type_name: "sensor_msgs/msg/LaserScan"
+#   gz_type_name: "gz.msgs.LaserScan"
+#   direction: GZ_TO_ROS
+#
+# - ros_topic_name: "/robot1/tf"             # odom→base tf (gz → ROS)
+#   gz_topic_name: "/robot1/tf"
+#   ros_type_name: "tf2_msgs/msg/TFMessage"
+#   gz_type_name: "gz.msgs.Pose_V"
+#   direction: GZ_TO_ROS
 
 - ros_topic_name: "/robot2/cmd_vel"        # mecanum_lift_robot (Method B, 라이다+카메라)
   gz_topic_name: "/robot2/cmd_vel"

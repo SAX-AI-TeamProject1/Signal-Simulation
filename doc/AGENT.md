@@ -164,8 +164,8 @@ Bridged between ROS 2 and Gazebo (`config/bridge.yaml`):
 | `/robot2/pose_gt` | gz → ROS | `geometry_msgs/Pose` | `gz.msgs.Pose` |
 <!-- 위 표: 브리지되는 토픽들. ROS에서 Gazebo로 가는 것은 <ns>/cmd_vel 하나뿐이고 나머지는 전부 시뮬레이터가 내보내는 방향. -->
 
-The file spells the namespace out per robot, and it currently carries a full `/robot1` set as well as the `/robot2` set even though only `robot2` is spawned. Bridging a topic nobody publishes is harmless, so the `/robot1` block is left in place for when that robot comes back.
-<!-- 파일에는 네임스페이스가 로봇별로 적혀 있고, 현재 robot2 만 스폰되는데도 /robot1 한 벌과 /robot2 한 벌이 함께 들어 있음. 아무도 발행하지 않는 토픽을 브리지해 두는 건 무해하므로, 그 로봇이 돌아올 때를 위해 /robot1 블록은 그대로 둠. -->
+The file spells the namespace out per robot. It used to carry a full `/robot1` set alongside the `/robot2` set even though only `robot2` is spawned; that block is now commented out, because a live-looking config for a robot that does not exist is what makes readers ask why the single robot is numbered two. Restoring it means adding the entry back to `robot_info` and uncommenting the block.
+<!-- 파일에는 네임스페이스가 로봇별로 적혀 있음. 예전에는 robot2 만 스폰되는데도 /robot1 한 벌이 /robot2 한 벌과 함께 살아 있었는데, 지금은 그 블록을 주석 처리했음 — 존재하지 않는 로봇의 설정이 살아 있는 것처럼 보이는 게 "로봇이 한 대인데 왜 2번이냐"는 의문의 원인이기 때문. 되살리려면 robot_info 에 항목을 다시 넣고 그 블록의 주석만 풀면 됨. -->
 
 `/robot2/pose_gt` is the exception to the namespace pattern: its Gazebo side is `/model/mecanum_lift_robot/pose`, keyed by model name rather than namespace, because that is what the pose-publisher system emits. `waypoint_follower` subscribes to it instead of `odom` because wheel odometry drifts under slip.
 <!-- /robot2/pose_gt 는 네임스페이스 규칙의 예외임. Gazebo 쪽 이름이 /model/mecanum_lift_robot/pose 로 네임스페이스가 아니라 모델 이름 기준인데, pose-publisher 시스템이 그렇게 내보내기 때문. waypoint_follower 는 바퀴 오도메트리가 슬립으로 어긋나기 때문에 odom 대신 이 토픽을 구독함. -->

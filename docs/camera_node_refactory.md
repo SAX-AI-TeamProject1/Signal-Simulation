@@ -214,7 +214,7 @@ ros2 run robot_control camera_node_refactory --ros-args -p enable_inference:=fal
 
 **노드 이름은 여전히 `camera_node`다.** 파라미터 파일과 리맵을 그대로 쓸 수 있는 드롭인 교체를 노린 것이다. 같은 이유로 **두 변형을 동시에 띄우면 이름이 충돌한다.** 한 번에 하나만 실행할 것.
 
-**단독 실행으로는 로봇이 안 움직인다.** `ros2 run`으로 띄우면 `/cmd_vel_gesture`로 발행되는데, `twist_mux`는 `/robot1/cmd_vel_gesture`를 구독한다. launch 파일이 리맵으로 이어주는 구조다.
+**단독 실행으로는 로봇이 안 움직인다.** `ros2 run`으로 띄우면 `/cmd_vel_gesture`로 발행되는데, `twist_mux`는 `/robot2/cmd_vel_gesture`를 구독한다. bringup 이 이 노드를 로봇 네임스페이스 안에서 띄워 주는 구조라, 단독 실행하면 그 네임스페이스가 안 붙는다.
 
 ### 통계 읽는 법
 

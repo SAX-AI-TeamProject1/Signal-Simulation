@@ -158,7 +158,7 @@ def generate_launch_description():
         #    자작 노드가 아니라 설치 패키지(ros-jazzy-twist-mux)를 그대로 쓴다.
         #    - 로봇마다 하나씩 필요하므로 이 루프 안에 둔다(네임스페이스로 분리).
         #    - 'cmd_vel_out' 은 twist_mux 가 쓰는 기본 출력 토픽 이름. 이걸 'cmd_vel' 로 리맵하면
-        #      네임스페이스가 붙어 /robot1/cmd_vel 이 되고, bridge.yaml 항목과 맞아떨어진다.
+        #      네임스페이스가 붙어 /robot2/cmd_vel 이 되고, bridge.yaml 항목과 맞아떨어진다.
         #    - 입력 토픽/우선순위/timeout 은 config/twist_mux.yaml 참고.
         twist_mux = Node(
             package='twist_mux',
@@ -283,7 +283,7 @@ def generate_launch_description():
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
 #
-# 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot1/cmd_vel 에 직접 쓰지 않고
+# 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot2/cmd_vel 에 직접 쓰지 않고
 # mux 입력(cmd_vel_teleop)으로 넣는다. 안 그러면 mux 출력과 충돌한다.
 #   ros2 run teleop_twist_keyboard teleop_twist_keyboard \
-#     --ros-args -r /cmd_vel:=/robot1/cmd_vel_teleop
+#     --ros-args -r /cmd_vel:=/robot2/cmd_vel_teleop
