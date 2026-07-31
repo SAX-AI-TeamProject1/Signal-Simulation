@@ -160,7 +160,7 @@ Bridged between ROS 2 and Gazebo (`config/bridge.yaml`):
 | `<ns>/odom` | gz → ROS | `nav_msgs/Odometry` | `gz.msgs.Odometry` |
 | `<ns>/joint_states` | gz → ROS | `sensor_msgs/JointState` | `gz.msgs.Model` |
 | `<ns>/scan` | gz → ROS | `sensor_msgs/LaserScan` | `gz.msgs.LaserScan` |
-| `<ns>/tf` | gz → ROS | `tf2_msgs/TFMessage` | `gz.msgs.Pose_V` |
+| `/tf` (gz side `<ns>/tf`) | gz → ROS | `tf2_msgs/TFMessage` | `gz.msgs.Pose_V` |
 | `/robot2/pose_gt` | gz → ROS | `geometry_msgs/Pose` | `gz.msgs.Pose` |
 <!-- 위 표: 브리지되는 토픽들. ROS에서 Gazebo로 가는 것은 <ns>/cmd_vel 하나뿐이고 나머지는 전부 시뮬레이터가 내보내는 방향. -->
 
@@ -172,6 +172,12 @@ The file spells the namespace out per robot. It used to carry a full `/robot1` s
 
 `/clock` deliberately carries no namespace — it is world-wide, not per-robot. The simulated camera publishes to `<ns>/camera/image` inside Gazebo but is not bridged, because the gesture pipeline uses a real webcam instead.
 <!-- /clock 은 일부러 네임스페이스를 안 붙임 — 로봇별이 아니라 월드 전역이기 때문. 시뮬레이션 카메라는 Gazebo 안에서 <ns>/camera/image 로 발행하지만 브리지하지 않음 — 수신호 파이프라인이 실물 웹캠을 쓰기 때문. -->
+
+`tf` is the other topic with no namespace, and unlike `/clock` that is not a choice this repo made. `tf2_ros` hard-codes the topic names as absolute paths — `"/tf"` and `"/tf_static"` with a leading slash, in `transform_broadcaster.hpp` and `transform_listener.hpp` — so a node's namespace never applies to them. The namespaced `robot_state_publisher` has always published its link transforms to the global `/tf`; only the bridged Gazebo side was named `<ns>/tf`, and nothing subscribed to it, which left `odom → base_link` missing from the tf tree every tool actually reads.
+<!-- tf 도 네임스페이스가 없는 토픽인데, /clock 과 달리 이건 이 리포지토리가 고른 게 아님. tf2_ros 가 토픽 이름을 절대 경로로 박아 놓았음 — transform_broadcaster.hpp 와 transform_listener.hpp 안의 앞 슬래시 붙은 "/tf", "/tf_static" — 그래서 노드에 네임스페이스를 줘도 tf 에는 적용되지 않음. 네임스페이스가 붙은 robot_state_publisher 도 링크 변환을 처음부터 전역 /tf 로 발행해 왔고, 브리지된 Gazebo 쪽만 <ns>/tf 라는 이름이었는데 그걸 구독하는 게 아무도 없었음. 그 결과 도구들이 실제로 읽는 tf 트리에서 odom → base_link 가 빠져 있었음. -->
+
+Robots are therefore separated in tf by **frame name**, not by topic. `robot_state_publisher` gets `frame_prefix: <ns>/`, and the URDF spells the same prefix into the `DiffDrive` plugin's `frame_id` / `child_frame_id` and into every sensor's `gz_frame_id`, so the frames are `robot2/odom`, `robot2/base_link`, `robot2/lidar_link`, and so on. Both halves must use the identical string or the tree breaks in two at `base_link`.
+<!-- 그래서 tf 에서 로봇은 토픽이 아니라 프레임 이름으로 갈림. robot_state_publisher 에 frame_prefix: <ns>/ 를 주고, URDF 는 DiffDrive 플러그인의 frame_id·child_frame_id 와 모든 센서의 gz_frame_id 에 같은 접두어를 적음. 그래서 프레임 이름이 robot2/odom, robot2/base_link, robot2/lidar_link 같은 형태가 됨. 두 쪽이 완전히 같은 문자열을 써야 하고, 다르면 트리가 base_link 에서 두 조각으로 끊어짐. -->
 
 Velocity sources arbitrated by `twist_mux`, highest priority first:
 <!-- twist_mux 가 중재하는 속도 명령 소스, 우선순위가 높은 순: -->

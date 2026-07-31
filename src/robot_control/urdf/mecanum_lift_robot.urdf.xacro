@@ -162,8 +162,13 @@
       <max_linear_acceleration>1.5</max_linear_acceleration>
       <topic>$(arg ns)/cmd_vel</topic>
       <odom_topic>$(arg ns)/odom</odom_topic>
-      <frame_id>odom</frame_id>
-      <child_frame_id>base_link</child_frame_id>
+      <!-- 프레임 이름에 ns 접두어를 붙인다. tf2_ros 가 토픽 이름을 절대 경로 "/tf" 로
+           박아 놓아서(transform_broadcaster.hpp) 로봇이 여러 대여도 tf 는 전부 한
+           토픽에 섞여 들어온다 — 토픽으로는 못 가르고 프레임 "이름"으로만 갈린다.
+           launch 의 robot_state_publisher 에 준 frame_prefix 와 같은 값이라야
+           odom→base_link 와 base_link→chassis 가 한 트리로 이어진다. -->
+      <frame_id>$(arg ns)/odom</frame_id>
+      <child_frame_id>$(arg ns)/base_link</child_frame_id>
       <tf_topic>$(arg ns)/tf</tf_topic>
     </plugin>
     <plugin filename="gz-sim-joint-state-publisher-system"
@@ -200,7 +205,9 @@
       <!-- gz_frame_id 를 반드시 넣는다: 없으면 ROS 로 넘어온 Image 의 frame_id 가
            "mecanum_lift_robot/camera_link/sim_camera" 같은 gz 내부 스코프 이름이 되어
            tf 조회(카메라 좌표 → base_link)가 실패한다. -->
-      <gz_frame_id>camera_link</gz_frame_id>
+      <!-- ns 접두어는 위 DiffDrive frame_id 와 같은 이유 — rsp 의 frame_prefix 가
+           만드는 이름(robot2/camera_link)과 글자 하나까지 같아야 tf 조회가 붙는다. -->
+      <gz_frame_id>$(arg ns)/camera_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image><width>640</width><height>480</height></image>

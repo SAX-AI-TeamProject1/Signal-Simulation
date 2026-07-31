@@ -120,12 +120,21 @@ def generate_launch_description():
         # 여기서 state는 상태가 아니라, 로봇의 부품이 어떤 방향인지에 대한 좌표정보들(베터리 정보 이런거x)
         # 이 정보는 처음에는 spawn 토픽으로 pub되어 객체를 스폰 할 수 있게 한다[지금은 이 용도만]
 
+        #
+        # frame_prefix 를 주는 이유: 네임스페이스는 tf 를 갈라 주지 못한다. tf2_ros 가
+        # 토픽 이름을 앞 슬래시 붙은 절대 경로 "/tf" / "/tf_static" 으로 박아 놔서
+        # (transform_broadcaster.hpp, transform_listener.hpp), ns 를 robot2 로 줘도 이
+        # 노드는 여전히 전역 /tf 로 발행한다. 로봇이 2대가 되면 양쪽이 같은 토픽에 같은
+        # 이름 base_link 를 쏴서 tf 트리가 뒤엉킨다. 갈리는 건 프레임 "이름"뿐이라
+        # 여기서 robot2/ 를 붙인다 — urdf 의 DiffDrive frame_id 와 센서 gz_frame_id 도
+        # 같은 접두어를 쓰므로($(arg ns)/...) 두 쪽이 한 트리로 이어진다.
         rsp = Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             namespace=namespace,  # 이 namespace를 붙여서 토픽 발생
             parameters=[{
                 'robot_description': robot_description,
+                'frame_prefix': namespace + '/',
                 'use_sim_time': use_sim_time}],
         )
 
@@ -220,13 +229,15 @@ def generate_launch_description():
     gz_sim_gui = ExecuteProcess(
         condition=UnlessCondition(headless),
         cmd=['gz', 'sim', '--render-engine', 'ogre', world, '-r'],
-        output='screen',
+        # output='screen',
+        output='log',
         on_exit=Shutdown(),
     )
     gz_sim_headless = ExecuteProcess(
         condition=IfCondition(headless),
         cmd=['gz', 'sim', '-s', '--render-engine', 'ogre', world, '-r'],
-        output='screen',
+        # output='screen',
+        output='log',
         on_exit=Shutdown(),
     )
 
@@ -241,8 +252,7 @@ def generate_launch_description():
         executable='bridge_node',
         parameters=[{'config_file': bridge_config,
                      'use_sim_time': use_sim_time}],
-        # output='screen',
-        output='log',
+        output='screen',
     )
 
     # 안정용 평평한 바닥판 스폰 (창고 STL 바닥 접촉 불안정 회피용).
@@ -260,8 +270,7 @@ def generate_launch_description():
         executable='create',
         condition=IfCondition(enable_flat_ground),
         arguments=['-file', ground_sdf, '-name', 'flat_ground', '-z', '0.25'],
-        # output='screen',
-        output='log',
+        output='screen',
     )
 
     # navi_factory 월드의 model:// 참조(바닥 충돌 STL·창고·모델들·OGV 메시)를 gz 가 찾게 리소스 경로 등록.

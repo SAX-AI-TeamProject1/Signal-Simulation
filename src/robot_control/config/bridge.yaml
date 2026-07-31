@@ -64,7 +64,16 @@
   gz_type_name: "gz.msgs.Model"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/robot2/tf"
+# ROS 쪽 이름만 "/tf" 다 — 여기만 네임스페이스를 안 붙이는 이유:
+# tf2_ros 는 토픽 이름을 앞에 슬래시 붙은 절대 경로로 박아 놓았다
+# (transform_listener.hpp / transform_broadcaster.hpp 의 "/tf", "/tf_static").
+# 그래서 노드에 네임스페이스를 줘도 tf 는 언제나 전역 /tf 로 오간다. 실제로
+# robot_state_publisher 도 ns 가 robot2 인데 링크 tf 를 /tf 로 내보내고 있다.
+# 여기만 /robot2/tf 로 두면 gz 가 주는 odom→base_link 를 구독하는 쪽이 아무도
+# 없어서(RViz, tf2 버퍼, 나중의 Nav2 전부 /tf 만 본다) tf 트리가 odom 에서 끊긴다.
+# 로봇을 여러 대로 늘릴 때는 이 토픽을 다시 가르는 게 아니라 robot_state_publisher
+# 의 frame_prefix 로 프레임 "이름"을 갈라야 한다 — 토픽으로는 못 가른다.
+- ros_topic_name: "/tf"
   gz_topic_name: "/robot2/tf"
   ros_type_name: "tf2_msgs/msg/TFMessage"
   gz_type_name: "gz.msgs.Pose_V"
