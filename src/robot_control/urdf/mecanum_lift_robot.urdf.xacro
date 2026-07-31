@@ -30,13 +30,42 @@
        주면 포크가 +X를 향하도록 검증했다. -->
   <xacro:property name="mesh_yaw" value="-1.5708"/>
 
+  <!-- ===== 차체 실측 치수 =====
+       외형 메시를 지게차로 바꾸면서 물리 치수는 옛 값(2.0x0.9x0.6)이 남아 있었다.
+       그 값들의 근거가 사라졌으므로 실제 렌더되는 메시를 시뮬레이션에서 직접 쟀다:
+       라이다를 차체 밖 6m 지점(정면 x=+6, 측면 y=+6)에 두고 자기 몸을 스캔해
+       높이별 실루엣을 읽는 방식이다. 계산으로 glTF 좌표를 변환해 보기도 했는데
+       두 번 다 실측과 안 맞아서(Y-up 변환 가정 문제) 계산값은 쓰지 않았다.
+
+         높이 0.3m : x[-0.85, 1.10]  y[-0.52, 0.57]
+         높이 0.6m : x[-0.80, 1.10]  y[-0.52, 0.55]
+         높이 1.5m : x[-0.67, 0.96]  y[-0.48, 0.49]
+         위끝      : z=2.1m 에는 반사 있고 z=2.3m 에는 없음
+
+       => 길이 1.95, 폭 1.09, 높이 약 2.2. 앞뒤로는 원점 기준 앞이 더 길다
+       (중심이 x=+0.125). 월드 소품 deco_forklift_ogv 의 collision box 에 적힌
+       2.4x1.4x2.06 은 이 메시의 실제 크기가 아니다 — 그 값을 믿고 맞추면 안 된다. -->
+  <xacro:property name="body_len"    value="1.95"/>
+  <xacro:property name="body_wid"    value="1.09"/>
+  <xacro:property name="body_x"      value="0.125"/>  <!-- 차체 중심의 x 오프셋 -->
+  <xacro:property name="body_top"    value="2.2"/>
+  <!-- 지면과 차체 바닥 사이 간격. 0 으로 두면 collision 박스가 바닥에 먼저 닿아
+       바퀴가 뜨고 로봇이 굴러가지 않는다. -->
+  <xacro:property name="ground_gap"  value="0.15"/>
+
   <!-- ===== 구동 파라미터 ===== -->
   <xacro:property name="wheel_radius" value="0.15"/>
   <xacro:property name="wheel_width"  value="0.12"/>
-  <!-- 고속 코너링 시 전복 방지: 바퀴/캐스터 간격을 넓혀 안정성 확보 -->
-  <xacro:property name="wheel_sep"    value="1.3"/>
+  <!-- 바퀴가 차체 폭(1.09) 밖으로 튀어나오지 않게 잡는다: 1.3 이던 예전 값은
+       옛 차체(폭 0.9) 기준이라 지금 메시에서는 바퀴가 좌우로 0.17m 씩 삐져나왔다.
+       0.95 면 바깥면이 0.95/2+0.12/2 = 0.535 로 차체 반폭 0.545 안에 들어온다.
+       전복 걱정은 이 모델에선 크지 않다 — box_inertia 매크로가 <origin> 을 주지
+       않아 무게중심이 링크 원점(지면 높이)에 있기 때문이다. -->
+  <xacro:property name="wheel_sep"    value="0.95"/>
   <xacro:property name="caster_radius" value="0.07"/>
-  <xacro:property name="caster_x"      value="0.95"/>
+  <!-- 캐스터도 차체 안쪽으로. 0.95 였을 때 뒤 캐스터(-0.95)가 차체 뒤끝(-0.85)
+       밖으로 나가 허공에 떠 있었다. 앞뒤 짧은 쪽(0.85)에서 여유를 둔 값이다. -->
+  <xacro:property name="caster_x"      value="0.72"/>
 
   <xacro:property name="base_mass"   value="25.0"/>
   <xacro:property name="wheel_mass"  value="1.5"/>
@@ -83,11 +112,15 @@
         <mesh filename="${lift_mesh}" scale="${lift_scale}"/>
       </geometry>
     </visual>
+    <!-- collision 박스를 실측 치수로. 바닥에서 ground_gap 만큼 띄우고 body_top 까지
+         올린다 — 위끝을 2.2 로 잡으면 지게차 마스트까지 포함되므로, 로봇이 선반
+         아래를 통과하던 게 이제 막힐 수 있다(예전 박스는 높이 0.6 뿐이었다). -->
+    <xacro:property name="body_hgt" value="${body_top - ground_gap}"/>
     <collision>
-      <origin xyz="0 0 0.45" rpy="0 0 0"/>
-      <geometry><box size="2.0 0.9 0.6"/></geometry>
+      <origin xyz="${body_x} 0 ${ground_gap + body_hgt/2}" rpy="0 0 0"/>
+      <geometry><box size="${body_len} ${body_wid} ${body_hgt}"/></geometry>
     </collision>
-    <xacro:box_inertia m="${base_mass}" x="2.0" y="0.9" z="0.6"/>
+    <xacro:box_inertia m="${base_mass}" x="${body_len}" y="${body_wid}" z="${body_hgt}"/>
   </link>
 
   <!-- ===== 구동 바퀴 매크로 ===== -->
@@ -152,24 +185,29 @@
   </joint>
 
   <!-- ===== 라이다 링크 ===== -->
-  <!-- 앞 범퍼 위치. 예전엔 (0.3, 0, 1.1) 이었는데 그건 외형 메시 "안쪽"이라
-       360개 광선이 전부 0.32~1.43m 에서 자기 몸에 맞았다(창고 벽은 하나도 안 보였음).
-       collision 박스(높이 0.6)는 넘겼지만 gpu_lidar 는 collision 이 아니라 visual 을
-       렌더링해서 맞히기 때문에 소용이 없었다.
-       MecanumLift.dae 를 COLLADA 씬 그래프(단위 0.01m, Y_UP)까지 반영해 재 보면
-       chassis 기준 bbox 가 x[-1.07,0.99] y[-0.61,0.34] z[0.08,2.01] 이고, 그 footprint 가
-       높이 0~2.01m 전 구간에서 유지된다 — 몸통 안에는 트이는 높이가 없다.
-       위(z>2.01)로 올리는 방법도 있지만 2.15m 수평 단면은 사람도 팔레트도 그 아래로
-       지나가서, 신호수 안전이 목적인 이 프로젝트에는 맞지 않는다. 그래서 앞으로 뺐다:
-       x=1.05 는 메시 앞면(0.988)과 collision 박스 앞면(1.0) 둘 다 바깥이고,
-       z=0.5 는 사람 다리·팔레트·콘이 걸리는 높이다. -->
+  <!-- 앞 범퍼, 다리 높이. gpu_lidar 는 collision 이 아니라 visual 을 렌더링해서
+       맞히므로, collision 박스를 피하는 것만으로는 자기 몸을 안 보게 할 수 없다.
+       위치를 시뮬레이션에서 후보별로 재 봤다(막힌 광선 비율 / 연속으로 트인 각):
+
+         (1.05, 0, 0.50) 이전 값   57% 막힘   ±75.7도
+         (1.25, 0, 0.35) 이 값     41% 막힘   ±105.8도
+         (1.25, 0, 0.60)           41% 막힘   ±105.8도
+         (0.125, 0, 2.40) 마스트 위 0% 막힘   완전 360도
+
+       마스트 위가 유일하게 진짜 360도지만, 지면 2.4m 높이의 수평 단면이라 사람도
+       팔레트도 콘도 그 아래로 지나간다. 신호수 안전이 목적인 1단계에는 못 쓴다.
+       실물 AGV 도 항법용 라이다는 마스트 위, 안전용 스캐너는 낮게 따로 단다.
+       그래서 안전용 쪽을 골랐다: x=1.25 는 차체 앞끝(1.10) 바로 앞이고,
+       z=0.35 는 사람 다리와 팔레트가 걸리는 높이다.
+       뒤쪽 41% 는 차체에 막힌 채로 남는다 — 뒤를 보려면 뒤 범퍼에 한 대를 더
+       달아야 하고(실물 AGV 의 대각선 2대 배치), 지금은 후진을 안 하므로 미룬다. -->
   <link name="lidar_link">
     <xacro:box_inertia m="0.1" x="0.05" y="0.05" z="0.05"/>
   </link>
   <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
     <child  link="lidar_link"/>
-    <origin xyz="1.05 0 0.5" rpy="0 0 0"/>
+    <origin xyz="1.25 0 0.35" rpy="0 0 0"/>
   </joint>
 
   <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
