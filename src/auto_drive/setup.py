@@ -40,6 +40,9 @@ setup(
             # 트랙 왕복 추종: pose_gt 를 보고 cmd_vel_auto 발행(twist_mux 최하위 우선순위).
             # 시스템 python3.12 로 실행된다 — rclpy 외에 별도 의존성이 없다.
             'waypoint_follower = auto_drive.patrol.waypoint_follower:main',
+            # 코너 표지(TrackMarker) 감속: 카메라로 마커를 보고 waypoint_follower의
+            # cmd_vel_auto를 줄여 재발행. ultralytics가 필요해 시스템 python3.12로 실행된다.
+            'marker_vision = auto_drive.patrol.marker_vision:main',
             # estop_node: /robot2/scan → cmd_vel_estop. 시스템 python3.12 로 실행된다.
             # detect_node(YOLO)와 slowdown_node 는 구현하면서 추가한다.
             #   YOLO 노드는 ros2 run 으로는 venv 에 못 닿는다(설치 스크립트 shebang 이 /usr/bin/python3).
