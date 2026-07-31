@@ -1,7 +1,10 @@
 # Last updated: 2026-07-31
 '''Signal-transport-perception을 pip으로 설치한 venv를 만들고, track_follow.py를
-robot_control/patrol/ 로 vendor 복사한 뒤 시스템 python3.12에 런타임 의존성을 설치하고,
+auto_drive/patrol/ 로 vendor 복사한 뒤 시스템 python3.12에 런타임 의존성을 설치하고,
 Kaggle에서 학습된 obstacle 탐지 모델(best.pt)까지 받아온다.
+
+(2026-08-01: robot_control 패키지가 auto_drive/signal_vision/knavi_bringup 셋으로
+분리되면서, 이 스크립트가 vendor 복사·모델 배치에 쓰는 경로도 auto_drive로 옮겼다.)
 
 setup_infer_env.py(Signal-Vision)와 같은 패턴이다 — venv는 vendor 복사의 "재료"일 뿐
 실행 환경이 아니므로 끝나면 지운다(colcon이 빌드하는 console_scripts는 항상 시스템
@@ -41,15 +44,15 @@ REPO_URL = "https://github.com/SAX-AI-TeamProject1/Signal-transport-perception.g
 KAGGLE_KERNEL = "heojaeseong/yolo-percep"  # fetch_model.py(Signal-transport-perception)와 동일한 커널
 REPO_ROOT = Path(__file__).resolve().parent.parent
 VENV_DIR = REPO_ROOT / ".venv-perception"
-VENDOR_DEST = (REPO_ROOT / "src" / "robot_control" / "robot_control"
+VENDOR_DEST = (REPO_ROOT / "src" / "auto_drive" / "auto_drive"
                / "patrol" / "track_follow.py")
-MODEL_DEST = REPO_ROOT / "src" / "robot_control" / "models" / "obstacle_detector.pt"
+MODEL_DEST = REPO_ROOT / "src" / "auto_drive" / "models" / "obstacle_detector.pt"
 DOTENV_PATH = REPO_ROOT / ".env"
 
 
 def _vendor_copy() -> None:
     """venv에 pip으로 깔린 Signal-transport-perception의 src/track_follow.py 한 파일을
-    robot_control/patrol/track_follow.py로 복사한다(track_marker_infer.py와 같은 위치,
+    auto_drive/patrol/track_follow.py로 복사한다(track_marker_infer.py와 같은 위치,
     같은 "벤더 복사본" 패턴).
 
     vision_hand처럼 패키지 전체를 복사하지 않고 파일 하나만 복사하는 이유: 인계 문서
@@ -74,7 +77,7 @@ def _vendor_copy() -> None:
     shutil.copy(src_file, VENDOR_DEST)
     print(f"vendor 복사 완료: {src_file} -> {VENDOR_DEST}")
 
-    # 복사만으로 끝내지 않고 실제로 robot_control 패키지 경로에서 import가 되는지 바로
+    # 복사만으로 끝내지 않고 실제로 auto_drive 패키지 경로에서 import가 되는지 바로
     # 확인한다 — 형제 모듈 참조가 있으면 여기서 ModuleNotFoundError로 즉시 드러난다.
     verify = subprocess.run(
         [sys.executable, "-c",
