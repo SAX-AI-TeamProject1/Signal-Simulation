@@ -21,6 +21,7 @@
   <exec_depend>robot_state_publisher</exec_depend> <!-- URDF + joint_states → tf -->
   <exec_depend>xacro</exec_depend>              <!-- *.urdf.xacro 를 URDF 로 펼치는 도구 -->
   <exec_depend>twist_mux</exec_depend>          <!-- 속도 명령 우선순위 중재(설치 패키지) -->
+  <exec_depend>rviz2</exec_depend>              <!-- enable_rviz:=true 일 때만 쓰는 뷰어 -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

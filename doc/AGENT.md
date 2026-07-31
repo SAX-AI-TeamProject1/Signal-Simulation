@@ -125,14 +125,15 @@ What `knavi_bringup/launch/bringup.launch.py` actually starts. One robot is spaw
 | `waypoint_follower` (ns `/robot2`) | one per robot | resident | follows the track from `pose_gt`, publishes `cmd_vel_auto`; off with `enable_patrol:=false` |
 | `camera_node` (ns `/robot2`) | one per robot | resident | one physical webcam per robot; off with `enable_camera:=false` |
 | `ros_gz_bridge bridge_node` | one for the whole system | resident | translates the topics listed in `config/bridge.yaml` |
+| `rviz2` | one for the whole system | resident | views `/tf` and `<ns>/scan`; off with `enable_rviz:=false` or `headless:=true` |
 | `gz sim` process | one | resident | physics; **not** a ROS node, so it never appears in `ros2 node list` |
 <!-- 위 표: bringup이 띄우는 구성요소별 개수·수명·역할. gz sim은 ROS 노드가 아니라 별도 프로세스라 ros2 node list에 안 나옴. -->
 
 Inside the Gazebo process, not separate nodes: the `DiffDrive` plugin (subscribes `cmd_vel`, publishes `odom` and `odom → base_link` tf), the `JointStatePublisher` plugin, the simulated camera sensor, and the `gpu_lidar` sensor.
 <!-- Gazebo 프로세스 내부에서 도는 것들(별도 노드가 아님): DiffDrive 플러그인(cmd_vel 구독, odom과 odom→base_link tf 발행), JointStatePublisher 플러그인, 시뮬레이션 카메라 센서, gpu_lidar 센서. -->
 
-Startup order: set `GZ_SIM_RESOURCE_PATH` → `gz sim` → `robot_state_publisher` → spawn → ground plate → bridge → `camera_node`.
-<!-- 기동 순서: GZ_SIM_RESOURCE_PATH 설정 → gz sim → robot_state_publisher → 스폰 → 바닥판 → 브릿지 → camera_node. -->
+Startup order: set `GZ_SIM_RESOURCE_PATH` → `gz sim` → `robot_state_publisher` → spawn → ground plate → bridge → `camera_node` → `rviz2`.
+<!-- 기동 순서: GZ_SIM_RESOURCE_PATH 설정 → gz sim → robot_state_publisher → 스폰 → 바닥판 → 브릿지 → camera_node → rviz2. -->
 
 Adding a robot means adding one entry to the `robot_info` list at the top of the launch file; the bridge and `gz sim` stay at one each, and only `bridge.yaml` grows.
 <!-- 로봇을 늘리려면 launch 파일 상단 robot_info 리스트에 항목을 추가하면 됨. 브릿지와 gz sim은 계속 1개씩이고 bridge.yaml에 토픽만 늘어남. -->
@@ -229,12 +230,22 @@ Launching:
 ros2 launch knavi_bringup bringup.launch.py
 ros2 launch knavi_bringup bringup.launch.py headless:=true enable_camera:=false
 ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
+ros2 launch knavi_bringup bringup.launch.py enable_rviz:=false
 ros2 run signal_vision camera_node --ros-args -p enable_inference:=false
 ```
-<!-- 위 명령: bringup 기본 실행, GUI·카메라 없이 실행, 웹캠 장치 번호 지정 실행, 그리고 camera_node 단독 실행(추론 끔). -->
+<!-- 위 명령: bringup 기본 실행, GUI·카메라 없이 실행, 웹캠 장치 번호 지정 실행, RViz 창 없이 실행, 그리고 camera_node 단독 실행(추론 끔). -->
 
-Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`).
-<!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true). -->
+Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`), `enable_rviz` (`true`).
+<!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true), enable_rviz(true). -->
+
+`enable_rviz` is on by default, so a plain `bringup` opens RViz2 on `config/knavi.rviz` next to the `gz sim` window: the lidar scan as points, the tf axes, fixed frame `robot2/odom`. It is part of bringup rather than a separate step because the `gz sim` window only draws the sensor's own rays and cannot tell you whether the scan reached ROS at all.
+<!-- enable_rviz 는 기본이 켜짐이라, 그냥 bringup 하면 gz sim 창 옆에 config/knavi.rviz 로 RViz2 가 함께 뜸 — 라이다 스캔은 점으로, tf 는 좌표축으로, 고정 프레임은 robot2/odom. 별도 단계가 아니라 bringup 에 넣은 이유는, gz sim 창은 센서 자신의 광선만 그릴 뿐 그 스캔이 ROS 까지 넘어왔는지는 알려 주지 못하기 때문. -->
+
+Two ways it stays shut: `enable_rviz:=false`, or `headless:=true`, which wins over `enable_rviz` because a run asked to have no GUI must not open a window.
+<!-- 안 뜨게 하는 방법은 둘: enable_rviz:=false, 또는 headless:=true. headless 가 enable_rviz 를 이기는데, GUI 없이 돌리라고 시킨 실행이 창을 띄우면 안 되기 때문. -->
+
+That config carries no `RobotModel` display: the only link with a visual is `chassis`, and its mesh URI is `model://mecanum_lift/...`, which RViz's resource retriever cannot resolve — it handles `package://`, `file://` and `http://` only.
+<!-- 그 설정에는 RobotModel 디스플레이가 없음 — visual 을 가진 링크가 chassis 하나뿐인데 그 메시 URI 가 model://mecanum_lift/... 이고, RViz 의 resource retriever 는 package://, file://, http:// 만 풀 수 있어서 이걸 못 읽기 때문. -->
 
 `enable_flat_ground` defaults on, but a robot that actually has to roll needs it off: the thin plate and this world's collision detector together pin the wheels so the robot never moves. See `doc/design.md`.
 <!-- enable_flat_ground 는 기본이 켜짐이지만 실제로 굴러가야 하는 로봇에는 꺼야 함. 얇은 판과 이 월드의 충돌 검출기가 맞물리면 바퀴가 고정돼 로봇이 전혀 움직이지 않기 때문. doc/design.md 참고. -->

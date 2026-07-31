@@ -1,0 +1,164 @@
+# robot2 라이다 스캔 확인용 RViz 설정.
+#
+# 주의: 이 파일은 RViz 가 "다른 이름으로 저장"할 때 통째로 다시 써진다.
+#       그때 아래 주석은 전부 날아가므로, 설정을 바꿨으면 주석을 다시 붙일 것.
+#
+# Fixed Frame 이 robot2/odom 인 이유: 스캔을 로봇에 붙여 놓고 보면(base_link 기준) 로봇은
+# 가만히 있고 벽이 흘러가는 그림이 된다. odom 기준으로 봐야 로봇이 창고를 지나가고
+# 벽이 제자리에 서 있는, 사람이 읽을 수 있는 그림이 나온다.
+# robot2/odom → robot2/base_link 는 gz DiffDrive 가 만들고 브리지가 /tf 로 넘긴다
+# (config/bridge.yaml). 그 아래 링크들은 robot_state_publisher 가 발행한다.
+#
+# 프레임 이름에 robot2/ 가 붙는 이유: tf2_ros 는 토픽을 절대 경로 "/tf" 로 고정해서
+# 로봇이 여러 대여도 tf 가 한 토픽에 섞인다 — 토픽으로는 못 가르고 이름으로만 갈린다.
+# 그래서 launch 의 rsp 에 frame_prefix, urdf 의 frame_id·gz_frame_id 에 $(arg ns)/ 를 준다.
+# 로봇을 바꿔 볼 때는 이 파일의 robot2/ 를 그 로봇의 ns 로 바꾸면 된다.
+#
+# RobotModel 디스플레이가 없는 이유: 이 URDF 에서 visual 을 가진 링크는 chassis 하나뿐이고
+# 그 메시 경로가 model://mecanum_lift/... 이다. RViz 의 resource_retriever 는
+# package:// file:// http:// 만 풀 수 있어서 model:// 은 못 읽는다 — 켜 봐야 오류만 난다.
+# 로봇의 모양은 TF 디스플레이의 좌표축(base_link, lidar_link, 바퀴)으로 대신 본다.
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /LaserScan1
+      Splitter Ratio: 0.5
+    Tree Height: 700
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    # 1m 격자 40칸 = 40m. 라이다 사거리가 10m 라 스캔 점이 격자 어디까지 닿는지 눈으로 잰다.
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 40
+      Reference Frame: <Fixed Frame>
+      Value: true
+    # tf 트리가 robot2/odom→robot2/base_link→robot2/chassis→robot2/lidar_link 로 이어져
+    # 있는지 확인하는 용도이기도 하다. 라이다 점이 안 보일 때 여기서 축이 뜨는지부터 본다.
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: false
+      Show Axes: true
+      Show Names: true
+      Tree Height: 0
+      Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 60; 60
+      Color Transformer: FlatColor
+      # 0 이 아니라 0.2 초 잔상을 남긴다: 10Hz 스캔을 잔상 없이 보면 점이 깜빡여서
+      # 벽 모양이 눈에 잘 안 들어온다. 두 스캔이 겹치는 정도가 보기 좋다.
+      Decay Time: 0.2
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      # 10m 밖 점도 보이라고 5cm. 기본 1cm 는 창고 규모에서 거의 안 보인다.
+      Size (m): 0.05
+      Style: Spheres
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        # Best Effort 로 둔다. 구독자가 Best Effort 면 발행자가 Reliable 이든
+        # Best Effort 든 다 받는다 — 반대(구독자 Reliable)면 한쪽에서 아예 안 붙는다.
+        # ros_gz_bridge 의 QoS 설정에 이 파일이 끌려다니지 않게 하는 쪽을 골랐다.
+        Reliability Policy: Best Effort
+        Value: /robot2/scan
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: robot2/odom
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      # Target Frame 을 robot2/base_link 로: 카메라가 로봇을 따라다닌다. odom 고정으로
+      # 두면 로봇이 트랙을 왕복하다가 화면 밖으로 나가 버린다.
+      Distance: 25
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.85
+      Target Frame: robot2/base_link
+      Value: Orbit (rviz)
+      Yaw: 3.14
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 900
+  Hide Left Dock: false
+  Hide Right Dock: true
+  Views:
+    collapsed: false
+  Width: 1400
+  X: 60
+  Y: 60

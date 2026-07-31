@@ -47,6 +47,10 @@ def generate_launch_description():
     enable_camera = LaunchConfiguration('enable_camera')
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
+    # 라이다 스캔을 눈으로 보는 뷰어. gz GUI 에서는 레이저가 로봇 주변 선으로만 보이고
+    # ROS 쪽으로 실제로 넘어왔는지는 알 수 없어서, 스캔을 확인하려면 어차피 이게 필요하다.
+    # 그래서 bringup 에 포함시킨다 — 창이 하나 더 뜨는 게 부담이면 enable_rviz:=false.
+    enable_rviz = LaunchConfiguration('enable_rviz')
 
     # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
     # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
@@ -81,6 +85,9 @@ def generate_launch_description():
                               description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
                                           '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
                                           '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
+        DeclareLaunchArgument('enable_rviz', default_value='true',
+                              description='false 면 RViz2 를 띄우지 않는다 '
+                                          '(라이다 스캔·tf 뷰어, config/knavi.rviz)'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
@@ -273,6 +280,26 @@ def generate_launch_description():
         output='screen',
     )
 
+    # RViz2: 라이다 스캔과 tf 트리를 보는 뷰어. 로봇 루프 밖에 하나만 둔다 — RViz 는
+    # 로봇별 노드가 아니라 전역 /tf 를 통째로 보는 뷰어라서, 로봇이 늘어도 창 하나면 된다
+    # (늘어난 로봇의 스캔은 knavi.rviz 에 LaserScan 디스플레이를 추가해서 본다).
+    #
+    # use_sim_time 을 주는 이유: 스캔과 tf 의 타임스탬프가 Gazebo 시계다. RViz 가 벽시계로
+    # 돌면 "메시지가 미래에서 왔다 / 너무 오래됐다"로 판단해 스캔이 안 그려진다.
+    # headless 를 함께 보는 이유: enable_rviz 가 기본 켜짐이라, 그것만 보면
+    # 'headless:=true' (GUI 없이 서버만) 를 준 실행에서도 RViz 창이 떠 버린다 —
+    # headless 를 준 사람이 원한 것과 정반대다. 두 인자 중 headless 를 이기게 둔다.
+    rviz_config = os.path.join(robot_share, 'config', 'knavi.rviz')
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        condition=IfCondition(PythonExpression(
+            ["'", enable_rviz, "' == 'true' and '", headless, "' != 'true'"])),
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='log',
+    )
+
     # navi_factory 월드의 model:// 참조(바닥 충돌 STL·창고·모델들·OGV 메시)를 gz 가 찾게 리소스 경로 등록.
     # models_path 는 위에서 ws_root 기준으로 계산됨(절대경로 하드코딩 제거).
     # 기존 GZ_SIM_RESOURCE_PATH 값이 있으면 덮어쓰지 않고 뒤에 이어붙인다.
@@ -284,7 +311,7 @@ def generate_launch_description():
 
     # 웹캠 노드는 로봇당 1개라서 위 robot_info 루프 안에서 만들어진다(robot_nodes 에 포함).
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim_gui, gz_sim_headless, ground, bridge])
+                             [gz_sim_gui, gz_sim_headless, ground, bridge, rviz])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
