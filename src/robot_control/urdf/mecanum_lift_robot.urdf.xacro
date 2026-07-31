@@ -142,13 +142,24 @@
   </joint>
 
   <!-- ===== 라이다 링크 ===== -->
+  <!-- 앞 범퍼 위치. 예전엔 (0.3, 0, 1.1) 이었는데 그건 외형 메시 "안쪽"이라
+       360개 광선이 전부 0.32~1.43m 에서 자기 몸에 맞았다(창고 벽은 하나도 안 보였음).
+       collision 박스(높이 0.6)는 넘겼지만 gpu_lidar 는 collision 이 아니라 visual 을
+       렌더링해서 맞히기 때문에 소용이 없었다.
+       MecanumLift.dae 를 COLLADA 씬 그래프(단위 0.01m, Y_UP)까지 반영해 재 보면
+       chassis 기준 bbox 가 x[-1.07,0.99] y[-0.61,0.34] z[0.08,2.01] 이고, 그 footprint 가
+       높이 0~2.01m 전 구간에서 유지된다 — 몸통 안에는 트이는 높이가 없다.
+       위(z>2.01)로 올리는 방법도 있지만 2.15m 수평 단면은 사람도 팔레트도 그 아래로
+       지나가서, 신호수 안전이 목적인 이 프로젝트에는 맞지 않는다. 그래서 앞으로 뺐다:
+       x=1.05 는 메시 앞면(0.988)과 collision 박스 앞면(1.0) 둘 다 바깥이고,
+       z=0.5 는 사람 다리·팔레트·콘이 걸리는 높이다. -->
   <link name="lidar_link">
     <xacro:box_inertia m="0.1" x="0.05" y="0.05" z="0.05"/>
   </link>
   <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
     <child  link="lidar_link"/>
-    <origin xyz="0.3 0 1.1" rpy="0 0 0"/>
+    <origin xyz="1.05 0 0.5" rpy="0 0 0"/>
   </joint>
 
   <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
