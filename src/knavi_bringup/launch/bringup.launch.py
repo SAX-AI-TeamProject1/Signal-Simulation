@@ -97,6 +97,16 @@ def generate_launch_description():
     # robot1(knavi_robot, 센서 없음)은 물리 검증이 끝나서 제거 — 물리 로봇 2대를
     # 같이 돌리면 이 무거운 월드에서 성능 부담이 커진다. 센서(라이다+카메라) 있는
     # mecanum_lift_robot만 남긴다.
+    #
+    # 여기에 로봇을 하나 더 추가할 때 같이 해야 하는 일: map 루트 프레임 만들기.
+    # 로봇은 전역 /tf 안에서 프레임 "이름"으로 갈리는데(rsp 의 frame_prefix), 그래서
+    # robot1/odom 과 robot2/odom 이 서로 부모 없는 별개 조각으로 남는다. RViz 는
+    # fixed frame 을 하나만 갖기 때문에 그 상태로는 어느 한 대만 보이고 나머지는
+    # "No transform from [robot1/base_link] to [robot2/odom]" 만 뜬다.
+    # → 이 루프 안에서 로봇마다 static_transform_publisher 로 map → <ns>/odom 을
+    #   하나씩 발행할 것. 값은 아래 4번째 필드(스폰 pose)를 그대로 쓰면 된다.
+    #   config/knavi.rviz 의 Fixed Frame 도 map 으로 옮긴다.
+    #   나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
          ('0.0', '32.25', '0.3', '-1.5708'),  # entry 트랙 진행 방향(남쪽)으로 정렬
