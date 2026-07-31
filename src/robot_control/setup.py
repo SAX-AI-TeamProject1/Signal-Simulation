@@ -45,6 +45,7 @@ setup(
             # 원본 camera_node.py 와 단일 파일 리팩토링본 camera_node_refactory.py 는
             # 책임별 파일 분리가 끝나서 삭제했다. 필요하면 git 이력에서 꺼낸다.
             'camera_node = robot_control.camera_node.node:main',
+            'waypoint_follower = robot_control.patrol.waypoint_follower:main',
         ],
     },
 )

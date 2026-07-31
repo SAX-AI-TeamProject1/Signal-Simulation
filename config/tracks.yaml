@@ -1,0 +1,12 @@
+# config/tracks.yaml  (poses are x, y, yaw in world frame)
+# entry 트랙(track_ne_entry_*) 좌표를 그대로 재사용한 왕복 트랙.
+# [A, B, C, B] 순서 + loop:true 조합으로 tracks_to_actors.py가 A를 끝에 자동으로
+# 붙여서 A→B→C→B→A 왕복 궤적을 만들고, 이게 반복되면 영원히 왕복한다.
+tracks:
+  ne_entry_patrol:
+    loop: true
+    waypoints:
+      - [0.0, 32.25, -1.5708]   # A: 출발, 남쪽(B 방향)을 보고 시작
+      - [0.0, 13.0, 0.0]        # B(가는 길): 코너, 동쪽(C 방향)을 봄
+      - [8.75, 13.0, 3.1416]    # C: 도착점, 서쪽(돌아가는 방향)을 봄
+      - [0.0, 13.0, 1.5708]     # B(오는 길): 코너, 북쪽(A 방향)을 봄

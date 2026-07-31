@@ -200,8 +200,12 @@ class CameraNode(Node):
         # 처리량/유실 통계를 몇 초마다 찍을지. 0 이하면 끔.
         self.declare_parameter('stats_period', 1.0)
         # 라벨을 Twist 로 바꿀 때 쓸 속도. 로봇이 바뀌면 이 두 개만 조정하면 된다.
-        self.declare_parameter('linear_speed', 0.2)         # FORWARD 전진 속도 (m/s)
-        self.declare_parameter('angular_speed', 0.5)        # LEFT/RIGHT 회전 속도 (rad/s)
+        # (이 월드의 real-time factor가 한때 ~0.5%까지 떨어져서 속도값을 극단적으로
+        # 올렸던 적이 있는데, 진짜 원인은 navi_factory.sdf의 물리 스텝 크기였다
+        # — max_step_size를 0.001→0.01로 늘려 real-time factor≈1로 고쳤으니
+        # 이제 정상적인 속도값을 쓰면 된다.)
+        self.declare_parameter('linear_speed', 0.5)         # FORWARD 전진 속도 (m/s)
+        self.declare_parameter('angular_speed', 0.8)         # LEFT/RIGHT 회전 속도 (rad/s)
 
         names = ('device_id', 'frame_width', 'frame_height', 'fps', 'frame_id',
                  'capture_backend', 'enable_inference', 'publish_image',
