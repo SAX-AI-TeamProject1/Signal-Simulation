@@ -1,8 +1,13 @@
 """
-조립자 — 네 부품을 배선하고 타이머/스레드만 관리한다.
+조립자 — 부품들을 배선하고 타이머/스레드만 관리한다.
 
 이 파일은 cv2 도 모델도 Twist 도 직접 다루지 않는다. 그래서 import 목록에
 cv2 가 없다. 배선만 하는 파일이라는 사실이 맨 위에서 바로 보인다.
+
+부품은 다섯: 캡처(frame_source) / 이미지 발행(image_publisher) / 추론(inference)
+/ 라벨→Twist(command_publisher) / 수신호 존 게이트(signal_zone). 게이트는
+bringup 이 tracks_yaml_path 를 넘길 때만 만들어지고, 그때 pose_gt 를 구독해
+"신호 대기 지점에서 신호수 쪽을 볼 때"만 명령이 나가게 막는다.
 
 두 개의 실행 흐름:
 
@@ -47,9 +52,11 @@ STOP 다음에 FORWARD 가 나가는 사고가 된다.
     ros2 run signal_vision camera_node --ros-args -p enable_inference:=false
 """
 
+import math
 import threading
 import time
 
+from geometry_msgs.msg import Pose
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
@@ -58,6 +65,7 @@ from signal_vision.camera_node.frame_source import FrameSource
 from signal_vision.camera_node.image_publisher import ImagePublisher
 from signal_vision.camera_node.inference import GestureInference
 from signal_vision.camera_node.shutdown import is_shutting_down
+from signal_vision.camera_node.signal_zone import load_zone_points, SignalZoneGate
 from signal_vision.metrics import InferenceMetrics
 
 
@@ -115,6 +123,24 @@ class CameraNode(Node):
             frame_id=params['frame_id'],
             enabled=params['publish_image'])
 
+        # ── 부품 5: 수신호 존 게이트 (signal_zone.py) ───────────────────
+        # tracks_yaml_path 가 비어 있으면(단독 실행) 게이트 없이 항상 발행 —
+        # bringup 만 이 경로를 넘기므로 웹캠 단위 점검은 예전 그대로 돈다.
+        self._zone_gate = None
+        self._zone_gate_open = None     # 열림/닫힘 전환 로그용 직전 상태
+        if params['tracks_yaml_path']:
+            signal_point, spot = load_zone_points(params['tracks_yaml_path'])
+            self._zone_gate = SignalZoneGate(
+                signal_point=signal_point,
+                spot=spot,
+                radius=params['zone_radius'],
+                half_angle_rad=math.radians(params['facing_half_angle_deg']))
+            self.create_subscription(Pose, 'pose_gt', self._on_pose, 10)
+            self.get_logger().info(
+                f'수신호 게이트 사용: 대기 지점 {signal_point} 반경 '
+                f'{params["zone_radius"]} m, 스팟 {spot} 방향 '
+                f'±{params["facing_half_angle_deg"]}도')
+
         # ── 부품 4: 라벨 → Twist (command_publisher.py) ─────────────────
         # (3번보다 먼저 만든다. 3번이 실패해도 4번 퍼블리셔는 살아 있어야
         #  토픽 그래프가 정상으로 보이기 때문)
@@ -122,7 +148,8 @@ class CameraNode(Node):
             node=self,
             stop_event=self._stop_event,
             linear_speed=params['linear_speed'],
-            angular_speed=params['angular_speed'])
+            angular_speed=params['angular_speed'],
+            zone_gate=self._zone_gate)
 
         # ── 부품 3: 추론 (inference.py) + 워커 스레드 ───────────────────
         self._inference = None
@@ -206,10 +233,21 @@ class CameraNode(Node):
         # 이제 정상적인 속도값을 쓰면 된다.)
         self.declare_parameter('linear_speed', 0.5)         # FORWARD 전진 속도 (m/s)
         self.declare_parameter('angular_speed', 0.8)         # LEFT/RIGHT 회전 속도 (rad/s)
+        # 수신호 존 게이트. tracks.yaml 경로가 비어 있으면 게이트 없이 항상 발행
+        # (단독 실행용). 켜고 끄는 배경은 signal_zone.py 독스트링 참고.
+        self.declare_parameter('tracks_yaml_path', '')
+        # 반경 1.5 m 의 근거: waypoint_follower 의 도착 허용 오차(ARRIVAL_TOLERANCE
+        # 0.6 m)보다 넉넉하되, 대기 지점에서 한 타일(2.4 m) 떨어진 트랙 위는 밖.
+        self.declare_parameter('zone_radius', 3.5)
+        # 반각 45도의 근거: 대기 지점에서 스팟까지 3.95 m 인데 로봇이 반경 안에서
+        # 최대 1.5 m 비껴 서면 방위각이 약 22도 틀어진다. 그 기하 오차를 덮고도
+        # "등지고 있다"는 걸러낼 만큼만 넓게.
+        self.declare_parameter('facing_half_angle_deg', 45.0)
 
         names = ('device_id', 'frame_width', 'frame_height', 'fps', 'frame_id',
                  'capture_backend', 'enable_inference', 'publish_image',
-                 'stats_period', 'linear_speed', 'angular_speed')
+                 'stats_period', 'linear_speed', 'angular_speed',
+                 'tracks_yaml_path', 'zone_radius', 'facing_half_angle_deg')
         params = {name: self.get_parameter(name).value for name in names}
 
         # 검증은 여기 한 곳에 모은다. 잘못된 값으로 카메라를 열고 나서 실패하면
@@ -219,6 +257,19 @@ class CameraNode(Node):
         if params['fps'] <= 0.0:
             raise ValueError(f'fps 는 0 보다 커야 합니다 (받은 값: {params["fps"]})')
         return params
+
+    def _on_pose(self, msg):
+        """pose_gt 콜백(실행기 스레드). 게이트를 갱신하고 전환만 로그로 남긴다."""
+        q = msg.orientation
+        allowed = self._zone_gate.update_pose(
+            msg.position.x, msg.position.y, q.x, q.y, q.z, q.w)
+        # 매 pose 마다 찍으면 물리 스텝 속도로 로그가 쏟아진다 → 전환만.
+        if allowed != self._zone_gate_open:
+            self._zone_gate_open = allowed
+            if allowed:
+                self.get_logger().info('수신호 게이트 열림 — 대기 지점에서 스팟 주시 중')
+            else:
+                self.get_logger().info('수신호 게이트 닫힘 — 인식은 계속, 명령만 차단')
 
     def _build_inference(self):
         """

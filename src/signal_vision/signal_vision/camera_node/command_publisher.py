@@ -34,13 +34,18 @@ class GestureCommandPublisher:
     """
 
     def __init__(self, node, stop_event, linear_speed, angular_speed,
-                 gesture_topic='gesture', cmd_vel_topic='cmd_vel_gesture'):
+                 gesture_topic='gesture', cmd_vel_topic='cmd_vel_gesture',
+                 zone_gate=None):
         """
         퍼블리셔 2개를 만들고, 라벨별 Twist 를 미리 만들어 캐싱한다.
 
         인자:
             linear_speed: FORWARD 전진 속도 (m/s)
             angular_speed: LEFT/RIGHT 회전 속도 (rad/s)
+            zone_gate: SignalZoneGate 또는 None. 있으면 allows() 가 참일 때만
+                cmd_vel_gesture 를 발행한다. gesture(String) 는 게이트와 무관하게
+                항상 나간다 — 관측·기록용이라 "존 밖에서 무슨 수신호가 잡혔나"도
+                rosbag 에 남아야 하기 때문이다.
 
         Twist 를 미리 만드는 이유: 라벨이 4개뿐이라 매 프레임 새로 만들 이유가 없다.
         캐시된 객체를 재발행해도 되는 것은 publish() 가 내부에서 직렬화하기 때문이다
@@ -53,6 +58,7 @@ class GestureCommandPublisher:
 
         self._node = node
         self._stop_event = stop_event
+        self._zone_gate = zone_gate
         self._last_label = None     # 워커 스레드에서만 읽고 쓴다 → 락 불필요
 
         self._pub_gesture = node.create_publisher(String, gesture_topic, 10)
@@ -109,6 +115,11 @@ class GestureCommandPublisher:
                 self._node.get_logger().info(f'수신호 인식: {label}')
                 self._last_label = label
             self._pub_gesture.publish(String(data=label))
+            # 게이트가 닫혀 있으면 명령만 삼킨다. 발행을 그냥 안 하면 되는 이유는
+            # estop 의 해제와 같다 — twist_mux 가 timeout(0.5초)으로 gesture
+            # 소스를 버리므로 별도의 "무효화" 신호가 필요 없다.
+            if self._zone_gate is not None and not self._zone_gate.allows():
+                return True
             self._pub_cmd_vel.publish(self._label_to_twist[label])
         except RuntimeError:
             # 위 검사와 발행 사이에 종료가 끼어든 경우.

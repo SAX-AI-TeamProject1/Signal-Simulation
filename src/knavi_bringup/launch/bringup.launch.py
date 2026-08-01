@@ -264,12 +264,19 @@ def generate_launch_description():
         #      ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
         #    주의: 로봇 수만큼 실물 웹캠이 꽂혀 있어야 한다. 장치가 모자라면 그 로봇의
         #    camera_node 만 못 뜨고, 나머지 로봇과 시뮬레이션은 그대로 돈다.
+        #
+        #    tracks_yaml_path 를 넘기는 이유: 수신호 존 게이트를 켠다. 로봇이 신호
+        #    대기 지점(signal_point) 반경 안에서 신호수 스팟(hand_signal_spot)
+        #    쪽을 보고 있을 때만 cmd_vel_gesture 가 나간다 — 트랙 주행 중에 웹캠
+        #    앞에서 손을 흔들어도 순찰을 덮지 못하게. 경로를 안 넘기는 단독
+        #    실행(run_camera_node.sh)은 게이트 없이 예전처럼 항상 발행한다.
         camera = Node(
             package='signal_vision',
             executable='camera_node',
             namespace=namespace,
             condition=IfCondition(enable_camera),
-            parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
+            parameters=[{'device_id': ParameterValue(device_id, value_type=int),
+                         'tracks_yaml_path': tracks_yaml_path}],
             output='screen',
         )
         # 8) 라이다 광선 뷰어 : <ns>/scan 을 읽어 <ns>/scan_rays 마커로 다시 그린다.
