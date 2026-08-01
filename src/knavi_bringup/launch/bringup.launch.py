@@ -47,6 +47,8 @@ def generate_launch_description():
     enable_camera = LaunchConfiguration('enable_camera')
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
+    # 비상정지. 기본 on — 끄는 건 정지 거리를 재는 것 같은 의도된 실험일 때뿐이다.
+    enable_estop = LaunchConfiguration('enable_estop')
 
     # 라이다 스캔을 눈으로 보는 뷰어. gz GUI 에서는 레이저가 로봇 주변 선으로만 보이고
     # ROS 쪽으로 실제로 넘어왔는지는 알 수 없어서, 스캔을 확인하려면 어차피 이게 필요하다.
@@ -88,6 +90,10 @@ def generate_launch_description():
                               description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
                                           '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
                                           '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
+        DeclareLaunchArgument('enable_estop', default_value='true',
+                              description='false 면 비상정지 노드(estop_node)를 띄우지 '
+                                          '않는다 — 정지 거리 측정처럼 일부러 안 세울 '
+                                          '때만 쓸 것'),
         DeclareLaunchArgument('enable_rviz', default_value='true',
                               description='false 면 RViz2 를 띄우지 않는다 '
                                           '(라이다 스캔·tf 뷰어, config/knavi.rviz)'),
@@ -288,8 +294,20 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
+        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로에 장애물이 있으면 cmd_vel_estop 에
+        #     0 속도를 쏜다. twist_mux 최우선(100) 자리라 수신호·teleop·순찰을 전부
+        #     덮는다. 회피는 하지 않는다 — 길 위에 사람이 있으면 서고 지나가면 간다.
+        #     RViz 와 무관하게 항상 뜬다: 이건 뷰어가 아니라 안전 장치다.
+        estop = Node(
+            package='auto_drive',
+            executable='estop_node',
+            namespace=namespace,
+            condition=IfCondition(enable_estop),
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
         robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,
-                        scan_rays, map_to_odom]
+                        scan_rays, map_to_odom, estop]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
