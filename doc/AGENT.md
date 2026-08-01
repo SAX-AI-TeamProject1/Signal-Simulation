@@ -42,7 +42,7 @@ Signal-Simulation/
 ├── src/
 │   ├── robot_control/     # the robot's body and wiring: urdf + config, no nodes
 │   ├── signal_vision/     # gesture recognition: camera_node + the vendored model source
-│   ├── auto_drive/        # autonomous driving: waypoint_follower (estop / detection to come)
+│   ├── auto_drive/        # autonomous driving: waypoint_follower + scan_rays viewer (estop / detection to come)
 │   └── knavi_bringup/     # assembly only: the top-level launch, no nodes of its own
 ├── tools/                 # offline track editing / SDF generation (see requirements.txt)
 └── worlds/
@@ -71,7 +71,7 @@ Four `ament_python` packages, split by responsibility rather than by file type. 
 |---|---|---|
 | `robot_control` | `urdf/` (`robot.urdf.xacro`, `mecanum_lift_robot.urdf.xacro`), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
 | `signal_vision` | `camera_node/`, the vendored `vision_hand/`, `metrics.py`, `models/` (weights) | `camera_node` |
-| `auto_drive` | `patrol/waypoint_follower.py` | `waypoint_follower` |
+| `auto_drive` | `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `waypoint_follower`, `scan_rays` |
 | `knavi_bringup` | `launch/bringup.launch.py` | nothing of its own — it starts the other three |
 <!-- 위 표: 패키지 4개가 각각 무엇을 소유하고 무엇을 실행하는지. robot_control 과 knavi_bringup 은 실행 노드가 없음. -->
 
@@ -124,8 +124,9 @@ What `knavi_bringup/launch/bringup.launch.py` actually starts. One robot is spaw
 | `twist_mux` (ns `/robot2`) | one per robot | resident | passes through the highest-priority live velocity source |
 | `waypoint_follower` (ns `/robot2`) | one per robot | resident | follows the track from `pose_gt`, publishes `cmd_vel_auto`; off with `enable_patrol:=false` |
 | `camera_node` (ns `/robot2`) | one per robot | resident | one physical webcam per robot; off with `enable_camera:=false` |
+| `scan_rays` (ns `/robot2`) | one per robot | resident | redraws `scan` as ray line segments on `scan_rays`; starts only when RViz does |
 | `ros_gz_bridge bridge_node` | one for the whole system | resident | translates the topics listed in `config/bridge.yaml` |
-| `rviz2` | one for the whole system | resident | views `/tf` and `<ns>/scan`; off with `enable_rviz:=false` or `headless:=true` |
+| `rviz2` | one for the whole system | resident | views `/tf`, `<ns>/scan` and `<ns>/scan_rays`; off with `enable_rviz:=false` or `headless:=true` |
 | `gz sim` process | one | resident | physics; **not** a ROS node, so it never appears in `ros2 node list` |
 <!-- 위 표: bringup이 띄우는 구성요소별 개수·수명·역할. gz sim은 ROS 노드가 아니라 별도 프로세스라 ros2 node list에 안 나옴. -->
 
@@ -203,6 +204,9 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard \
 Driving by hand while `enable_patrol` is on means fighting the follower for the mux, since teleop only outranks it — pass `enable_patrol:=false` for a clean manual check.
 <!-- enable_patrol 이 켜진 채로 수동 주행을 하면 mux 를 두고 팔로워와 겨루게 됨. teleop 이 우선순위만 높을 뿐이기 때문 — 깔끔하게 수동 확인을 하려면 enable_patrol:=false 를 줄 것. -->
 
+`<ns>/scan_rays` (`visualization_msgs/MarkerArray`) is not bridged either — `scan_rays` builds it inside ROS from the scan that was already bridged, so it is a second view of existing data rather than a new sensor.
+<!-- <ns>/scan_rays(visualization_msgs/MarkerArray) 도 브리지 대상이 아님 — scan_rays 가 이미 브리지된 스캔을 ROS 안에서 다시 그린 것이라, 새 센서가 아니라 있는 데이터를 한 번 더 보는 것임. -->
+
 `camera_node` itself publishes `<ns>/gesture` (`std_msgs/String`, the recognized label, for logging and latency measurement), `<ns>/cmd_vel_gesture` (`geometry_msgs/Twist`), and `<ns>/image_webcam` (`sensor_msgs/Image`, off by default). These carry the robot namespace because `bringup` starts the node inside it; started bare with `ros2 run` the same topics appear at the root instead.
 <!-- camera_node 자체가 발행하는 것: <ns>/gesture(std_msgs/String — 인식된 라벨, 기록·지연시간 측정용), <ns>/cmd_vel_gesture(geometry_msgs/Twist), <ns>/image_webcam(sensor_msgs/Image, 기본 꺼짐). bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우기 때문에 네임스페이스가 붙는 것이며, ros2 run 으로 그냥 띄우면 같은 토픽들이 루트에 생김. -->
 
@@ -238,8 +242,11 @@ ros2 run signal_vision camera_node --ros-args -p enable_inference:=false
 Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`), `enable_rviz` (`true`).
 <!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true), enable_rviz(true). -->
 
-`enable_rviz` is on by default, so a plain `bringup` opens RViz2 on `config/knavi.rviz` next to the `gz sim` window: the lidar scan as points, the tf axes, fixed frame `robot2/odom`. It is part of bringup rather than a separate step because the `gz sim` window only draws the sensor's own rays and cannot tell you whether the scan reached ROS at all.
-<!-- enable_rviz 는 기본이 켜짐이라, 그냥 bringup 하면 gz sim 창 옆에 config/knavi.rviz 로 RViz2 가 함께 뜸 — 라이다 스캔은 점으로, tf 는 좌표축으로, 고정 프레임은 robot2/odom. 별도 단계가 아니라 bringup 에 넣은 이유는, gz sim 창은 센서 자신의 광선만 그릴 뿐 그 스캔이 ROS 까지 넘어왔는지는 알려 주지 못하기 때문. -->
+`enable_rviz` is on by default, so a plain `bringup` opens RViz2 on `config/knavi.rviz` next to the `gz sim` window: the lidar scan as points, the same scan again as ray line segments, the tf axes, fixed frame `robot2/odom`. It is part of bringup rather than a separate step because the `gz sim` window only draws the sensor's own rays and cannot tell you whether the scan reached ROS at all.
+<!-- enable_rviz 는 기본이 켜짐이라, 그냥 bringup 하면 gz sim 창 옆에 config/knavi.rviz 로 RViz2 가 함께 뜸 — 라이다 스캔은 점으로, 같은 스캔을 광선 선분으로 한 번 더, tf 는 좌표축으로, 고정 프레임은 robot2/odom. 별도 단계가 아니라 bringup 에 넣은 이유는, gz sim 창은 센서 자신의 광선만 그릴 뿐 그 스캔이 ROS 까지 넘어왔는지는 알려 주지 못하기 때문. -->
+
+The ray line segments come from `scan_rays`, which starts and stops with RViz because it is a viewer aid and nothing else reads it. RViz's `LaserScan` display puts a point only where a return came back, so a ray that hit nothing within range draws nothing at all — measured on the 180° scan, 283 of 360 rays were `inf`, leaving most of the fan blank and no way to tell "the sensor does not look there" from "it looked and the space is empty". `scan_rays` republishes the same scan on `<ns>/scan_rays` as two `Marker` line lists, returns in red and misses drawn out to range in cyan. It never rewrites `<ns>/scan` itself: turning `inf` into a range value there would read as a wall at 10 m to the estop node and to Nav2 later.
+<!-- 광선 선분은 scan_rays 가 그리는 것이고, 뷰어 보조용이라 읽는 쪽이 RViz 뿐이어서 RViz 와 함께 뜨고 함께 꺼짐. RViz 의 LaserScan 디스플레이는 반사가 돌아온 자리에만 점을 찍으므로, 사거리 안에서 아무것도 못 맞힌 광선은 아예 안 그려짐 — 180도 스캔에서 실측하니 360개 중 283개가 inf 였고, 부채꼴 대부분이 빈 채로 남아서 "센서가 저쪽을 안 본다"와 "봤는데 비어 있다"를 구분할 수 없었음. scan_rays 는 같은 스캔을 <ns>/scan_rays 에 Marker 선분 목록 두 개로 다시 발행함 — 반사가 온 광선은 빨강, 못 맞힌 광선은 사거리 끝까지 청록. <ns>/scan 자체는 절대 고치지 않음: 거기서 inf 를 거리 값으로 바꾸면 estop 노드와 나중의 Nav2 가 10m 앞에 벽이 있다고 읽게 됨. -->
 
 Two ways it stays shut: `enable_rviz:=false`, or `headless:=true`, which wins over `enable_rviz` because a run asked to have no GUI must not open a window.
 <!-- 안 뜨게 하는 방법은 둘: enable_rviz:=false, 또는 headless:=true. headless 가 enable_rviz 를 이기는데, GUI 없이 돌리라고 시킨 실행이 창을 띄우면 안 되기 때문. -->

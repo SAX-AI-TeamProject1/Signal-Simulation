@@ -115,6 +115,28 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    # 광선을 선으로 보는 디스플레이. 위 LaserScan 은 반사가 온 자리에 점만 찍어서,
+    # 아무것도 못 맞힌 광선(range=inf)은 화면에서 사라진다 — 전방 180도 360개 중
+    # 283개가 그랬다. auto_drive 의 scan_rays 노드가 그 광선까지 사거리 끝까지
+    # 선분으로 그려 준다(빨강=반사 있음, 청록=10m 안에 아무것도 없음).
+    # 이 디스플레이만 끄면 예전처럼 점만 보는 화면으로 돌아온다.
+    # 색·투명도·굵기는 이 파일이 아니라 노드 파라미터로 바꾼다 — 화면을 보면서
+    # 맞춰야 하는 값이라 다시 띄우지 않고 조정할 수 있게 해 뒀다:
+    #   ros2 param set /robot2/scan_rays miss_color "[0.2, 0.9, 1.0, 0.9]"
+    #   ros2 param set /robot2/scan_rays line_width 0.05
+    #   ros2 param set /robot2/scan_rays stride 2      (선을 더 촘촘히)
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: ScanRays
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot2/scan_rays
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

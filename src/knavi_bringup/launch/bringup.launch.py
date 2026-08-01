@@ -120,6 +120,11 @@ def generate_launch_description():
     #   하나씩 발행할 것. 값은 아래 4번째 필드(스폰 pose)를 그대로 쓰면 된다.
     #   config/knavi.rviz 의 Fixed Frame 도 map 으로 옮긴다.
     #   나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
+    # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz 노드가 같은
+    # 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
+    show_rviz = PythonExpression(
+        ["'", enable_rviz, "' == 'true' and '", headless, "' != 'true'"])
+
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
          ('0.0', '32.25', '0.3', '-1.5708'),  # entry 트랙 진행 방향(남쪽)으로 정렬
@@ -256,7 +261,19 @@ def generate_launch_description():
             parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera]
+        # 8) 라이다 광선 뷰어 : <ns>/scan 을 읽어 <ns>/scan_rays 마커로 다시 그린다.
+        #    RViz 의 LaserScan 은 반사가 온 자리에 점만 찍어서, 아무것도 못 맞힌
+        #    광선(inf)은 화면에서 사라진다 — 실측으로 360개 중 283개가 그랬다.
+        #    주행에는 관여하지 않는 순수 뷰어라 RViz 를 띄울 때만 함께 뜬다.
+        scan_rays = Node(
+            package='auto_drive',
+            executable='scan_rays',
+            namespace=namespace,
+            condition=IfCondition(show_rviz),
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera, scan_rays]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
@@ -326,8 +343,7 @@ def generate_launch_description():
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        condition=IfCondition(PythonExpression(
-            ["'", enable_rviz, "' == 'true' and '", headless, "' != 'true'"])),
+        condition=IfCondition(show_rviz),
         arguments=['-d', rviz_config],
         parameters=[{'use_sim_time': use_sim_time}],
         output='log',

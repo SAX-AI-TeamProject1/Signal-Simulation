@@ -43,6 +43,9 @@ setup(
             # 코너 표지(TrackMarker) 감속: 카메라로 마커를 보고 waypoint_follower의
             # cmd_vel_auto를 줄여 재발행. ultralytics가 필요해 시스템 python3.12로 실행된다.
             'marker_vision = auto_drive.patrol.marker_vision:main',
+            # 라이다 스캔을 광선 선분(Marker)으로 다시 그리는 뷰어 전용 노드.
+            # 주행에는 아무 영향이 없어서 RViz 를 띄울 때만 함께 뜬다.
+            'scan_rays = auto_drive.viz.scan_rays:main',
             # estop_node: /robot2/scan → cmd_vel_estop. 시스템 python3.12 로 실행된다.
             # detect_node(YOLO)와 slowdown_node 는 구현하면서 추가한다.
             #   YOLO 노드는 ros2 run 으로는 venv 에 못 닿는다(설치 스크립트 shebang 이 /usr/bin/python3).
