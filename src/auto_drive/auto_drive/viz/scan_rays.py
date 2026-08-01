@@ -28,10 +28,11 @@ from visualization_msgs.msg import Marker, MarkerArray
 # 바꾸고 alpha 를 올린다 — miss 선과 hit 선은 사실상 겹치지 않으므로(각 광선은
 # 둘 중 하나에만 들어간다) 진하게 해도 hit 을 가리지 않는다.
 HIT_COLOR = (1.0, 0.3, 0.2, 1.0)
-MISS_COLOR = (0.2, 0.9, 1.0, 0.6)
+MISS_COLOR = (0.3, 0.9, 1.0, 0.6)
 
-# 스캔이 끊겼을 때 화면에 선이 남아 있지 않게 하는 수명. 10Hz 스캔의 5배 여유.
-MARKER_LIFETIME_SEC = 0.5
+# 스캔이 끊겼을 때 화면에 선이 남아 있지 않게 하는 수명. 10Hz 스캔의 3배 여유 —
+# 한 프레임 걸러도 선이 유지되면서, 끊기면 0.3초 안에 사라진다.
+MARKER_LIFETIME_SEC = 0.3
 
 
 class ScanRays(Node):
@@ -40,14 +41,15 @@ class ScanRays(Node):
     def __init__(self):
         super().__init__('scan_rays')
 
-        # 360개를 다 그리면 선 사이가 붙어 부채꼴이 통짜 면처럼 보인다. 몇 개 걸러
+        # 720개를 다 그리면 선 사이가 붙어 부채꼴이 통짜 면처럼 보인다. 몇 개 걸러
         # 그려야 "광선"으로 읽힌다 — 점(LaserScan 디스플레이)이 이미 전부 보여
         # 주므로 선 쪽은 성기어도 정보가 빠지지 않는다.
         self.declare_parameter('stride', 4)
-        # 0.02 는 25m 궤도 뷰에서 실처럼 가늘어 잘 안 보였다. 3cm 로 올린다.
-        self.declare_parameter('line_width', 0.03)
+        # 3cm 까지 올려 봤더니 선끼리 붙어 부채꼴이 뭉쳤다. 2cm 가 25m 궤도 뷰에서
+        # 보이면서 선이 서로 안 겹치는 선이다.
+        self.declare_parameter('line_width', 0.02)
         # 사거리 끝까지 그린 miss 선이 진짜 반사로 오해받지 않게 살짝 짧게 끊는다.
-        self.declare_parameter('miss_scale', 0.98)
+        self.declare_parameter('miss_scale', 0.95)
         # 색을 파라미터로 뺀 이유: 가시성은 화면을 보면서 맞춰야 하는 값이라,
         # 고치고 다시 띄우는 것보다 ros2 param set 으로 바로 바꾸는 게 빠르다.
         #   ros2 param set /robot2/scan_rays miss_color "[0.2, 0.9, 1.0, 0.8]"
@@ -56,9 +58,9 @@ class ScanRays(Node):
 
         self.pub = self.create_publisher(MarkerArray, 'scan_rays', 1)
         # 스캔은 센서 데이터라 Best Effort 로 온다. Reliable 로 구독하면 아예 안 붙는다.
-        self.create_subscription(LaserScan, 'scan', self.on_scan, qos_profile_sensor_data)
+        self.create_subscription(LaserScan, 'scan', self._on_scan, qos_profile_sensor_data)
 
-    def on_scan(self, msg):
+    def _on_scan(self, msg):
         stride = max(1, self.get_parameter('stride').value)
         miss_scale = self.get_parameter('miss_scale').value
 
@@ -67,7 +69,8 @@ class ScanRays(Node):
         for i in range(0, len(msg.ranges), stride):
             r = msg.ranges[i]
             angle = msg.angle_min + i * msg.angle_increment
-            if math.isfinite(r) and msg.range_min <= r <= msg.range_max:
+            # isfinite() 는 "무한인가"가 아니라 "유한한가"다 — inf 도 nan 도 False.
+            if math.isfinite(r) and msg.range_min <= r and r <= msg.range_max:
                 self.append_ray(hit_pts, angle, r)
             else:
                 # inf(사거리 안에 반사 없음)와 nan(무효)을 같이 묶는다. 둘 다
