@@ -111,15 +111,15 @@ def generate_launch_description():
     # 같이 돌리면 이 무거운 월드에서 성능 부담이 커진다. 센서(라이다+카메라) 있는
     # mecanum_lift_robot만 남긴다.
     #
-    # 여기에 로봇을 하나 더 추가할 때 같이 해야 하는 일: map 루트 프레임 만들기.
+    # map 루트 프레임은 아래 로봇 루프에서 로봇마다 하나씩 만든다.
     # 로봇은 전역 /tf 안에서 프레임 "이름"으로 갈리는데(rsp 의 frame_prefix), 그래서
     # robot1/odom 과 robot2/odom 이 서로 부모 없는 별개 조각으로 남는다. RViz 는
     # fixed frame 을 하나만 갖기 때문에 그 상태로는 어느 한 대만 보이고 나머지는
     # "No transform from [robot1/base_link] to [robot2/odom]" 만 뜬다.
-    # → 이 루프 안에서 로봇마다 static_transform_publisher 로 map → <ns>/odom 을
-    #   하나씩 발행할 것. 값은 아래 4번째 필드(스폰 pose)를 그대로 쓰면 된다.
-    #   config/knavi.rviz 의 Fixed Frame 도 map 으로 옮긴다.
-    #   나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
+    # 로봇이 한 대뿐이라 미뤄 뒀다가, 월드 좌표로 그리는 것들을 RViz 에 올리면서
+    # 필요해져 만들었다 — 월드 좌표를 놓을 프레임이 있어야 하고, 그 프레임과 로봇을
+    # 잇는 게 아래 로봇 루프의 map → <ns>/odom 이다.
+    # 나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
     # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz 노드가 같은
     # 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
     show_rviz = PythonExpression(
@@ -273,7 +273,23 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera, scan_rays]
+        # 9) map → <ns>/odom. 이게 있어야 월드 좌표로 그린 world_markers 와 로봇의
+        #    스캔이 한 화면에서 겹쳐 보인다.
+        #    처음엔 static_transform_publisher 로 스폰 pose 를 그대로 박아 뒀는데,
+        #    그러면 로봇이 달릴수록 gz 창과 RViz 가 조금씩 벌어졌다 — 뒷단
+        #    odom → base_link 가 바퀴 적산치라서 슬립만큼 오차가 쌓이고, 이 로봇은
+        #    메카넘인데 적산은 diff-drive 공식이라 옆으로 미끄러진 건 아예 안 잡힌다.
+        #    그래서 고정값 대신 pose_gt 로 매번 보정하는 노드를 쓴다. SLAM 이
+        #    들어오면 이 노드를 내리고 그쪽이 같은 변환을 낸다(doc/design.md).
+        map_to_odom = Node(
+            package='auto_drive',
+            executable='ground_truth_tf',
+            namespace=namespace,
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,
+                        scan_rays, map_to_odom]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건

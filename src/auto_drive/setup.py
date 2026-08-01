@@ -46,6 +46,10 @@ setup(
             # 라이다 스캔을 광선 선분(Marker)으로 다시 그리는 뷰어 전용 노드.
             # 주행에는 아무 영향이 없어서 RViz 를 띄울 때만 함께 뜬다.
             'scan_rays = auto_drive.viz.scan_rays:main',
+            # map → <ns>/odom 을 진짜 좌표(pose_gt)로 보정해 발행. 바퀴 적산치의
+            # 누적 오차 때문에 RViz 와 gz 의 로봇 위치가 벌어지는 걸 없앤다.
+            # 나중에 SLAM 이 이 자리를 대신한다.
+            'ground_truth_tf = auto_drive.localization.ground_truth_tf:main',
             # estop_node: /robot2/scan → cmd_vel_estop. 시스템 python3.12 로 실행된다.
             # detect_node(YOLO)와 slowdown_node 는 구현하면서 추가한다.
             #   YOLO 노드는 ros2 run 으로는 venv 에 못 닿는다(설치 스크립트 shebang 이 /usr/bin/python3).
