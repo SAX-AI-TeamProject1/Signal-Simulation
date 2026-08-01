@@ -299,9 +299,12 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
-        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로에 장애물이 있으면 cmd_vel_estop 에
-        #     0 속도를 쏜다. twist_mux 최우선(100) 자리라 수신호·teleop·순찰을 전부
-        #     덮는다. 회피는 하지 않는다 — 길 위에 사람이 있으면 서고 지나가면 간다.
+        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로의 장애물 거리에 따라 두 단계로
+        #     반응한다 — 감속 링(1.5~5m)에서는 순찰 명령의 속도를 깎아
+        #     cmd_vel_estop_slow(18)로 재발행하고(수신호를 받으러 신호수에게 접근할
+        #     수 있도록), 정지 링(1.5m 이내)에서는 cmd_vel_estop(100)에 0 속도를
+        #     쏴서 수신호·teleop·순찰을 전부 덮는다. 회피는 하지 않는다 — 길 위에
+        #     사람이 있으면 서고 지나가면 간다.
         #     RViz 와 무관하게 항상 뜬다: 이건 뷰어가 아니라 안전 장치다.
         estop = Node(
             package='auto_drive',
