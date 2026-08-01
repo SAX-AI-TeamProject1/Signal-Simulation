@@ -116,9 +116,9 @@ def generate_launch_description():
     # robot1/odom 과 robot2/odom 이 서로 부모 없는 별개 조각으로 남는다. RViz 는
     # fixed frame 을 하나만 갖기 때문에 그 상태로는 어느 한 대만 보이고 나머지는
     # "No transform from [robot1/base_link] to [robot2/odom]" 만 뜬다.
-    # 로봇이 한 대뿐이라 미뤄 뒀다가, 월드 좌표로 그리는 것들을 RViz 에 올리면서
-    # 필요해져 만들었다 — 월드 좌표를 놓을 프레임이 있어야 하고, 그 프레임과 로봇을
-    # 잇는 게 아래 로봇 루프의 map → <ns>/odom 이다.
+    # 로봇이 한 대뿐이라 미뤄 뒀다가, 월드 형상을 RViz 로 가져오면서 필요해져 만들었다:
+    # world_markers 가 내는 마커는 월드 좌표라서 그걸 놓을 프레임이 있어야 하고,
+    # 그 프레임과 로봇을 잇는 게 여기 정적 변환이다.
     # 나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
     # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz 노드가 같은
     # 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
@@ -364,6 +364,40 @@ def generate_launch_description():
     # headless 를 함께 보는 이유: enable_rviz 가 기본 켜짐이라, 그것만 보면
     # 'headless:=true' (GUI 없이 서버만) 를 준 실행에서도 RViz 창이 떠 버린다 —
     # headless 를 준 사람이 원한 것과 정반대다. 두 인자 중 headless 를 이기게 둔다.
+    # 월드 형상 뷰어. 창고의 visual 을 읽어 map 프레임 마커로 한 번 발행한다.
+    # RViz 에는 라이다 점과 선만 떠 있어서 그 점이 벽인지 선반인지 카트인지 알 수
+    # 없었다. gz 쪽 Visualize Lidar 플러그인으로 광선을 창고 위에 겹쳐 보려 했지만
+    # 광선이 월드 원점에만 그려졌다(그 플러그인은 토픽으로 센서 엔티티를 찾는데,
+    # 실행 중 스폰되는 이 로봇에서는 조회가 안 됐다). 그래서 반대 방향으로,
+    # 이미 점을 제 위치에 그리고 있는 RViz 로 형상을 가져온다.
+    # 로봇별이 아니라 시스템에 하나다 — 월드는 로봇 수와 무관하게 하나뿐이다.
+    world_markers = Node(
+        package='auto_drive',
+        executable='world_markers',
+        condition=IfCondition(show_rviz),
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'world_path': ParameterValue(world, value_type=str),
+            'models_root': models_path,
+        }],
+        output='screen',
+    )
+
+    # 돌아다니는 사람(<actor>) 뷰어. 소품과 달리 움직이므로 한 번 그리고 끝낼 수
+    # 없어 노드를 나눴다. gz 의 pose 토픽을 새로 브리지하는 대신 SDF 에 적힌 궤적을
+    # /clock 으로 직접 풀어 쓴다 — 이 월드의 actor 는 전부 주기가 고정된 왕복이다.
+    actor_markers = Node(
+        package='auto_drive',
+        executable='actor_markers',
+        condition=IfCondition(show_rviz),
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'world_path': ParameterValue(world, value_type=str),
+            'models_root': models_path,
+        }],
+        output='screen',
+    )
+
     rviz_config = os.path.join(robot_share, 'config', 'knavi.rviz')
     rviz = Node(
         package='rviz2',
@@ -385,7 +419,8 @@ def generate_launch_description():
 
     # 웹캠 노드는 로봇당 1개라서 위 robot_info 루프 안에서 만들어진다(robot_nodes 에 포함).
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim_gui, gz_sim_headless, ground, bridge, rviz])
+                             [gz_sim_gui, gz_sim_headless, ground, bridge,
+                              world_markers, actor_markers, rviz])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
