@@ -1,7 +1,6 @@
 # Last updated: 2026-07-31
-'''
-카메라 프레임에서 바닥에 그려진 트랙(navi_factory의 주황색 대시라인)을 인식해, 로봇 바로 앞
-트랙의 좌우 오프셋과 곡률을 추정한다.
+"""
+카메라 프레임에서 바닥에 그려진 트랙(navi_factory의 주황색 대시라인)을 인식해, 로봇 바로 앞 트랙의 좌우 오프셋과 곡률을 추정한다.
 
 분기점/반환점/목표지점 같은 상위 라우팅 판단(어느 분기로 갈지, 언제 유턴할지)은 이 모듈의
 책임이 아니다 — Signal-Simulation이 이미 웨이포인트 순서를 알고 있으므로, 이 모듈은 "지금
@@ -17,7 +16,7 @@ Vehicle/Person 탐지 결과를 그대로 재사용)까지가 이 모듈의 책�
 ROS 2로 넘기는 출력 인터페이스는 이 프로젝트 전체적으로 아직 미정(docu/decisions.md
 ADR-005/010)이라, 이 모듈은 순수 인식 함수(이미지 → 오프셋/곡률)까지만 만들고 실제 노드
 배선은 인터페이스가 정해진 뒤에 잇는다.
-'''
+"""
 
 import cv2
 import numpy as np
@@ -34,9 +33,17 @@ BRANCH_JUMP_THRESHOLD = 0.5  # 오프셋이 한 프레임 만에 이 이상 튀�
 TrackEstimate = tuple[float, float, float]  # (offset, curvature, confidence)
 
 
-def obstacle_mask(shape: tuple[int, int], boxes_xyxy: list[tuple[float, float, float, float]], pad: int = 6) -> np.ndarray:
-    '''YOLO 탐지 박스(Vehicle/Person 등) 영역을 True로 표시한 마스크. 트랙 색상 마스크에서
-    이 영역을 빼서, 트랙 위에 서 있는 다른 차량/사람 때문에 생기는 끊김·오검출을 막는다.'''
+def obstacle_mask(
+    shape: tuple[int, int],
+    boxes_xyxy: list[tuple[float, float, float, float]],
+    pad: int = 6,
+) -> np.ndarray:
+    """
+    YOLO 탐지 박스(Vehicle/Person 등) 영역을 True로 표시한 마스크.
+
+    트랙 색상 마스크에서 이 영역을 빼서, 트랙 위에 서 있는 다른 차량/사람 때문에 생기는
+    끊김·오검출을 막는다.
+    """
     mask = np.zeros(shape, dtype=bool)
     h, w = shape
     for x1, y1, x2, y2 in boxes_xyxy:
@@ -46,7 +53,10 @@ def obstacle_mask(shape: tuple[int, int], boxes_xyxy: list[tuple[float, float, f
     return mask
 
 
-def track_color_mask(frame_bgr: np.ndarray, obstacle_boxes: list[tuple] | None = None) -> np.ndarray:
+def track_color_mask(
+    frame_bgr: np.ndarray,
+    obstacle_boxes: list[tuple] | None = None,
+) -> np.ndarray:
     hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, TRACK_HSV_LOW, TRACK_HSV_HIGH) > 0
     h = frame_bgr.shape[0]
@@ -57,9 +67,11 @@ def track_color_mask(frame_bgr: np.ndarray, obstacle_boxes: list[tuple] | None =
 
 
 def select_own_track(mask: np.ndarray) -> np.ndarray | None:
-    '''화면에 여러 트랙 분기가 동시에 보여도, 로봇 바로 앞(화면 하단 중앙)에 맞닿은 연결
-    성분 하나만 "지금 타고 있는 트랙"으로 고른다. 중심점이 아니라 "로봇에 가장 가까운 끝"을
-    기준으로 골라야, 화면 저 멀리 지나가는 다른 차선과 헷갈리지 않는다.'''
+    """
+    화면에 여러 트랙 분기가 동시에 보여도, 로봇 바로 앞(화면 하단 중앙)에 맞닿은 연결 성분 하나만 "지금 타고 있는 트랙"으로 고른다.
+
+    중심점이 아니라 "로봇에 가장 가까운 끝"을 기준으로 골라야, 화면 저 멀리 지나가는 다른 차선과 헷갈리지 않는다.
+    """
     num, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=8)
     if num <= 1:
         return None
@@ -83,9 +95,11 @@ def select_own_track(mask: np.ndarray) -> np.ndarray | None:
 
 
 def fit_curve(track_mask: np.ndarray) -> tuple[np.ndarray, list[tuple[float, float]]] | None:
-    '''선택된 트랙 성분을 가까운 밴드 → 먼 밴드로 나눠 각 밴드의 x중심을 뽑고, 다항식으로
-    피팅한다(x = f(y)). 코너에서 앞으로 얼마나 꺾이는지까지 반영하려면 직선(1차)만으로는
-    부족해서 기본 2차를 쓴다.'''
+    """
+    선택된 트랙 성분을 가까운 밴드 → 먼 밴드로 나눠 각 밴드의 x중심을 뽑고, 다항식으로 피팅한다(x = f(y)).
+
+    코너에서 앞으로 얼마나 꺾이는지까지 반영하려면 직선(1차)만으로는 부족해서 기본 2차를 쓴다.
+    """
     ys, xs = np.where(track_mask)
     if len(ys) < 10:
         return None
@@ -113,7 +127,8 @@ def estimate_track(
     obstacle_boxes: list[tuple] | None = None,
     previous: TrackEstimate | None = None,
 ) -> TrackEstimate | None:
-    '''로봇 바로 앞 트랙의 (offset, curvature, confidence)를 추정한다.
+    """
+    로봇 바로 앞 트랙의 (offset, curvature, confidence)를 추정한다.
 
     offset: 화면 하단(로봇 바로 앞)에서 트랙 중심이 화면 중앙 대비 얼마나 치우쳤는지,
         -1(왼쪽 끝) ~ 1(오른쪽 끝)로 정규화.
@@ -123,7 +138,7 @@ def estimate_track(
         추정치를 유지할지 감속할지 판단하는 데 쓸 수 있다.
     previous: 직전 프레임의 추정치. 주어지면 (1) 오프셋이 갑자기 크게 튀는 경우(=다른 분기로
         잘못 물린 것으로 봄) 억제하고 (2) 프레임 간 값을 평활화한다.
-    '''
+    """
     h, w = frame_bgr.shape[:2]
     mask = track_color_mask(frame_bgr, obstacle_boxes)
     own = select_own_track(mask)

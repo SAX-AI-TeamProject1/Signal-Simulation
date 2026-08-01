@@ -26,6 +26,10 @@ def generate_launch_description():
     navi_dir = os.path.join(ws_root, 'worlds', 'navi_factory')
     default_world = os.path.join(navi_dir, 'world', 'navi_factory', 'navi_factory.sdf')
     models_path = os.path.join(navi_dir, 'models')  # GZ_SIM_RESOURCE_PATH 용
+    # 트랙 웨이포인트별 코너/목적지/신호 대기 지점 분류(waypoint_follower)의 유일한
+    # 소스 오브 트루스. world와 마찬가지로 어느 패키지도 소유하지 않는 저장소 루트
+    # 파일이라 절대경로를 여기서 계산해 넘긴다.
+    tracks_yaml_path = os.path.join(ws_root, 'config', 'tracks.yaml')
 
     # 월드는 어느 패키지도 소유하지 않는다(worlds/ 는 ROS 패키지가 아니다). 외부에서 world 인자로 주입.
     # 창고 월드로 띄우려면:
@@ -80,7 +84,7 @@ def generate_launch_description():
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
                               description='true 면 실물 웹캠 노드(camera_node)를 함께 띄운다'),
-        DeclareLaunchArgument('camera_device_id', default_value='2',
+        DeclareLaunchArgument('camera_device_id', default_value='',
                               description='첫 번째 로봇의 웹캠 장치 번호(/dev/video<N> 의 N)를 '
                                           '덮어쓴다. ls /dev/video* 로 확인. 비워 두면 '
                                           '모든 로봇이 robot_info 에 적힌 자기 값을 쓴다'),
@@ -226,7 +230,8 @@ def generate_launch_description():
             executable='waypoint_follower',
             namespace=namespace,
             condition=IfCondition(enable_patrol),
-            parameters=[{'use_sim_time': use_sim_time}],
+            parameters=[{'use_sim_time': use_sim_time,
+                         'tracks_yaml_path': tracks_yaml_path}],
             output='screen',
         )
         # 6) 코너 표지(TrackMarker) 감속 — 카메라로 마커를 보고 waypoint의 cmd_vel_auto를
