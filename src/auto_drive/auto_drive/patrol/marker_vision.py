@@ -18,15 +18,14 @@
 
 from pathlib import Path
 
-import rclpy
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Twist
+import rclpy
 from rclpy.node import Node
+from robot_control.patrol.track_marker_infer import load_model, predict
 from sensor_msgs.msg import Image
 
-from robot_control.patrol.track_marker_infer import load_model, predict
-
-TRACK_MARKER_CLASS = "TrackMarker"
+TRACK_MARKER_CLASS = 'TrackMarker'
 
 
 class MarkerVision(Node):
@@ -49,9 +48,9 @@ class MarkerVision(Node):
         if not weights_path or not Path(weights_path).is_file():
             raise RuntimeError(
                 f"TrackMarker 가중치 파일을 찾을 수 없습니다: '{weights_path}'. "
-                "Signal-transport-perception에서 capture_gazebo_dataset.py TrackMarker "
-                "→ prepare_dataset.py → train_kaggle.sh 로 먼저 학습해야 합니다. "
-                "당장 필요 없으면 enable_marker_vision:=false 로 끄세요.")
+                'Signal-transport-perception에서 capture_gazebo_dataset.py TrackMarker '
+                '→ prepare_dataset.py → train_kaggle.sh 로 먼저 학습해야 합니다. '
+                '당장 필요 없으면 enable_marker_vision:=false 로 끄세요.')
 
         self._image_topic = self.get_parameter('image_topic').value
         self._conf_threshold = self.get_parameter('conf_threshold').value
@@ -70,7 +69,7 @@ class MarkerVision(Node):
             Twist, self.get_parameter('output_topic').value, 10)
 
         self.get_logger().info(
-            f"marker_vision 시작 — weights={weights_path}, image_topic={self._image_topic}")
+            f'marker_vision 시작 — weights={weights_path}, image_topic={self._image_topic}')
 
     def _on_cmd_auto(self, msg: Twist) -> None:
         self._latest_cmd = msg

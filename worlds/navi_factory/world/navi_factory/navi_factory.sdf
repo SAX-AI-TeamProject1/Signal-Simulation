@@ -5,10 +5,17 @@
       <!-- 이 무거운 월드(소품 메시 수백 개)에서 실시간 배속이 실제 시간의
            ~0.5% 수준으로 떨어지는 문제가 있어, 스텝 크기를 10배 늘려(계산량은
            스텝 개수에 비례하지 stepsize 자체엔 크게 안 늘어나므로) 물리
-           정밀도를 조금 희생하고 실시간 배속을 개선한다. -->
-      <max_step_size>0.05</max_step_size>
+           정밀도를 조금 희생하고 실시간 배속을 개선했었다.
+           그런데 스텝이 0.05s로 크면 바퀴-바닥 접촉이 매 스텝 더 큰 침투/보정을
+           겪어야 해서 접촉 솔버가 불안정해지기 쉽다 — '스톨' 버그(아래 dart 주석)의
+           원인 중 하나로 의심되어, 5배 더 촘촘한 스텝(0.01s)으로 되돌리고 그만큼
+           update_rate를 올려(20→100) 같은 실시간 배속(0.05x20=0.01x100=1.0)을
+           유지한다. 이러면 스텝당 계산은 가벼워지되(mesh 수는 그대로라 스텝 자체의
+           비용은 안 바뀌지만) 스텝 수가 5배 늘어 총 연산량은 늘어난다 — 이 월드가
+           여전히 무겁다면 실시간 배속이 다시 떨어질 수 있어 실측이 필요하다. -->
+      <max_step_size>0.01</max_step_size>
       <real_time_factor>1</real_time_factor>
-      <real_time_update_rate>20</real_time_update_rate>
+      <real_time_update_rate>100</real_time_update_rate>
       <!-- 실제로 로드되는 physics 플러그인은 dartsim(gz-physics-dartsim)이고, 이 world의
            type='ode'는 DART가 기본으로 쓰는 충돌 검출기 백엔드를 ODE로 고른다는 뜻이다.
            box(flat_ground) vs trimesh(창고 소품 메시들) 충돌에서 ODE의 dCollideBTL이
@@ -18,8 +25,18 @@
            ODE 전용 코드 경로 자체를 피한다. -->
       <dart>
         <collision_detector>bullet</collision_detector>
+        <!-- '스톨' 버그: 바퀴 관절 속도(joint_states)는 명령대로 정상 회전하는데 차체
+             pose_gt는 수십 초씩 그대로인 현상을 실측으로 확인함(직진/제자리회전 모두
+             재현, flat_ground 유무 무관, 물리 시계(/clock)는 정상 속도로 흐름 — 즉
+             속도저하가 아니라 접지력이 실제로 안 걸리는 상태). mecanum_lift_robot은
+             구동바퀴 2개 + 무마찰 캐스터 2개가 동시에 바닥에 닿는 4점 접지라 강체 하나가
+             바닥과 과도구속(redundant contact)되는 전형적인 구성인데, dantzig는 이런
+             경우 수치적으로 접촉력을 0으로 반환해버리는 퇴화해(degenerate solution)를
+             내는 경우가 있다고 알려진 direct LCP solver다. 반복형(iterative) 솔버인
+             pgs로 바꿔 이 퇴화해 문제를 회피한다.
+        -->
         <solver>
-          <solver_type>dantzig</solver_type>
+          <solver_type>pgs</solver_type>
         </solver>
       </dart>
     </physics>
@@ -38,6 +55,224 @@
     </scene>
     <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
+    <!-- gz-sim 8 기본 GUI 구성(/opt/ros/jazzy/opt/gz_sim_vendor/share/gz/gz-sim8/gui/gui.config)을
+         그대로 복제하고 ImageDisplay 패널 하나만 덧붙인다. <gui> 블록을 world에 넣으면 gz-sim의
+         내장 기본 GUI 설정 전체가 이 블록으로 치환되므로(부분 지정이 아니라 전체 대체), 3D 뷰·
+         엔티티 트리·월드 컨트롤 같은 기본 패널을 계속 쓰려면 여기서 전부 다시 선언해야 한다.
+         ImageDisplay 는 robot2(mecanum_lift_robot, 유일한 실제 주행 차량)의 시뮬 카메라
+         (/robot2/camera/image, bridge.yaml 로 ROS 에도 이미 연결됨)를 기본 토픽으로 물려서,
+         task 7 실행 시 맵 전체 3D 뷰 + 차량 1인칭 카메라 뷰가 자동으로 나란히 뜨게 한다. -->
+    <gui fullscreen='false'>
+      <plugin filename='MinimalScene' name='3D View'>
+        <gz-gui>
+          <title>3D View</title>
+          <property type='bool' key='showTitleBar'>false</property>
+          <property type='string' key='state'>docked</property>
+        </gz-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <ambient_light>0.4 0.4 0.4</ambient_light>
+        <background_color>0.8 0.8 0.8</background_color>
+        <!-- 신호지점(북쪽, 0,~38) 바로 위에서 허브+회차루프를 내려다보는 각도.
+             예전 z=62 값은 격리된 테스트 월드(코너 4곳에 마커)로 검증한 값이라
+             건물 네 모서리는 다 들어왔지만, 실제 navi_factory 전체 맵(남쪽
+             도착지까지 포함해 훨씬 큼)에서는 그만큼 멀리 있을 필요가 없었다 —
+             오프스크린 카메라 센서로 렌더링해 비교해보니 z=62든 z=24든 어차피
+             화면엔 허브+루프 정도만 잡히고(트랙이 남쪽으로 워낙 길어서 한
+             프레임에 남쪽 끝까지는 안 들어옴), 24 정도가 확대된 만큼 더
+             또렷하게 보여서 이 값으로 낮췄다. -->
+        <camera_pose>0 48 24 0 1.006 -1.5708</camera_pose>
+      </plugin>
+      <plugin filename='EntityContextMenuPlugin' name='Entity context menu'>
+        <gz-gui>
+          <property key='state' type='string'>floating</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='GzSceneManager' name='Scene Manager'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='InteractiveViewControl' name='Interactive view control'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='CameraTracking' name='Camera Tracking'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='MarkerManager' name='Marker manager'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='SelectEntities' name='Select Entities'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='Spawn' name='Spawn Entities'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='VisualizationCapabilities' name='Visualization Capabilities'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='width' type='double'>5</property>
+          <property key='height' type='double'>5</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='WorldControl' name='World control'>
+        <gz-gui>
+          <title>World control</title>
+          <property type='bool' key='showTitleBar'>false</property>
+          <property type='bool' key='resizable'>false</property>
+          <property type='double' key='height'>72</property>
+          <property type='double' key='z'>1</property>
+          <property type='string' key='state'>floating</property>
+          <anchors target='3D View'>
+            <line own='left' target='left'/>
+            <line own='bottom' target='bottom'/>
+          </anchors>
+        </gz-gui>
+        <play_pause>true</play_pause>
+        <step>true</step>
+        <start_paused>true</start_paused>
+        <use_event>true</use_event>
+      </plugin>
+      <plugin filename='WorldStats' name='World stats'>
+        <gz-gui>
+          <title>World stats</title>
+          <property type='bool' key='showTitleBar'>false</property>
+          <property type='bool' key='resizable'>false</property>
+          <property type='double' key='height'>110</property>
+          <property type='double' key='width'>290</property>
+          <property type='double' key='z'>1</property>
+          <property type='string' key='state'>floating</property>
+          <anchors target='3D View'>
+            <line own='right' target='right'/>
+            <line own='bottom' target='bottom'/>
+          </anchors>
+        </gz-gui>
+        <sim_time>true</sim_time>
+        <real_time>true</real_time>
+        <real_time_factor>true</real_time_factor>
+        <iterations>true</iterations>
+      </plugin>
+      <plugin filename='Shapes' name='Shapes'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='x' type='double'>0</property>
+          <property key='y' type='double'>0</property>
+          <property key='width' type='double'>300</property>
+          <property key='height' type='double'>50</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+          <property key='cardBackground' type='string'>#666666</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='Lights' name='Lights'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='x' type='double'>300</property>
+          <property key='y' type='double'>0</property>
+          <property key='width' type='double'>150</property>
+          <property key='height' type='double'>50</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+          <property key='cardBackground' type='string'>#666666</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='TransformControl' name='Transform control'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='x' type='double'>0</property>
+          <property key='y' type='double'>50</property>
+          <property key='width' type='double'>250</property>
+          <property key='height' type='double'>50</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+          <property key='cardBackground' type='string'>#777777</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='Screenshot' name='Screenshot'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='x' type='double'>250</property>
+          <property key='y' type='double'>50</property>
+          <property key='width' type='double'>50</property>
+          <property key='height' type='double'>50</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+          <property key='cardBackground' type='string'>#777777</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='CopyPaste' name='CopyPaste'>
+        <gz-gui>
+          <property key='resizable' type='bool'>false</property>
+          <property key='x' type='double'>300</property>
+          <property key='y' type='double'>50</property>
+          <property key='width' type='double'>100</property>
+          <property key='height' type='double'>50</property>
+          <property key='state' type='string'>floating</property>
+          <property key='showTitleBar' type='bool'>false</property>
+          <property key='cardBackground' type='string'>#777777</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='ComponentInspector' name='Component inspector'>
+        <gz-gui>
+          <property type='bool' key='showTitleBar'>false</property>
+          <property type='string' key='state'>docked</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename='EntityTree' name='Entity tree'>
+        <gz-gui>
+          <property type='bool' key='showTitleBar'>false</property>
+          <property type='string' key='state'>docked</property>
+        </gz-gui>
+      </plugin>
+      <!-- 추가: robot2(주행 차량) 1인칭 카메라 뷰 — 맵 전체(3D View) 옆에 도킹되어 동시에 보인다 -->
+      <plugin filename='ImageDisplay' name='Vehicle Camera (robot2)'>
+        <gz-gui>
+          <title>Vehicle Camera (robot2)</title>
+          <property type='string' key='state'>docked</property>
+        </gz-gui>
+        <topic>/robot2/camera/image</topic>
+        <topic_picker>false</topic_picker>
+      </plugin>
+    </gui>
     <model name='warehouse'>
       <pose>0 0 -0.1002 0 0 0</pose>
       <self_collide>false</self_collide>
@@ -13062,59 +13297,71 @@
       <pose>0 40 0.2497 0 0 0</pose>
     </model>
     <actor name='path_prop_2_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>0.0</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>3.495 9.0 0.2497 0 0 0.0</pose></waypoint>
-          <waypoint><time>3.75</time><pose>6.495 9.0 0.2497 0 0 0.0</pose></waypoint>
-          <waypoint><time>7.5</time><pose>3.495 9.0 0.2497 0 0 0.0</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>3.495 9.0 1.05 0 0 0.0</pose></waypoint>
+          <waypoint><time>8.125</time><pose>9.995 9.0 1.05 0 0 0.0</pose></waypoint>
+          <waypoint><time>9.125</time><pose>9.995 9.0 1.05 0 0 3.142</pose></waypoint>
+          <waypoint><time>17.25</time><pose>3.495 9.0 1.05 0 0 3.142</pose></waypoint>
+          <waypoint><time>18.25</time><pose>3.495 9.0 1.05 0 0 0.0</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_3_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>0.6</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>-3.704 9.876 0.2497 0 0 0.877</pose></waypoint>
-          <waypoint><time>3.75</time><pose>-1.787 12.184 0.2497 0 0 0.877</pose></waypoint>
-          <waypoint><time>7.5</time><pose>-3.704 9.876 0.2497 0 0 0.877</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>-3.704 9.876 0.09 0 0 0.877</pose></waypoint>
+          <waypoint><time>9.375</time><pose>1.092 15.642 0.09 0 0 0.877</pose></waypoint>
+          <waypoint><time>10.375</time><pose>1.092 15.642 0.09 0 0 -2.265</pose></waypoint>
+          <waypoint><time>19.75</time><pose>-3.704 9.876 0.09 0 0 -2.265</pose></waypoint>
+          <waypoint><time>20.75</time><pose>-3.704 9.876 0.09 0 0 0.877</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_6_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://StandingPerson/meshes/standing.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>1.2</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>-3.14 5.283 0.2497 0 0 0.178</pose></waypoint>
-          <waypoint><time>3.75</time><pose>-0.187 5.814 0.2497 0 0 0.178</pose></waypoint>
-          <waypoint><time>7.5</time><pose>-3.14 5.283 0.2497 0 0 0.178</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>-3.14 5.283 1.05 0 0 0.178</pose></waypoint>
+          <waypoint><time>8.125</time><pose>3.257 6.434 1.05 0 0 0.178</pose></waypoint>
+          <waypoint><time>9.125</time><pose>3.257 6.434 1.05 0 0 -2.964</pose></waypoint>
+          <waypoint><time>17.25</time><pose>-3.14 5.283 1.05 0 0 -2.964</pose></waypoint>
+          <waypoint><time>18.25</time><pose>-3.14 5.283 1.05 0 0 0.178</pose></waypoint>
         </trajectory>
       </script>
     </actor>
@@ -13133,94 +13380,103 @@
         <delay_start>0.0</delay_start>
         <auto_start>true</auto_start>
         <trajectory id='0' type='walking'>
-          <waypoint>
-            <time>0</time>
-            <pose>3.577 15.642 0.2497 0 0 4.996</pose>
-          </waypoint>
-          <waypoint>
-            <time>1.5</time>
-            <pose>3.661 15.354 0.2497 0 0 4.996</pose>
-          </waypoint>
-          <waypoint>
-            <time>3.0</time>
-            <pose>3.577 15.642 0.2497 0 0 4.996</pose>
-          </waypoint>
+          <waypoint><time>0</time><pose>3.577 15.642 1.05 0 0 4.996</pose></waypoint>
+          <waypoint><time>7.5</time><pose>5.256 9.882 1.05 0 0 4.996</pose></waypoint>
+          <waypoint><time>8.5</time><pose>5.256 9.882 1.05 0 0 1.854</pose></waypoint>
+          <waypoint><time>16.0</time><pose>3.577 15.642 1.05 0 0 1.854</pose></waypoint>
+          <waypoint><time>17.0</time><pose>3.577 15.642 1.05 0 0 4.996</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_17_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://CasualFemale/meshes/casual_female.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>1.8</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>3.867 -8.136 0.2497 0 0 5.994</pose></waypoint>
-          <waypoint><time>3.75</time><pose>6.743 -8.991 0.2497 0 0 5.994</pose></waypoint>
-          <waypoint><time>7.5</time><pose>3.867 -8.136 0.2497 0 0 5.994</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>3.867 -8.136 0.09 0 0 5.994</pose></waypoint>
+          <waypoint><time>3.75</time><pose>6.742 -8.992 0.09 0 0 5.994</pose></waypoint>
+          <waypoint><time>4.75</time><pose>6.742 -8.992 0.09 0 0 2.852</pose></waypoint>
+          <waypoint><time>8.5</time><pose>3.867 -8.136 0.09 0 0 2.852</pose></waypoint>
+          <waypoint><time>9.5</time><pose>3.867 -8.136 0.09 0 0 5.994</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_20_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://CasualFemale/meshes/casual_female.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>2.4</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>-3.061 -14.826 0.2497 0 0 4.045</pose></waypoint>
-          <waypoint><time>3.75</time><pose>-4.916 -17.184 0.2497 0 0 4.045</pose></waypoint>
-          <waypoint><time>7.5</time><pose>-3.061 -14.826 0.2497 0 0 4.045</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>-3.061 -14.826 0.09 0 0 4.045</pose></waypoint>
+          <waypoint><time>9.375</time><pose>-7.703 -20.717 0.09 0 0 4.045</pose></waypoint>
+          <waypoint><time>10.375</time><pose>-7.703 -20.717 0.09 0 0 0.903</pose></waypoint>
+          <waypoint><time>19.75</time><pose>-3.061 -14.826 0.09 0 0 0.903</pose></waypoint>
+          <waypoint><time>20.75</time><pose>-3.061 -14.826 0.09 0 0 4.045</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_21_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://WalkingPerson/meshes/walking.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>3.0</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>0.765 -15.126 0.2497 0 0 5.351</pose></waypoint>
-          <waypoint><time>3.75</time><pose>2.558 -17.532 0.2497 0 0 5.351</pose></waypoint>
-          <waypoint><time>7.5</time><pose>0.765 -15.126 0.2497 0 0 5.351</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>0.765 -15.126 1.05 0 0 5.351</pose></waypoint>
+          <waypoint><time>9.375</time><pose>5.236 -21.148 1.05 0 0 5.351</pose></waypoint>
+          <waypoint><time>10.375</time><pose>5.236 -21.148 1.05 0 0 2.209</pose></waypoint>
+          <waypoint><time>19.75</time><pose>0.765 -15.126 1.05 0 0 2.209</pose></waypoint>
+          <waypoint><time>20.75</time><pose>0.765 -15.126 1.05 0 0 5.351</pose></waypoint>
         </trajectory>
       </script>
     </actor>
     <actor name='path_prop_23_person'>
-      <link name="body">
-        <visual name="visual">
-          <pose>0 0 0.02 0.04 0 0</pose>
-          <geometry>
-            <mesh><uri>model://WalkingPerson/meshes/walking.dae</uri></mesh>
-          </geometry>
-        </visual>
-      </link>
+      <skin>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walking'>
+        <filename>model://FemaleVisitorWalk/meshes/FemaleVisitorWalk.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
       <script>
         <loop>true</loop>
+        <delay_start>3.6</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='square'>
-          <waypoint><time>0</time><pose>-4.187 -8.045 0.2497 0 0 1.616</pose></waypoint>
-          <waypoint><time>3.75</time><pose>-4.322 -5.048 0.2497 0 0 1.616</pose></waypoint>
-          <waypoint><time>7.5</time><pose>-4.187 -8.045 0.2497 0 0 1.616</pose></waypoint>
+        <trajectory id='0' type='walking'>
+          <waypoint><time>0</time><pose>-4.187 -8.045 0.09 0 0 1.616</pose></waypoint>
+          <waypoint><time>8.75</time><pose>-4.503 -1.052 0.09 0 0 1.616</pose></waypoint>
+          <waypoint><time>9.75</time><pose>-4.503 -1.052 0.09 0 0 -1.526</pose></waypoint>
+          <waypoint><time>18.5</time><pose>-4.187 -8.045 0.09 0 0 -1.526</pose></waypoint>
+          <waypoint><time>19.5</time><pose>-4.187 -8.045 0.09 0 0 1.616</pose></waypoint>
         </trajectory>
       </script>
     </actor>

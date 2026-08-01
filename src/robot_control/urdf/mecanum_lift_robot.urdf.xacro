@@ -108,6 +108,24 @@
               <mu2>1.0</mu2>
             </ode>
           </friction>
+          <!-- '스톨' 버그(바퀴 관절은 명령대로 도는데 차체가 접지력을 못 받고
+               멈추는 현상) 원인 재분석: 바퀴 바닥(-0.01, chassis 원점 기준)과
+               캐스터 바닥(+0.02, 아래 캐스터 매크로 참고)이 3cm나 어긋나 있어서,
+               평상시 순항 중엔 캐스터가 바닥에서 3cm 떠 있다가 급가감속으로
+               섀시가 피치(앞뒤 기울임)할 때만 갑자기 캐스터가 바닥에 부딪히듯
+               접촉하게 되는 구조였다 — 이런 "상대속도가 있는 상태에서 갑자기
+               새로 생기는 접촉"이 DART 접촉 솔버에 불안정한 입력이 되어 접촉력을
+               잘못 계산(0으로 반환)하는 것으로 보인다. contact_max_correcting_vel/
+               min_depth를 낮춰 침투 보정을 부드럽게 하고, kp/kd로 접촉 강성 자체를
+               유한하게(무한강성 아니게) 줘서 순간적인 충격성 접촉이 생겨도 힘이
+               한 스텝에 몰리지 않게 한다. -->
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <kp>1e6</kp>
+              <kd>100</kd>
+            </ode>
+          </contact>
         </surface>
       </collision>
     </gazebo>
@@ -122,6 +140,11 @@
   <xacro:drive_wheel prefix="right" side_y="${-wheel_sep/2}"/>
 
   <!-- ===== 캐스터 매크로 (앞/뒤 지지, 마찰 0) ===== -->
+  <!-- 바퀴와 같은 방식(반지름-0.01)으로 바닥에서 같은 깊이만큼 파묻히게 맞춰서,
+       스폰 직후 중력으로 가라앉아 자리잡을 때 바퀴/캐스터 4점이 동시에 자리를
+       잡는다 — 예전엔 캐스터 바닥이 바퀴보다 3cm 높아서 평상시엔 안 닿다가
+       급가감속으로 섀시가 기울 때만 갑자기 닿는 구조였고, 그 순간접촉이 스톨의
+       원인으로 보였다(위 wheel contact 주석 참고). -->
   <xacro:macro name="caster" params="prefix px">
     <link name="${prefix}_caster">
       <collision>
@@ -132,10 +155,26 @@
     <joint name="${prefix}_caster_joint" type="fixed">
       <parent link="chassis"/>
       <child  link="${prefix}_caster"/>
-      <origin xyz="${px} 0 ${caster_radius + 0.02}" rpy="0 0 0"/>
+      <origin xyz="${px} 0 ${caster_radius - 0.01}" rpy="0 0 0"/>
     </joint>
     <gazebo reference="${prefix}_caster">
-      <mu1>0.0</mu1><mu2>0.0</mu2>
+      <collision>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.0</mu>
+              <mu2>0.0</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <kp>1e6</kp>
+              <kd>100</kd>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
     </gazebo>
   </xacro:macro>
   <xacro:caster prefix="front" px="${ caster_x}"/>

@@ -21,6 +21,12 @@ clone한 레포의 `src/` 디렉터리를 signal_vision/signal_vision/vision_han
 이 스크립트를 다시 돌릴 때마다 vision_hand/도 최신 태그 기준으로 통째로 교체되므로
 수동으로 다시 복사할 필요가 없다.
 
+clone한 레포 루트의 models/sign_classifier.pt(학습된 LSTM 가중치)도 함께
+signal_vision/signal_vision/models/sign_classifier.pt 로 복사한다. 이 파일은 src/ 밖에
+있어서 위 vendor 복사 범위에 안 들어가는데, hand_landmarker.task/pose_landmarker.task와
+달리 최초 실행 시 자동 다운로드되는 경로도 없어서(구글 저장소가 아니라 이 프로젝트가
+직접 학습한 가중치이므로) 여기서 복사해 주지 않으면 갱신할 방법이 없다.
+
 복사한 파일들 내부에도 서로를 `from src.xxx import ...`로 참조하는 절대 import가 섞여
 있어서(원래 패키지명이 src였으니 당연함), 그대로 두면 vision_hand 안의 파일들이 서로가
 아니라 시스템/venv에 pip으로 깔린 별개의 src 패키지를 참조하게 된다 — 두 사본이 버전
@@ -47,10 +53,19 @@ from task_output import banner, step
 REPO_URL = "https://github.com/SAX-AI-TeamProject1/Signal-Vision.git"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 VENDOR_DEST = REPO_ROOT / "src" / "signal_vision" / "signal_vision" / "vision_hand"
+MODEL_DEST = REPO_ROOT / "src" / "signal_vision" / "signal_vision" / "models" / "sign_classifier.pt"
 
 # 복사가 성공했는지 확인할 대표 파일. camera_node/inference.py 가 실제로 import 하는 모듈이라,
 # 이게 없으면 상류 레포가 구조를 바꾼 것이므로 조용히 넘어가지 않고 여기서 실패시킨다.
 VENDOR_SENTINEL = Path("capture") / "extractor.py"
+
+# 학습된 LSTM 가중치. Signal-Vision 레포에서 src/ 의 형제 디렉터리인 models/ 아래에 있어
+# _vendor_copy()가 복사하는 src/ 범위 밖이므로 따로 찾아 복사해야 한다 — 안 그러면
+# hand_landmarker.task/pose_landmarker.task(구글 저장소에서 최초 실행 시 자동 다운로드됨,
+# extractor.py의 ensure_hand_model/ensure_pose_model 참고)와 달리 이 파일만 자동 다운로드
+# 경로가 없어서 vendor 복사가 유일한 공급원인데, 그게 빠져 있으면 predict.py가 조용히
+# 예전 가중치(또는 아예 없는 파일)를 계속 쓰게 된다.
+MODEL_SENTINEL = Path("models") / "sign_classifier.pt"
 
 # 줄 시작(들여쓰기 허용)의 "from src." / "import src." / "import src " 형태만 건드린다.
 # 문자열/주석 안의 우연한 "src" 언급까지 건드리지 않도록 import 문 자리로 한정.
@@ -89,10 +104,20 @@ def _vendor_copy(ref: str) -> int:
                           "— 상류 레포 구조가 바뀐 것으로 보입니다")
             return 1
 
+        model_file = clone_dir / MODEL_SENTINEL
+        if not model_file.is_file():
+            banner(False, f"clone 은 됐지만 {MODEL_SENTINEL} 가 없습니다 "
+                          "— 상류 레포 구조가 바뀐 것으로 보입니다")
+            return 1
+
         step(f"vendor 복사 중 -> {VENDOR_DEST}")
         if VENDOR_DEST.exists():
             shutil.rmtree(VENDOR_DEST)
         shutil.copytree(src_pkg, VENDOR_DEST, ignore=shutil.ignore_patterns("__pycache__"))
+
+        step(f"학습된 가중치 복사 중 -> {MODEL_DEST}")
+        MODEL_DEST.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(model_file, MODEL_DEST)
 
     # 이 디렉터리를 ament 린터(colcon test 의 flake8) 대상에서 뺀다. 남의 레포 코드라
     # 이 리포지토리의 스타일 규칙을 강제할 대상이 아니고, 고쳐도 다음 복사 때 덮인다.
@@ -101,7 +126,8 @@ def _vendor_copy(ref: str) -> int:
     (VENDOR_DEST / "AMENT_IGNORE").touch()
 
     _rewrite_internal_imports()
-    banner(True, f"vendor 복사 완료 ({ref}) — 내부 src.* import도 signal_vision.vision_hand.*로 치환")
+    banner(True, f"vendor 복사 완료 ({ref}) — 내부 src.* import도 signal_vision.vision_hand.*로 치환, "
+                 "sign_classifier.pt도 갱신")
     return 0
 
 
