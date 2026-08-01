@@ -3,21 +3,23 @@
 # 주의: 이 파일은 RViz 가 "다른 이름으로 저장"할 때 통째로 다시 써진다.
 #       그때 아래 주석은 전부 날아가므로, 설정을 바꿨으면 주석을 다시 붙일 것.
 #
-# Fixed Frame 이 robot2/odom 인 이유: 스캔을 로봇에 붙여 놓고 보면(base_link 기준) 로봇은
-# 가만히 있고 벽이 흘러가는 그림이 된다. odom 기준으로 봐야 로봇이 창고를 지나가고
-# 벽이 제자리에 서 있는, 사람이 읽을 수 있는 그림이 나온다.
+# Fixed Frame 이 map 인 이유: 스캔을 로봇에 붙여 놓고 보면(base_link 기준) 로봇은
+# 가만히 있고 벽이 흘러가는 그림이 된다. 로봇이 창고를 지나가고 벽이 제자리에 서
+# 있는 그림이 나오려면 로봇 밖의 프레임이어야 하는데, robot2/odom 으로도 그건 됐다.
+# map 으로 올린 건 world_markers 때문이다 — 창고 형상 마커는 월드 좌표라서 월드
+# 원점 프레임에 실리고, odom 에 고정해 두면 그 마커와 로봇이 어긋난다.
+# map → robot2/odom 은 launch 의 static_transform_publisher 가 스폰 pose 로 발행하고,
 # robot2/odom → robot2/base_link 는 gz DiffDrive 가 만들고 브리지가 /tf 로 넘긴다
 # (config/bridge.yaml). 그 아래 링크들은 robot_state_publisher 가 발행한다.
 #
 # 프레임 이름에 robot2/ 가 붙는 이유: tf2_ros 는 토픽을 절대 경로 "/tf" 로 고정해서
 # 로봇이 여러 대여도 tf 가 한 토픽에 섞인다 — 토픽으로는 못 가르고 이름으로만 갈린다.
 # 그래서 launch 의 rsp 에 frame_prefix, urdf 의 frame_id·gz_frame_id 에 $(arg ns)/ 를 준다.
-# 로봇을 바꿔 볼 때는 이 파일의 robot2/ 를 그 로봇의 ns 로 바꾸면 된다 — 단 이건
-# "한 번에 한 대만 본다"는 전제에서만 맞다. 두 대를 한 화면에 놓으려면 이름만 바꿔선
-# 안 되는데, robot1/odom 과 robot2/odom 이 공통 부모 없는 별개 조각이라 RViz 의
-# fixed frame(하나뿐이다) 을 어느 쪽으로 잡아도 나머지 한 대는 못 그리기 때문이다.
-# 그때는 map 루트를 만들고(launch 에서 로봇마다 map → <ns>/odom 발행) 아래 Fixed
-# Frame 을 map 으로 바꾼다. LaserScan 디스플레이도 로봇 수만큼 있어야 한다.
+# 로봇을 바꿔 볼 때는 이 파일의 robot2/ 를 그 로봇의 ns 로 바꾸면 된다.
+# 두 대를 한 화면에 놓는 것도 이제 프레임 쪽은 막혀 있지 않다 — robot1/odom 과
+# robot2/odom 이 공통 부모 없는 별개 조각이라 안 됐던 건데, launch 가 로봇마다
+# map → <ns>/odom 을 발행하면서 map 이 그 공통 부모가 됐다. 남은 건 이 파일 쪽
+# 일뿐이다: LaserScan·ScanRays 디스플레이를 로봇 수만큼 복제해 각자의 토픽에 건다.
 #
 # RobotModel 디스플레이가 없는 이유: 이 URDF 에서 visual 을 가진 링크는 chassis 하나뿐이고
 # 그 메시 경로가 model://mecanum_lift/... 이다. RViz 의 resource_retriever 는
@@ -137,10 +139,45 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /robot2/scan_rays
       Value: true
+    # 창고 형상. auto_drive 의 world_markers 노드가 월드 SDF 의 visual 을 읽어
+    # map 프레임 마커로 내보낸 것이다 — 스캔 점 옆에 벽·선반·카트가 같이 보여야
+    # 그 점이 무엇을 맞힌 건지 알 수 있다.
+    # Durability 가 Transient Local 인 이유: 이 마커는 실행 중 딱 한 번 발행된다.
+    # Volatile 로 두면 RViz 가 늦게 붙었을 때 그 한 번을 놓쳐 화면이 빈다.
+    # 무거우면 이 디스플레이만 꺼도 나머지는 그대로 돌아간다 — 메시가 227개다.
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: WorldMarkers
+      Namespaces:
+        {}
+      Topic:
+        Depth: 1
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /world_markers
+      Value: true
+    # 돌아다니는 사람. auto_drive 의 actor_markers 가 SDF 의 <actor> 궤적을 시뮬레이션
+    # 시각으로 풀어 20Hz 로 다시 발행한다. 위 WorldMarkers 와 달리 계속 갱신되므로
+    # Durability 가 Volatile 이다.
+    # 골격 애니메이션은 없다 — RViz 마커는 스키닝을 못 해서, 걷는 자세 그대로
+    # 미끄러진다. 사람이 어디 있는지 보는 게 목적이라 그대로 둔다.
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: WorldActors
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /world_actors
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: robot2/odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
