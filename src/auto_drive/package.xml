@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>auto_drive</name>
+  <version>0.0.0</version>
+  <description>K-NAVI obstacle reaction: LiDAR emergency stop, sim-camera object detection, slow-down arbitration</description>
+  <maintainer email="shp9826@naver.com">sho</maintainer>
+  <license>MIT</license>
+
+  <!--
+    robot_control 과 같은 방식으로 exec_depend 만 쓴다: 파이썬 노드뿐이라 빌드타임 코드가 없다.
+    (ros2 pkg create 가 넣어 준 <depend> 는 build+exec 포괄이라 여기서는 과하다)
+
+    이 패키지가 robot_control 과 갈라지는 이유:
+      - 여기 들어올 YOLO 노드는 ultralytics 가 필요하고, ultralytics 는 opencv-python 을 끌고 온다.
+        robot_control 의 제스처 파이프라인은 mediapipe → opencv-contrib-python 을 쓴다.
+        둘은 같은 cv2/ 에 설치되는 다른 pip 배포판이라 한 환경에 공존할 수 없다.
+        그래서 YOLO 노드만 전용 venv 로 띄운다(launch 의 prefix 인자 사용).
+      - estop 노드는 rclpy/numpy 만 쓰므로 시스템 python3.12 로 그냥 돈다.
+  -->
+  <exec_depend>rclpy</exec_depend>            <!-- ROS 2 파이썬 클라이언트 -->
+  <exec_depend>sensor_msgs</exec_depend>      <!-- LaserScan(/robot1/scan), Image(시뮬 카메라) -->
+  <exec_depend>vision_msgs</exec_depend>      <!-- Detection2DArray: 클래스+bbox+score 를 그대로 담아 자체 msg 패키지를 안 만든다 -->
+  <exec_depend>geometry_msgs</exec_depend>    <!-- Twist: cmd_vel_estop / 서행 명령 -->
+  <exec_depend>std_msgs</exec_depend>         <!-- Bool: 정지 상태 표시용(로깅/디버그) -->
+  <exec_depend>cv_bridge</exec_depend>        <!-- Image ↔ numpy 변환. YOLO 노드에서만 사용 -->
+  <exec_depend>message_filters</exec_depend>  <!-- 카메라 15Hz 와 라이다 10Hz 를 묶는 ApproximateTimeSynchronizer -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -12,13 +12,23 @@
 
   <xacro:arg name="ns" default="robot2"/>
 
-  <!-- ===== 외형 메시 (mecanum_lift) ===== -->
-  <!-- 원본 model.sdf의 visual pose(0 0 -0.084, roll 90도)를 그대로 재사용 —
-       이 메시는 원래부터 이 오프셋으로 정렬해서 쓰도록 만들어진 애셋이다. -->
-  <xacro:property name="lift_mesh" value="model://mecanum_lift/meshes/MecanumLift.dae"/>
-  <xacro:property name="lift_scale" value="0.6 0.6 0.6"/>
-  <xacro:property name="mesh_roll" value="1.5708"/>
-  <xacro:property name="mesh_z_offset" value="-0.084"/>
+  <!-- ===== 외형 메시 (deco_forklift 재사용) ===== -->
+  <!-- worlds/navi_factory 의 deco_forklift_ogv 소품과 같은 glb를 그대로 쓴다. 그 소품은
+       scale/offset 없이(즉 1:1 실척, 원점=바닥) 배치돼 있었으므로 여기서도 동일하게
+       회전·오프셋 없이 얹는다. 실제 지게차 실척(길이 2.4 x 폭 1.4 x 높이 2.06m)이라
+       지금 chassis collision(2.0x0.9x0.6)/바퀴 배치보다 눈에 띄게 크고 높다 — 요청은
+       "메시 교체"까지라 물리 치수(collision/wheel_sep 등)는 안 건드렸고, 시각적으로
+       안 맞으면 후속으로 chassis 치수도 지게차 실척에 맞춰 키우는 작업이 필요하다. -->
+  <xacro:property name="lift_mesh" value="model://Forklift/base_visual.glb"/>
+  <xacro:property name="lift_scale" value="1 1 1"/>
+  <xacro:property name="mesh_roll" value="0"/>
+  <xacro:property name="mesh_z_offset" value="0"/>
+  <!-- base_visual.glb 안에 Y축 +90도 회전이 이미 baked돼 있다(glTF 노드 rotation
+       [0, 0.7071, 0, 0.7071] 확인됨). 노드 rotation+scale을 반영해 정점을 직접
+       변환해보면 mesh_yaw=0일 때 포크(바닥 근처 저-z 밴드가 몸통보다 튀어나온 방향)가
+       로컬 +Y를 향한다 — 로봇 전진(+X, DiffDrive)과 90도 어긋난다. -1.5708(-90도)을
+       주면 포크가 +X를 향하도록 검증했다. -->
+  <xacro:property name="mesh_yaw" value="-1.5708"/>
 
   <!-- ===== 구동 파라미터 ===== -->
   <xacro:property name="wheel_radius" value="0.15"/>
@@ -68,7 +78,7 @@
   <!-- ===== chassis (지면 기준, 원점 z=0) ===== -->
   <link name="chassis">
     <visual>
-      <origin xyz="0 0 ${mesh_z_offset}" rpy="${mesh_roll} 0 0"/>
+      <origin xyz="0 0 ${mesh_z_offset}" rpy="${mesh_roll} 0 ${mesh_yaw}"/>
       <geometry>
         <mesh filename="${lift_mesh}" scale="${lift_scale}"/>
       </geometry>
@@ -194,7 +204,13 @@
     <sensor name="sim_camera" type="camera">
       <always_on>1</always_on>
       <update_rate>15</update_rate>
-      <topic>camera/image</topic>
+      <!-- 다른 센서/플러그인(scan, cmd_vel, odom)과 동일하게 ns로 분리 — 이전엔 그냥
+           camera/image로 전역 토픽이라 로봇이 여러 대면 충돌할 뻔했다. -->
+      <topic>$(arg ns)/camera/image</topic>
+      <!-- gz_frame_id 를 반드시 넣는다: 없으면 ROS 로 넘어온 Image 의 frame_id 가
+           "mecanum_lift_robot/camera_link/sim_camera" 같은 gz 내부 스코프 이름이 되어
+           tf 조회(카메라 좌표 → base_link)가 실패한다. -->
+      <gz_frame_id>camera_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image><width>640</width><height>480</height></image>
@@ -210,6 +226,9 @@
   <gazebo reference="lidar_link">
     <sensor name="lidar" type="gpu_lidar">
       <topic>$(arg ns)/scan</topic>
+      <!-- 카메라와 같은 이유. 없으면 LaserScan 의 frame_id 가 gz 내부 스코프 이름이 되어
+           Nav2 가 tf 조회에 실패한다. -->
+      <gz_frame_id>lidar_link</gz_frame_id>
       <update_rate>5</update_rate>
       <lidar>
         <scan>
