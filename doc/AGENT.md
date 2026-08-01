@@ -42,7 +42,7 @@ Signal-Simulation/
 ├── src/
 │   ├── robot_control/     # the robot's body and wiring: urdf + config, no nodes
 │   ├── signal_vision/     # gesture recognition: camera_node + the vendored model source
-│   ├── auto_drive/        # autonomous driving: waypoint_follower (estop / detection to come)
+│   ├── auto_drive/        # autonomous driving: waypoint_follower + scan_rays viewer (estop / detection to come)
 │   └── knavi_bringup/     # assembly only: the top-level launch, no nodes of its own
 ├── tools/                 # offline track editing / SDF generation (see requirements.txt)
 └── worlds/
@@ -71,7 +71,7 @@ Four `ament_python` packages, split by responsibility rather than by file type. 
 |---|---|---|
 | `robot_control` | `urdf/` (`robot.urdf.xacro`, `mecanum_lift_robot.urdf.xacro`), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
 | `signal_vision` | `camera_node/`, the vendored `vision_hand/`, `metrics.py`, `models/` (weights) | `camera_node` |
-| `auto_drive` | `patrol/waypoint_follower.py` | `waypoint_follower` |
+| `auto_drive` | `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `waypoint_follower`, `scan_rays` |
 | `knavi_bringup` | `launch/bringup.launch.py` | nothing of its own — it starts the other three |
 <!-- 위 표: 패키지 4개가 각각 무엇을 소유하고 무엇을 실행하는지. robot_control 과 knavi_bringup 은 실행 노드가 없음. -->
 
@@ -124,15 +124,17 @@ What `knavi_bringup/launch/bringup.launch.py` actually starts. One robot is spaw
 | `twist_mux` (ns `/robot2`) | one per robot | resident | passes through the highest-priority live velocity source |
 | `waypoint_follower` (ns `/robot2`) | one per robot | resident | follows the track from `pose_gt`, publishes `cmd_vel_auto`; off with `enable_patrol:=false` |
 | `camera_node` (ns `/robot2`) | one per robot | resident | one physical webcam per robot; off with `enable_camera:=false` |
+| `scan_rays` (ns `/robot2`) | one per robot | resident | redraws `scan` as ray line segments on `scan_rays`; starts only when RViz does |
 | `ros_gz_bridge bridge_node` | one for the whole system | resident | translates the topics listed in `config/bridge.yaml` |
+| `rviz2` | one for the whole system | resident | views `/tf`, `<ns>/scan` and `<ns>/scan_rays`; off with `enable_rviz:=false` or `headless:=true` |
 | `gz sim` process | one | resident | physics; **not** a ROS node, so it never appears in `ros2 node list` |
 <!-- 위 표: bringup이 띄우는 구성요소별 개수·수명·역할. gz sim은 ROS 노드가 아니라 별도 프로세스라 ros2 node list에 안 나옴. -->
 
 Inside the Gazebo process, not separate nodes: the `DiffDrive` plugin (subscribes `cmd_vel`, publishes `odom` and `odom → base_link` tf), the `JointStatePublisher` plugin, the simulated camera sensor, and the `gpu_lidar` sensor.
 <!-- Gazebo 프로세스 내부에서 도는 것들(별도 노드가 아님): DiffDrive 플러그인(cmd_vel 구독, odom과 odom→base_link tf 발행), JointStatePublisher 플러그인, 시뮬레이션 카메라 센서, gpu_lidar 센서. -->
 
-Startup order: set `GZ_SIM_RESOURCE_PATH` → `gz sim` → `robot_state_publisher` → spawn → ground plate → bridge → `camera_node`.
-<!-- 기동 순서: GZ_SIM_RESOURCE_PATH 설정 → gz sim → robot_state_publisher → 스폰 → 바닥판 → 브릿지 → camera_node. -->
+Startup order: set `GZ_SIM_RESOURCE_PATH` → `gz sim` → `robot_state_publisher` → spawn → ground plate → bridge → `camera_node` → `rviz2`.
+<!-- 기동 순서: GZ_SIM_RESOURCE_PATH 설정 → gz sim → robot_state_publisher → 스폰 → 바닥판 → 브릿지 → camera_node → rviz2. -->
 
 Adding a robot means adding one entry to the `robot_info` list at the top of the launch file; the bridge and `gz sim` stay at one each, and only `bridge.yaml` grows.
 <!-- 로봇을 늘리려면 launch 파일 상단 robot_info 리스트에 항목을 추가하면 됨. 브릿지와 gz sim은 계속 1개씩이고 bridge.yaml에 토픽만 늘어남. -->
@@ -160,18 +162,24 @@ Bridged between ROS 2 and Gazebo (`config/bridge.yaml`):
 | `<ns>/odom` | gz → ROS | `nav_msgs/Odometry` | `gz.msgs.Odometry` |
 | `<ns>/joint_states` | gz → ROS | `sensor_msgs/JointState` | `gz.msgs.Model` |
 | `<ns>/scan` | gz → ROS | `sensor_msgs/LaserScan` | `gz.msgs.LaserScan` |
-| `<ns>/tf` | gz → ROS | `tf2_msgs/TFMessage` | `gz.msgs.Pose_V` |
+| `/tf` (gz side `<ns>/tf`) | gz → ROS | `tf2_msgs/TFMessage` | `gz.msgs.Pose_V` |
 | `/robot2/pose_gt` | gz → ROS | `geometry_msgs/Pose` | `gz.msgs.Pose` |
 <!-- 위 표: 브리지되는 토픽들. ROS에서 Gazebo로 가는 것은 <ns>/cmd_vel 하나뿐이고 나머지는 전부 시뮬레이터가 내보내는 방향. -->
 
-The file spells the namespace out per robot, and it currently carries a full `/robot1` set as well as the `/robot2` set even though only `robot2` is spawned. Bridging a topic nobody publishes is harmless, so the `/robot1` block is left in place for when that robot comes back.
-<!-- 파일에는 네임스페이스가 로봇별로 적혀 있고, 현재 robot2 만 스폰되는데도 /robot1 한 벌과 /robot2 한 벌이 함께 들어 있음. 아무도 발행하지 않는 토픽을 브리지해 두는 건 무해하므로, 그 로봇이 돌아올 때를 위해 /robot1 블록은 그대로 둠. -->
+The file spells the namespace out per robot. It used to carry a full `/robot1` set alongside the `/robot2` set even though only `robot2` is spawned; that block is now commented out, because a live-looking config for a robot that does not exist is what makes readers ask why the single robot is numbered two. Restoring it means adding the entry back to `robot_info` and uncommenting the block.
+<!-- 파일에는 네임스페이스가 로봇별로 적혀 있음. 예전에는 robot2 만 스폰되는데도 /robot1 한 벌이 /robot2 한 벌과 함께 살아 있었는데, 지금은 그 블록을 주석 처리했음 — 존재하지 않는 로봇의 설정이 살아 있는 것처럼 보이는 게 "로봇이 한 대인데 왜 2번이냐"는 의문의 원인이기 때문. 되살리려면 robot_info 에 항목을 다시 넣고 그 블록의 주석만 풀면 됨. -->
 
 `/robot2/pose_gt` is the exception to the namespace pattern: its Gazebo side is `/model/mecanum_lift_robot/pose`, keyed by model name rather than namespace, because that is what the pose-publisher system emits. `waypoint_follower` subscribes to it instead of `odom` because wheel odometry drifts under slip.
 <!-- /robot2/pose_gt 는 네임스페이스 규칙의 예외임. Gazebo 쪽 이름이 /model/mecanum_lift_robot/pose 로 네임스페이스가 아니라 모델 이름 기준인데, pose-publisher 시스템이 그렇게 내보내기 때문. waypoint_follower 는 바퀴 오도메트리가 슬립으로 어긋나기 때문에 odom 대신 이 토픽을 구독함. -->
 
 `/clock` deliberately carries no namespace — it is world-wide, not per-robot. The simulated camera publishes to `<ns>/camera/image` inside Gazebo but is not bridged, because the gesture pipeline uses a real webcam instead.
 <!-- /clock 은 일부러 네임스페이스를 안 붙임 — 로봇별이 아니라 월드 전역이기 때문. 시뮬레이션 카메라는 Gazebo 안에서 <ns>/camera/image 로 발행하지만 브리지하지 않음 — 수신호 파이프라인이 실물 웹캠을 쓰기 때문. -->
+
+`tf` is the other topic with no namespace, and unlike `/clock` that is not a choice this repo made. `tf2_ros` hard-codes the topic names as absolute paths — `"/tf"` and `"/tf_static"` with a leading slash, in `transform_broadcaster.hpp` and `transform_listener.hpp` — so a node's namespace never applies to them. The namespaced `robot_state_publisher` has always published its link transforms to the global `/tf`; only the bridged Gazebo side was named `<ns>/tf`, and nothing subscribed to it, which left `odom → base_link` missing from the tf tree every tool actually reads.
+<!-- tf 도 네임스페이스가 없는 토픽인데, /clock 과 달리 이건 이 리포지토리가 고른 게 아님. tf2_ros 가 토픽 이름을 절대 경로로 박아 놓았음 — transform_broadcaster.hpp 와 transform_listener.hpp 안의 앞 슬래시 붙은 "/tf", "/tf_static" — 그래서 노드에 네임스페이스를 줘도 tf 에는 적용되지 않음. 네임스페이스가 붙은 robot_state_publisher 도 링크 변환을 처음부터 전역 /tf 로 발행해 왔고, 브리지된 Gazebo 쪽만 <ns>/tf 라는 이름이었는데 그걸 구독하는 게 아무도 없었음. 그 결과 도구들이 실제로 읽는 tf 트리에서 odom → base_link 가 빠져 있었음. -->
+
+Robots are therefore separated in tf by **frame name**, not by topic. `robot_state_publisher` gets `frame_prefix: <ns>/`, and the URDF spells the same prefix into the `DiffDrive` plugin's `frame_id` / `child_frame_id` and into every sensor's `gz_frame_id`, so the frames are `robot2/odom`, `robot2/base_link`, `robot2/lidar_link`, and so on. Both halves must use the identical string or the tree breaks in two at `base_link`.
+<!-- 그래서 tf 에서 로봇은 토픽이 아니라 프레임 이름으로 갈림. robot_state_publisher 에 frame_prefix: <ns>/ 를 주고, URDF 는 DiffDrive 플러그인의 frame_id·child_frame_id 와 모든 센서의 gz_frame_id 에 같은 접두어를 적음. 그래서 프레임 이름이 robot2/odom, robot2/base_link, robot2/lidar_link 같은 형태가 됨. 두 쪽이 완전히 같은 문자열을 써야 하고, 다르면 트리가 base_link 에서 두 조각으로 끊어짐. -->
 
 Velocity sources arbitrated by `twist_mux`, highest priority first:
 <!-- twist_mux 가 중재하는 속도 명령 소스, 우선순위가 높은 순: -->
@@ -195,6 +203,9 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard \
 
 Driving by hand while `enable_patrol` is on means fighting the follower for the mux, since teleop only outranks it — pass `enable_patrol:=false` for a clean manual check.
 <!-- enable_patrol 이 켜진 채로 수동 주행을 하면 mux 를 두고 팔로워와 겨루게 됨. teleop 이 우선순위만 높을 뿐이기 때문 — 깔끔하게 수동 확인을 하려면 enable_patrol:=false 를 줄 것. -->
+
+`<ns>/scan_rays` (`visualization_msgs/MarkerArray`) is not bridged either — `scan_rays` builds it inside ROS from the scan that was already bridged, so it is a second view of existing data rather than a new sensor.
+<!-- <ns>/scan_rays(visualization_msgs/MarkerArray) 도 브리지 대상이 아님 — scan_rays 가 이미 브리지된 스캔을 ROS 안에서 다시 그린 것이라, 새 센서가 아니라 있는 데이터를 한 번 더 보는 것임. -->
 
 `camera_node` itself publishes `<ns>/gesture` (`std_msgs/String`, the recognized label, for logging and latency measurement), `<ns>/cmd_vel_gesture` (`geometry_msgs/Twist`), and `<ns>/image_webcam` (`sensor_msgs/Image`, off by default). These carry the robot namespace because `bringup` starts the node inside it; started bare with `ros2 run` the same topics appear at the root instead.
 <!-- camera_node 자체가 발행하는 것: <ns>/gesture(std_msgs/String — 인식된 라벨, 기록·지연시간 측정용), <ns>/cmd_vel_gesture(geometry_msgs/Twist), <ns>/image_webcam(sensor_msgs/Image, 기본 꺼짐). bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우기 때문에 네임스페이스가 붙는 것이며, ros2 run 으로 그냥 띄우면 같은 토픽들이 루트에 생김. -->
@@ -223,12 +234,25 @@ Launching:
 ros2 launch knavi_bringup bringup.launch.py
 ros2 launch knavi_bringup bringup.launch.py headless:=true enable_camera:=false
 ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
+ros2 launch knavi_bringup bringup.launch.py enable_rviz:=false
 ros2 run signal_vision camera_node --ros-args -p enable_inference:=false
 ```
-<!-- 위 명령: bringup 기본 실행, GUI·카메라 없이 실행, 웹캠 장치 번호 지정 실행, 그리고 camera_node 단독 실행(추론 끔). -->
+<!-- 위 명령: bringup 기본 실행, GUI·카메라 없이 실행, 웹캠 장치 번호 지정 실행, RViz 창 없이 실행, 그리고 camera_node 단독 실행(추론 끔). -->
 
-Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`).
-<!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true). -->
+Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`), `enable_rviz` (`true`).
+<!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true), enable_rviz(true). -->
+
+`enable_rviz` is on by default, so a plain `bringup` opens RViz2 on `config/knavi.rviz` next to the `gz sim` window: the lidar scan as points, the same scan again as ray line segments, the tf axes, fixed frame `robot2/odom`. It is part of bringup rather than a separate step because the `gz sim` window only draws the sensor's own rays and cannot tell you whether the scan reached ROS at all.
+<!-- enable_rviz 는 기본이 켜짐이라, 그냥 bringup 하면 gz sim 창 옆에 config/knavi.rviz 로 RViz2 가 함께 뜸 — 라이다 스캔은 점으로, 같은 스캔을 광선 선분으로 한 번 더, tf 는 좌표축으로, 고정 프레임은 robot2/odom. 별도 단계가 아니라 bringup 에 넣은 이유는, gz sim 창은 센서 자신의 광선만 그릴 뿐 그 스캔이 ROS 까지 넘어왔는지는 알려 주지 못하기 때문. -->
+
+The ray line segments come from `scan_rays`, which starts and stops with RViz because it is a viewer aid and nothing else reads it. RViz's `LaserScan` display puts a point only where a return came back, so a ray that hit nothing within range draws nothing at all — measured on the 180° scan, 283 of 360 rays were `inf`, leaving most of the fan blank and no way to tell "the sensor does not look there" from "it looked and the space is empty". `scan_rays` republishes the same scan on `<ns>/scan_rays` as two `Marker` line lists, returns in red and misses drawn out to range in cyan. It never rewrites `<ns>/scan` itself: turning `inf` into a range value there would read as a wall at 10 m to the estop node and to Nav2 later.
+<!-- 광선 선분은 scan_rays 가 그리는 것이고, 뷰어 보조용이라 읽는 쪽이 RViz 뿐이어서 RViz 와 함께 뜨고 함께 꺼짐. RViz 의 LaserScan 디스플레이는 반사가 돌아온 자리에만 점을 찍으므로, 사거리 안에서 아무것도 못 맞힌 광선은 아예 안 그려짐 — 180도 스캔에서 실측하니 360개 중 283개가 inf 였고, 부채꼴 대부분이 빈 채로 남아서 "센서가 저쪽을 안 본다"와 "봤는데 비어 있다"를 구분할 수 없었음. scan_rays 는 같은 스캔을 <ns>/scan_rays 에 Marker 선분 목록 두 개로 다시 발행함 — 반사가 온 광선은 빨강, 못 맞힌 광선은 사거리 끝까지 청록. <ns>/scan 자체는 절대 고치지 않음: 거기서 inf 를 거리 값으로 바꾸면 estop 노드와 나중의 Nav2 가 10m 앞에 벽이 있다고 읽게 됨. -->
+
+Two ways it stays shut: `enable_rviz:=false`, or `headless:=true`, which wins over `enable_rviz` because a run asked to have no GUI must not open a window.
+<!-- 안 뜨게 하는 방법은 둘: enable_rviz:=false, 또는 headless:=true. headless 가 enable_rviz 를 이기는데, GUI 없이 돌리라고 시킨 실행이 창을 띄우면 안 되기 때문. -->
+
+That config carries no `RobotModel` display: the only link with a visual is `chassis`, and its mesh URI is `model://mecanum_lift/...`, which RViz's resource retriever cannot resolve — it handles `package://`, `file://` and `http://` only.
+<!-- 그 설정에는 RobotModel 디스플레이가 없음 — visual 을 가진 링크가 chassis 하나뿐인데 그 메시 URI 가 model://mecanum_lift/... 이고, RViz 의 resource retriever 는 package://, file://, http:// 만 풀 수 있어서 이걸 못 읽기 때문. -->
 
 `enable_flat_ground` defaults on, but a robot that actually has to roll needs it off: the thin plate and this world's collision detector together pin the wheels so the robot never moves. See `doc/design.md`.
 <!-- enable_flat_ground 는 기본이 켜짐이지만 실제로 굴러가야 하는 로봇에는 꺼야 함. 얇은 판과 이 월드의 충돌 검출기가 맞물리면 바퀴가 고정돼 로봇이 전혀 움직이지 않기 때문. doc/design.md 참고. -->

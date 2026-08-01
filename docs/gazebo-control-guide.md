@@ -270,8 +270,8 @@ Add a dedicated link fixed to the chassis, with the sensor on it (inside the Met
 Requirements and caveats:
 <!-- 요구 사항과 주의점: -->
 
-- The world must load the sensors system — both warehouse worlds here already have `gz-sim-sensors-system` with `<render_engine>ogre2</render_engine>`, which is required: `gpu_lidar` only works on ogre2. Do not change that line even though the GUI runs with `--render-engine ogre`.
-  <!-- 월드에 sensors 시스템 플러그인이 있어야 한다 — 이 레포의 두 창고 월드에는 이미 gz-sim-sensors-system이 ogre2로 들어 있고, gpu_lidar는 ogre2에서만 동작하므로 GUI를 --render-engine ogre로 돌리더라도 그 줄은 바꾸지 말 것. -->
+- The world must load the sensors system — both warehouse worlds here already have `gz-sim-sensors-system` with `<render_engine>ogre2</render_engine>`, which is required: `gpu_lidar` only works on ogre2. Do not change that line. The GUI now also runs on `--render-engine ogre2`: on the old `ogre` (1.9) the GUI render thread aborted mid-run on an Ogre bounding-box assertion, and since `gz` is a required process that took the whole bringup down with it. Only the headless server still passes `ogre`, because that path has no GUI thread and is the one verified by the current scan measurements.
+  <!-- 월드에 sensors 시스템 플러그인이 있어야 한다 — 이 레포의 두 창고 월드에는 이미 gz-sim-sensors-system이 ogre2로 들어 있고, gpu_lidar는 ogre2에서만 동작하므로 그 줄은 바꾸지 말 것. GUI 도 이제 --render-engine ogre2 로 돌린다: 구버전 ogre(1.9)에서는 실행 도중 GUI 렌더 스레드가 Ogre 바운딩 박스 어서션으로 죽었고, gz 가 필수 프로세스라 bringup 전체가 함께 내려갔다. headless 서버만 ogre 를 그대로 두는데, 그 경로에는 GUI 스레드가 없고 지금의 스캔 실측이 검증한 경로이기 때문이다. -->
 - `gpu_lidar` renders the scene every scan, which is expensive without GPU acceleration. In the QEMU VM keep `update_rate` ≤ 5 Hz and `samples` ≤ 180 until GPU acceleration works, then raise them.
   <!-- gpu_lidar는 스캔마다 씬을 렌더링해서 GPU 가속이 없으면 부하가 크다. QEMU VM에서는 GPU 가속이 되기 전까지 update_rate ≤ 5 Hz, samples ≤ 180으로 두고, 이후에 올릴 것. -->
 - Place the sensor pose above/outside the vehicle body, or the scan will hit the vehicle itself; verify with `<visualize>true</visualize>` (rays drawn in the GUI).

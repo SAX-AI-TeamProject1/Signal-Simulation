@@ -25,7 +25,11 @@
   <exec_depend>std_msgs</exec_depend>         <!-- Bool: 정지 상태 표시용(로깅/디버그) -->
   <exec_depend>cv_bridge</exec_depend>        <!-- Image ↔ numpy 변환. YOLO 노드에서만 사용 -->
   <exec_depend>message_filters</exec_depend>  <!-- 카메라 15Hz 와 라이다 10Hz 를 묶는 ApproximateTimeSynchronizer -->
+  <exec_depend>visualization_msgs</exec_depend>  <!-- Marker: scan_rays 가 광선을 선분으로 그린다 -->
+  <exec_depend>nav_msgs</exec_depend>         <!-- Odometry: ground_truth_tf 가 적산치를 되뺀다 -->
+  <exec_depend>tf2_ros</exec_depend>          <!-- TransformBroadcaster: map → <ns>/odom 발행 -->
   <exec_depend>python3-yaml</exec_depend>     <!-- waypoint_follower: config/tracks.yaml(코너/목적지/신호지점) 파싱 -->
+
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

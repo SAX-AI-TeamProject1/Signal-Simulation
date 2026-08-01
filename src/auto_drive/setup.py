@@ -43,7 +43,22 @@ setup(
             # 코너 표지(TrackMarker) 감속: 카메라로 마커를 보고 waypoint_follower의
             # cmd_vel_auto를 줄여 재발행. ultralytics가 필요해 시스템 python3.12로 실행된다.
             'marker_vision = auto_drive.patrol.marker_vision:main',
-            # estop_node: /robot2/scan → cmd_vel_estop. 시스템 python3.12 로 실행된다.
+            # 라이다 스캔을 광선 선분(Marker)으로 다시 그리는 뷰어 전용 노드.
+            # 주행에는 아무 영향이 없어서 RViz 를 띄울 때만 함께 뜬다.
+            'scan_rays = auto_drive.viz.scan_rays:main',
+            # 월드 SDF 의 visual 을 RViz 마커로 옮겨 그리는 뷰어 전용 노드.
+            # 스캔 점 옆에 창고 형상이 같이 보여야 그 점이 뭘 맞힌 건지 알 수 있다.
+            'world_markers = auto_drive.viz.world_markers:main',
+            # 월드를 돌아다니는 사람(<actor>)을 SDF 궤적대로 움직이는 마커로 그린다.
+            # 소품과 달리 움직이므로 한 번 그리고 끝낼 수 없어 노드를 나눴다.
+            'actor_markers = auto_drive.viz.actor_markers:main',
+            # map → <ns>/odom 을 진짜 좌표(pose_gt)로 보정해 발행. 바퀴 적산치의
+            # 누적 오차 때문에 RViz 와 gz 의 로봇 위치가 벌어지는 걸 없앤다.
+            # 나중에 SLAM 이 이 자리를 대신한다.
+            'ground_truth_tf = auto_drive.localization.ground_truth_tf:main',
+            # 진행 통로 안의 장애물을 보고 세운다: <ns>/scan → cmd_vel_estop.
+            # 회피는 하지 않는다 — 길 위에 사람이 있으면 서고, 지나가면 다시 간다.
+            'estop_node = auto_drive.safety.estop_node:main',
             # detect_node(YOLO)와 slowdown_node 는 구현하면서 추가한다.
             #   YOLO 노드는 ros2 run 으로는 venv 에 못 닿는다(설치 스크립트 shebang 이 /usr/bin/python3).
             #   launch 에서 Node(prefix='<venv>/bin/python') 로 띄워야 한다 — 검증 완료.

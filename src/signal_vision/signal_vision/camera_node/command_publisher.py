@@ -23,8 +23,11 @@ class GestureCommandPublisher:
 
         cmd_vel_gesture (geometry_msgs/Twist) — 제어용.
             twist_mux 의 gesture 입력(priority 50)으로 들어간다.
-            이 노드는 네임스페이스가 없어 그냥 두면 /cmd_vel_gesture 가 되는데
-            twist_mux 는 /robot1/cmd_vel_gesture 를 구독한다 → launch 에서 리맵.
+            리맵은 없다. bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우므로
+            발행 토픽이 자동으로 <ns>/cmd_vel_gesture 가 되고, 같은 네임스페이스의
+            twist_mux 가 그대로 구독한다. 예전에는 이 노드가 로봇 밖에 있어서
+            '/robot1/cmd_vel_gesture' 로 하드코딩 리맵을 걸었는데, robot1 이
+            빠지면서 아무도 듣지 않는 토픽을 가리키게 된 적이 있다.
 
     QoS 는 둘 다 depth 10 + 기본 RELIABLE. 영상과 달리 라벨은 유실되면 안 된다
     (특히 STOP). 그래서 BEST_EFFORT 를 쓰지 않는다.

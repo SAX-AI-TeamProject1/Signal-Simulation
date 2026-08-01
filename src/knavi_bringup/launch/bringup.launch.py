@@ -51,6 +51,13 @@ def generate_launch_description():
     enable_camera = LaunchConfiguration('enable_camera')
     enable_patrol = LaunchConfiguration('enable_patrol')    # +
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
+    # 비상정지. 기본 on — 끄는 건 정지 거리를 재는 것 같은 의도된 실험일 때뿐이다.
+    enable_estop = LaunchConfiguration('enable_estop')
+
+    # 라이다 스캔을 눈으로 보는 뷰어. gz GUI 에서는 레이저가 로봇 주변 선으로만 보이고
+    # ROS 쪽으로 실제로 넘어왔는지는 알 수 없어서, 스캔을 확인하려면 어차피 이게 필요하다.
+    # 그래서 bringup 에 포함시킨다 — 창이 하나 더 뜨는 게 부담이면 enable_rviz:=false.
+    enable_rviz = LaunchConfiguration('enable_rviz')
     enable_marker_vision = LaunchConfiguration('enable_marker_vision')
     marker_weights = LaunchConfiguration('marker_weights')
 
@@ -87,6 +94,13 @@ def generate_launch_description():
                               description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
                                           '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
                                           '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
+        DeclareLaunchArgument('enable_estop', default_value='true',
+                              description='false 면 비상정지 노드(estop_node)를 띄우지 '
+                                          '않는다 — 정지 거리 측정처럼 일부러 안 세울 '
+                                          '때만 쓸 것'),
+        DeclareLaunchArgument('enable_rviz', default_value='true',
+                              description='false 면 RViz2 를 띄우지 않는다 '
+                                          '(라이다 스캔·tf 뷰어, config/knavi.rviz)'),
         # 기본 false: TrackMarker 가중치가 아직 학습 전이라(Signal-transport-perception
         # 쪽 capture+train 미실행), 켜면 marker_vision 생성자가 바로 에러를 낸다.
         # 학습이 끝나면 true로 켜고 marker_weights 에 나온 best.pt 경로를 넘기면 된다.
@@ -106,6 +120,21 @@ def generate_launch_description():
     # robot1(knavi_robot, 센서 없음)은 물리 검증이 끝나서 제거 — 물리 로봇 2대를
     # 같이 돌리면 이 무거운 월드에서 성능 부담이 커진다. 센서(라이다+카메라) 있는
     # mecanum_lift_robot만 남긴다.
+    #
+    # map 루트 프레임은 아래 로봇 루프에서 로봇마다 하나씩 만든다.
+    # 로봇은 전역 /tf 안에서 프레임 "이름"으로 갈리는데(rsp 의 frame_prefix), 그래서
+    # robot1/odom 과 robot2/odom 이 서로 부모 없는 별개 조각으로 남는다. RViz 는
+    # fixed frame 을 하나만 갖기 때문에 그 상태로는 어느 한 대만 보이고 나머지는
+    # "No transform from [robot1/base_link] to [robot2/odom]" 만 뜬다.
+    # 로봇이 한 대뿐이라 미뤄 뒀다가, 월드 형상을 RViz 로 가져오면서 필요해져 만들었다:
+    # world_markers 가 내는 마커는 월드 좌표라서 그걸 놓을 프레임이 있어야 하고,
+    # 그 프레임과 로봇을 잇는 게 여기 정적 변환이다.
+    # 나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
+    # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz 노드가 같은
+    # 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
+    show_rviz = PythonExpression(
+        ["'", enable_rviz, "' == 'true' and '", headless, "' != 'true'"])
+
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
          ('0.0', '32.25', '0.3', '-1.5708'),  # entry 트랙 진행 방향(남쪽)으로 정렬
@@ -136,12 +165,21 @@ def generate_launch_description():
         # 여기서 state는 상태가 아니라, 로봇의 부품이 어떤 방향인지에 대한 좌표정보들(베터리 정보 이런거x)
         # 이 정보는 처음에는 spawn 토픽으로 pub되어 객체를 스폰 할 수 있게 한다[지금은 이 용도만]
 
+        #
+        # frame_prefix 를 주는 이유: 네임스페이스는 tf 를 갈라 주지 못한다. tf2_ros 가
+        # 토픽 이름을 앞 슬래시 붙은 절대 경로 "/tf" / "/tf_static" 으로 박아 놔서
+        # (transform_broadcaster.hpp, transform_listener.hpp), ns 를 robot2 로 줘도 이
+        # 노드는 여전히 전역 /tf 로 발행한다. 로봇이 2대가 되면 양쪽이 같은 토픽에 같은
+        # 이름 base_link 를 쏴서 tf 트리가 뒤엉킨다. 갈리는 건 프레임 "이름"뿐이라
+        # 여기서 robot2/ 를 붙인다 — urdf 의 DiffDrive frame_id 와 센서 gz_frame_id 도
+        # 같은 접두어를 쓰므로($(arg ns)/...) 두 쪽이 한 트리로 이어진다.
         rsp = Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             namespace=namespace,  # 이 namespace를 붙여서 토픽 발생
             parameters=[{
                 'robot_description': robot_description,
+                'frame_prefix': namespace + '/',
                 'use_sim_time': use_sim_time}],
         )
 
@@ -174,7 +212,7 @@ def generate_launch_description():
         #    자작 노드가 아니라 설치 패키지(ros-jazzy-twist-mux)를 그대로 쓴다.
         #    - 로봇마다 하나씩 필요하므로 이 루프 안에 둔다(네임스페이스로 분리).
         #    - 'cmd_vel_out' 은 twist_mux 가 쓰는 기본 출력 토픽 이름. 이걸 'cmd_vel' 로 리맵하면
-        #      네임스페이스가 붙어 /robot1/cmd_vel 이 되고, bridge.yaml 항목과 맞아떨어진다.
+        #      네임스페이스가 붙어 /robot2/cmd_vel 이 되고, bridge.yaml 항목과 맞아떨어진다.
         #    - 입력 토픽/우선순위/timeout 은 config/twist_mux.yaml 참고.
         twist_mux = Node(
             package='twist_mux',
@@ -234,7 +272,47 @@ def generate_launch_description():
             parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera]
+        # 8) 라이다 광선 뷰어 : <ns>/scan 을 읽어 <ns>/scan_rays 마커로 다시 그린다.
+        #    RViz 의 LaserScan 은 반사가 온 자리에 점만 찍어서, 아무것도 못 맞힌
+        #    광선(inf)은 화면에서 사라진다 — 실측으로 360개 중 283개가 그랬다.
+        #    주행에는 관여하지 않는 순수 뷰어라 RViz 를 띄울 때만 함께 뜬다.
+        scan_rays = Node(
+            package='auto_drive',
+            executable='scan_rays',
+            namespace=namespace,
+            condition=IfCondition(show_rviz),
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
+        # 9) map → <ns>/odom. 이게 있어야 월드 좌표로 그린 world_markers 와 로봇의
+        #    스캔이 한 화면에서 겹쳐 보인다.
+        #    처음엔 static_transform_publisher 로 스폰 pose 를 그대로 박아 뒀는데,
+        #    그러면 로봇이 달릴수록 gz 창과 RViz 가 조금씩 벌어졌다 — 뒷단
+        #    odom → base_link 가 바퀴 적산치라서 슬립만큼 오차가 쌓이고, 이 로봇은
+        #    메카넘인데 적산은 diff-drive 공식이라 옆으로 미끄러진 건 아예 안 잡힌다.
+        #    그래서 고정값 대신 pose_gt 로 매번 보정하는 노드를 쓴다. SLAM 이
+        #    들어오면 이 노드를 내리고 그쪽이 같은 변환을 낸다(doc/design.md).
+        map_to_odom = Node(
+            package='auto_drive',
+            executable='ground_truth_tf',
+            namespace=namespace,
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
+        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로에 장애물이 있으면 cmd_vel_estop 에
+        #     0 속도를 쏜다. twist_mux 최우선(100) 자리라 수신호·teleop·순찰을 전부
+        #     덮는다. 회피는 하지 않는다 — 길 위에 사람이 있으면 서고 지나가면 간다.
+        #     RViz 와 무관하게 항상 뜬다: 이건 뷰어가 아니라 안전 장치다.
+        estop = Node(
+            package='auto_drive',
+            executable='estop_node',
+            namespace=namespace,
+            condition=IfCondition(enable_estop),
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,
+                        scan_rays, map_to_odom, estop]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
@@ -244,16 +322,27 @@ def generate_launch_description():
     #    -v 4 유무와 무관하게 재현됐다. 반면 태스크 2(run_gazebo.sh)처럼 'gz sim' 을
     #    ExecuteProcess 로 직접 부르면(ruby/shell 래핑 없이) 문제없이 계속 돈다. 그래서
     #    여기서도 태스크 2와 동일한 방식으로 직접 실행한다.
+    #    GUI 렌더 엔진이 ogre2 인 이유: 구버전 ogre(1.9)로 돌리면 실행 중 GUI 렌더
+    #    스레드가 Ogre 어서션으로 죽는 걸 실제로 겪었다(OgreAxisAlignedBox.h:251,
+    #    "min <= max" — 씬 노드의 바운딩 박스가 뒤집힌 채로 갱신됨). gz 가 죽으면
+    #    on_exit=Shutdown() 때문에 bringup 전체가 내려간다. ogre2 는 그 코드 경로
+    #    (Plugin_OctreeSceneManager)를 아예 안 지나간다. 예전에 ogre 를 쓰던 건
+    #    3D 가속이 안 되던 옛 VM 기준이고, 지금 머신에는 실물 GPU 가 있다.
     gz_sim_gui = ExecuteProcess(
         condition=UnlessCondition(headless),
-        cmd=['gz', 'sim', '--render-engine', 'ogre', world, '-r'],
-        output='screen',
+        cmd=['gz', 'sim', '--render-engine', 'ogre2', world, '-r'],
+        # output='screen',
+        output='log',
         on_exit=Shutdown(),
     )
     gz_sim_headless = ExecuteProcess(
         condition=IfCondition(headless),
+        # headless 쪽만 ogre 로 남겨 둔다: 죽은 건 GUI 렌더 스레드였고, 이 경로는
+        # 창 없이 센서만 돌리는 구성으로 오늘 여러 번 검증됐다(라이다 스캔 정상).
+        # 센서가 실제로 쓰는 엔진은 월드의 Sensors 플러그인이 지정한 ogre2 다.
         cmd=['gz', 'sim', '-s', '--render-engine', 'ogre', world, '-r'],
-        output='screen',
+        # output='screen',
+        output='log',
         on_exit=Shutdown(),
     )
 
@@ -289,6 +378,59 @@ def generate_launch_description():
         output='screen',
     )
 
+    # RViz2: 라이다 스캔과 tf 트리를 보는 뷰어. 로봇 루프 밖에 하나만 둔다 — RViz 는
+    # 로봇별 노드가 아니라 전역 /tf 를 통째로 보는 뷰어라서, 로봇이 늘어도 창 하나면 된다
+    # (늘어난 로봇의 스캔은 knavi.rviz 에 LaserScan 디스플레이를 추가해서 본다).
+    #
+    # use_sim_time 을 주는 이유: 스캔과 tf 의 타임스탬프가 Gazebo 시계다. RViz 가 벽시계로
+    # 돌면 "메시지가 미래에서 왔다 / 너무 오래됐다"로 판단해 스캔이 안 그려진다.
+    # headless 를 함께 보는 이유: enable_rviz 가 기본 켜짐이라, 그것만 보면
+    # 'headless:=true' (GUI 없이 서버만) 를 준 실행에서도 RViz 창이 떠 버린다 —
+    # headless 를 준 사람이 원한 것과 정반대다. 두 인자 중 headless 를 이기게 둔다.
+    # 월드 형상 뷰어. 창고의 visual 을 읽어 map 프레임 마커로 한 번 발행한다.
+    # RViz 에는 라이다 점과 선만 떠 있어서 그 점이 벽인지 선반인지 카트인지 알 수
+    # 없었다. gz 쪽 Visualize Lidar 플러그인으로 광선을 창고 위에 겹쳐 보려 했지만
+    # 광선이 월드 원점에만 그려졌다(그 플러그인은 토픽으로 센서 엔티티를 찾는데,
+    # 실행 중 스폰되는 이 로봇에서는 조회가 안 됐다). 그래서 반대 방향으로,
+    # 이미 점을 제 위치에 그리고 있는 RViz 로 형상을 가져온다.
+    # 로봇별이 아니라 시스템에 하나다 — 월드는 로봇 수와 무관하게 하나뿐이다.
+    world_markers = Node(
+        package='auto_drive',
+        executable='world_markers',
+        condition=IfCondition(show_rviz),
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'world_path': ParameterValue(world, value_type=str),
+            'models_root': models_path,
+        }],
+        output='screen',
+    )
+
+    # 돌아다니는 사람(<actor>) 뷰어. 소품과 달리 움직이므로 한 번 그리고 끝낼 수
+    # 없어 노드를 나눴다. gz 의 pose 토픽을 새로 브리지하는 대신 SDF 에 적힌 궤적을
+    # /clock 으로 직접 풀어 쓴다 — 이 월드의 actor 는 전부 주기가 고정된 왕복이다.
+    actor_markers = Node(
+        package='auto_drive',
+        executable='actor_markers',
+        condition=IfCondition(show_rviz),
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'world_path': ParameterValue(world, value_type=str),
+            'models_root': models_path,
+        }],
+        output='screen',
+    )
+
+    rviz_config = os.path.join(robot_share, 'config', 'knavi.rviz')
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        condition=IfCondition(show_rviz),
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='log',
+    )
+
     # navi_factory 월드의 model:// 참조(바닥 충돌 STL·창고·모델들·OGV 메시)를 gz 가 찾게 리소스 경로 등록.
     # models_path 는 위에서 ws_root 기준으로 계산됨(절대경로 하드코딩 제거).
     # 기존 GZ_SIM_RESOURCE_PATH 값이 있으면 덮어쓰지 않고 뒤에 이어붙인다.
@@ -300,7 +442,8 @@ def generate_launch_description():
 
     # 웹캠 노드는 로봇당 1개라서 위 robot_info 루프 안에서 만들어진다(robot_nodes 에 포함).
     return LaunchDescription([set_resource] + declare_args + robot_nodes +
-                             [gz_sim_gui, gz_sim_headless, ground, bridge])
+                             [gz_sim_gui, gz_sim_headless, ground, bridge,
+                              world_markers, actor_markers, rviz])
 
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
@@ -310,7 +453,7 @@ def generate_launch_description():
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
 #
-# 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot1/cmd_vel 에 직접 쓰지 않고
+# 수동 주행 검증: twist_mux 가 붙은 뒤로는 /robot2/cmd_vel 에 직접 쓰지 않고
 # mux 입력(cmd_vel_teleop)으로 넣는다. 안 그러면 mux 출력과 충돌한다.
 #   ros2 run teleop_twist_keyboard teleop_twist_keyboard \
-#     --ros-args -r /cmd_vel:=/robot1/cmd_vel_teleop
+#     --ros-args -r /cmd_vel:=/robot2/cmd_vel_teleop

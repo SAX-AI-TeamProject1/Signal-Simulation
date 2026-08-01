@@ -13,13 +13,13 @@
 #   - timeout : 이 시간(초) 동안 새 메시지가 없으면 그 소스를 버리고 속도 0 으로 본다
 #   - priority: 0~255. 클수록 우선. 동시에 살아 있으면 높은 쪽이 통과
 #
-# 최상위 키가 '/**' 인 이유: 이 노드를 로봇 네임스페이스(/robot1) 안에서 띄우므로
-# 노드의 전체 이름이 /robot1/twist_mux 가 된다. 'twist_mux:' 로 적으면 네임스페이스가
+# 최상위 키가 '/**' 인 이유: 이 노드를 로봇 네임스페이스(/robot2) 안에서 띄우므로
+# 노드의 전체 이름이 /robot2/twist_mux 가 된다. 'twist_mux:' 로 적으면 네임스페이스가
 # 안 맞아 파라미터가 적용되지 않는다. '/**' 는 네임스페이스와 무관하게 매칭된다.
 /**:
   ros__parameters:
     # false = geometry_msgs/Twist 로 발행(TwistStamped 아님).
-    # bridge.yaml 이 /robot1/cmd_vel 을 Twist 로 브리지하므로 반드시 false 여야 한다.
+    # bridge.yaml 이 /robot2/cmd_vel 을 Twist 로 브리지하므로 반드시 false 여야 한다.
     use_stamped: false
 
     topics:

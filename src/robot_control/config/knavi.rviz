@@ -1,0 +1,228 @@
+# robot2 라이다 스캔 확인용 RViz 설정.
+#
+# 주의: 이 파일은 RViz 가 "다른 이름으로 저장"할 때 통째로 다시 써진다.
+#       그때 아래 주석은 전부 날아가므로, 설정을 바꿨으면 주석을 다시 붙일 것.
+#
+# Fixed Frame 이 map 인 이유: 스캔을 로봇에 붙여 놓고 보면(base_link 기준) 로봇은
+# 가만히 있고 벽이 흘러가는 그림이 된다. 로봇이 창고를 지나가고 벽이 제자리에 서
+# 있는 그림이 나오려면 로봇 밖의 프레임이어야 하는데, robot2/odom 으로도 그건 됐다.
+# map 으로 올린 건 world_markers 때문이다 — 창고 형상 마커는 월드 좌표라서 월드
+# 원점 프레임에 실리고, odom 에 고정해 두면 그 마커와 로봇이 어긋난다.
+# map → robot2/odom 은 launch 의 static_transform_publisher 가 스폰 pose 로 발행하고,
+# robot2/odom → robot2/base_link 는 gz DiffDrive 가 만들고 브리지가 /tf 로 넘긴다
+# (config/bridge.yaml). 그 아래 링크들은 robot_state_publisher 가 발행한다.
+#
+# 프레임 이름에 robot2/ 가 붙는 이유: tf2_ros 는 토픽을 절대 경로 "/tf" 로 고정해서
+# 로봇이 여러 대여도 tf 가 한 토픽에 섞인다 — 토픽으로는 못 가르고 이름으로만 갈린다.
+# 그래서 launch 의 rsp 에 frame_prefix, urdf 의 frame_id·gz_frame_id 에 $(arg ns)/ 를 준다.
+# 로봇을 바꿔 볼 때는 이 파일의 robot2/ 를 그 로봇의 ns 로 바꾸면 된다.
+# 두 대를 한 화면에 놓는 것도 이제 프레임 쪽은 막혀 있지 않다 — robot1/odom 과
+# robot2/odom 이 공통 부모 없는 별개 조각이라 안 됐던 건데, launch 가 로봇마다
+# map → <ns>/odom 을 발행하면서 map 이 그 공통 부모가 됐다. 남은 건 이 파일 쪽
+# 일뿐이다: LaserScan·ScanRays 디스플레이를 로봇 수만큼 복제해 각자의 토픽에 건다.
+#
+# RobotModel 디스플레이가 없는 이유: 이 URDF 에서 visual 을 가진 링크는 chassis 하나뿐이고
+# 그 메시 경로가 model://mecanum_lift/... 이다. RViz 의 resource_retriever 는
+# package:// file:// http:// 만 풀 수 있어서 model:// 은 못 읽는다 — 켜 봐야 오류만 난다.
+# 로봇의 모양은 TF 디스플레이의 좌표축(base_link, lidar_link, 바퀴)으로 대신 본다.
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /LaserScan1
+      Splitter Ratio: 0.5
+    Tree Height: 700
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    # 1m 격자 40칸 = 40m. 라이다 사거리가 10m 라 스캔 점이 격자 어디까지 닿는지 눈으로 잰다.
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 40
+      Reference Frame: <Fixed Frame>
+      Value: true
+    # tf 트리가 robot2/odom→robot2/base_link→robot2/chassis→robot2/lidar_link 로 이어져
+    # 있는지 확인하는 용도이기도 하다. 라이다 점이 안 보일 때 여기서 축이 뜨는지부터 본다.
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: false
+      Show Axes: true
+      Show Names: true
+      Tree Height: 0
+      Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 60; 60
+      Color Transformer: FlatColor
+      # 0 이 아니라 0.2 초 잔상을 남긴다: 10Hz 스캔을 잔상 없이 보면 점이 깜빡여서
+      # 벽 모양이 눈에 잘 안 들어온다. 두 스캔이 겹치는 정도가 보기 좋다.
+      Decay Time: 0.2
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      # 10m 밖 점도 보이라고 5cm. 기본 1cm 는 창고 규모에서 거의 안 보인다.
+      Size (m): 0.05
+      Style: Spheres
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        # Best Effort 로 둔다. 구독자가 Best Effort 면 발행자가 Reliable 이든
+        # Best Effort 든 다 받는다 — 반대(구독자 Reliable)면 한쪽에서 아예 안 붙는다.
+        # ros_gz_bridge 의 QoS 설정에 이 파일이 끌려다니지 않게 하는 쪽을 골랐다.
+        Reliability Policy: Best Effort
+        Value: /robot2/scan
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    # 광선을 선으로 보는 디스플레이. 위 LaserScan 은 반사가 온 자리에 점만 찍어서,
+    # 아무것도 못 맞힌 광선(range=inf)은 화면에서 사라진다 — 전방 180도 360개 중
+    # 283개가 그랬다. auto_drive 의 scan_rays 노드가 그 광선까지 사거리 끝까지
+    # 선분으로 그려 준다(빨강=반사 있음, 청록=10m 안에 아무것도 없음).
+    # 이 디스플레이만 끄면 예전처럼 점만 보는 화면으로 돌아온다.
+    # 색·투명도·굵기는 이 파일이 아니라 노드 파라미터로 바꾼다 — 화면을 보면서
+    # 맞춰야 하는 값이라 다시 띄우지 않고 조정할 수 있게 해 뒀다:
+    #   ros2 param set /robot2/scan_rays miss_color "[0.2, 0.9, 1.0, 0.9]"
+    #   ros2 param set /robot2/scan_rays line_width 0.05
+    #   ros2 param set /robot2/scan_rays stride 2      (선을 더 촘촘히)
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: ScanRays
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot2/scan_rays
+      Value: true
+    # 창고 형상. auto_drive 의 world_markers 노드가 월드 SDF 의 visual 을 읽어
+    # map 프레임 마커로 내보낸 것이다 — 스캔 점 옆에 벽·선반·카트가 같이 보여야
+    # 그 점이 무엇을 맞힌 건지 알 수 있다.
+    # Durability 가 Transient Local 인 이유: 이 마커는 실행 중 딱 한 번 발행된다.
+    # Volatile 로 두면 RViz 가 늦게 붙었을 때 그 한 번을 놓쳐 화면이 빈다.
+    # 무거우면 이 디스플레이만 꺼도 나머지는 그대로 돌아간다 — 메시가 227개다.
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: WorldMarkers
+      Namespaces:
+        {}
+      Topic:
+        Depth: 1
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /world_markers
+      Value: true
+    # 돌아다니는 사람. auto_drive 의 actor_markers 가 SDF 의 <actor> 궤적을 시뮬레이션
+    # 시각으로 풀어 20Hz 로 다시 발행한다. 위 WorldMarkers 와 달리 계속 갱신되므로
+    # Durability 가 Volatile 이다.
+    # 골격 애니메이션은 없다 — RViz 마커는 스키닝을 못 해서, 걷는 자세 그대로
+    # 미끄러진다. 사람이 어디 있는지 보는 게 목적이라 그대로 둔다.
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: WorldActors
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /world_actors
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      # Target Frame 을 robot2/base_link 로: 카메라가 로봇을 따라다닌다. odom 고정으로
+      # 두면 로봇이 트랙을 왕복하다가 화면 밖으로 나가 버린다.
+      Distance: 25
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.85
+      Target Frame: robot2/base_link
+      Value: Orbit (rviz)
+      Yaw: 3.14
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 900
+  Hide Left Dock: false
+  Hide Right Dock: true
+  Views:
+    collapsed: false
+  Width: 1400
+  X: 60
+  Y: 60

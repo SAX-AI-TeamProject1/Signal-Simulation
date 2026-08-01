@@ -30,20 +30,54 @@
        주면 포크가 +X를 향하도록 검증했다. -->
   <xacro:property name="mesh_yaw" value="-1.5708"/>
 
+  <!-- ===== 차체 실측 치수 =====
+       외형 메시를 지게차로 바꾸면서 물리 치수는 옛 값(2.0x0.9x0.6)이 남아 있었다.
+       그 값들의 근거가 사라졌으므로 실제 렌더되는 메시를 시뮬레이션에서 직접 쟀다:
+       라이다를 차체 밖 6m 지점(정면 x=+6, 측면 y=+6)에 두고 자기 몸을 스캔해
+       높이별 실루엣을 읽는 방식이다. 계산으로 glTF 좌표를 변환해 보기도 했는데
+       두 번 다 실측과 안 맞아서(Y-up 변환 가정 문제) 계산값은 쓰지 않았다.
+
+         높이 0.3m : x[-0.85, 1.10]  y[-0.52, 0.57]
+         높이 0.6m : x[-0.80, 1.10]  y[-0.52, 0.55]
+         높이 1.5m : x[-0.67, 0.96]  y[-0.48, 0.49]
+         위끝      : z=2.1m 에는 반사 있고 z=2.3m 에는 없음
+
+       => 길이 1.95, 폭 1.09, 높이 약 2.2. 앞뒤로는 원점 기준 앞이 더 길다
+       (중심이 x=+0.125). 월드 소품 deco_forklift_ogv 의 collision box 에 적힌
+       2.4x1.4x2.06 은 이 메시의 실제 크기가 아니다 — 그 값을 믿고 맞추면 안 된다. -->
+  <xacro:property name="body_len"    value="1.95"/>
+  <xacro:property name="body_wid"    value="1.09"/>
+  <xacro:property name="body_x"      value="0.125"/>  <!-- 차체 중심의 x 오프셋 -->
+  <xacro:property name="body_top"    value="2.2"/>
+  <!-- 지면과 차체 바닥 사이 간격. 0 으로 두면 collision 박스가 바닥에 먼저 닿아
+       바퀴가 뜨고 로봇이 굴러가지 않는다. -->
+  <xacro:property name="ground_gap"  value="0.15"/>
+
   <!-- ===== 구동 파라미터 ===== -->
   <xacro:property name="wheel_radius" value="0.15"/>
   <xacro:property name="wheel_width"  value="0.12"/>
-  <!-- 고속 코너링 시 전복 방지: 바퀴/캐스터 간격을 넓혀 안정성 확보 -->
-  <xacro:property name="wheel_sep"    value="1.3"/>
+  <!-- 바퀴가 차체 폭(1.09) 밖으로 튀어나오지 않게 잡는다: 1.3 이던 예전 값은
+       옛 차체(폭 0.9) 기준이라 지금 메시에서는 바퀴가 좌우로 0.17m 씩 삐져나왔다.
+       0.95 면 바깥면이 0.95/2+0.12/2 = 0.535 로 차체 반폭 0.545 안에 들어온다.
+       무게중심을 z=0.3 으로 올린 뒤의 좌우 전복 여유: 바퀴 반간격 0.475 기준으로
+       횡가속 9.81 x 0.475 / 0.3 = 15.5 m/s^2 까지 버틴다. 순항 3.33m/s 에서 이
+       값에 닿으려면 회전 반경이 0.7m 여야 하므로 트랙 주행에서는 문제되지 않는다. -->
+  <xacro:property name="wheel_sep"    value="0.95"/>
   <xacro:property name="caster_radius" value="0.07"/>
-  <xacro:property name="caster_x"      value="0.95"/>
+  <!-- 캐스터도 차체 안쪽으로. 0.95 였을 때 뒤 캐스터(-0.95)가 차체 뒤끝(-0.85)
+       밖으로 나가 허공에 떠 있었다. 앞뒤 짧은 쪽(0.85)에서 여유를 둔 값이다. -->
+  <xacro:property name="caster_x"      value="0.72"/>
 
   <xacro:property name="base_mass"   value="25.0"/>
   <xacro:property name="wheel_mass"  value="1.5"/>
 
   <!-- ===== 관성 매크로 ===== -->
-  <xacro:macro name="box_inertia" params="m x y z">
+  <!-- px/py/pz 는 무게중심 위치(링크 원점 기준). 기본 0 이라 이 값을 안 주면
+       예전처럼 무게중심이 링크 원점에 놓인다. 관성 텐서는 박스 중심 기준 값이므로
+       그 중심을 어디에 둘지를 여기서 정하는 셈이다. -->
+  <xacro:macro name="box_inertia" params="m x y z px:=0 py:=0 pz:=0">
     <inertial>
+      <origin xyz="${px} ${py} ${pz}" rpy="0 0 0"/>
       <mass value="${m}"/>
       <inertia ixx="${m*(y*y+z*z)/12.0}" ixy="0" ixz="0"
                iyy="${m*(x*x+z*z)/12.0}" iyz="0"
@@ -83,11 +117,26 @@
         <mesh filename="${lift_mesh}" scale="${lift_scale}"/>
       </geometry>
     </visual>
+    <!-- collision 박스를 실측 치수로. 바닥에서 ground_gap 만큼 띄우고 body_top 까지
+         올린다 — 위끝을 2.2 로 잡으면 지게차 마스트까지 포함되므로, 로봇이 선반
+         아래를 통과하던 게 이제 막힐 수 있다(예전 박스는 높이 0.6 뿐이었다). -->
+    <xacro:property name="body_hgt" value="${body_top - ground_gap}"/>
     <collision>
-      <origin xyz="0 0 0.45" rpy="0 0 0"/>
-      <geometry><box size="2.0 0.9 0.6"/></geometry>
+      <origin xyz="${body_x} 0 ${ground_gap + body_hgt/2}" rpy="0 0 0"/>
+      <geometry><box size="${body_len} ${body_wid} ${body_hgt}"/></geometry>
     </collision>
-    <xacro:box_inertia m="${base_mass}" x="2.0" y="0.9" z="0.6"/>
+    <!-- 무게중심을 차체 기하 중심의 x(=0.125)로 옮긴다. 예전에는 <origin> 이 없어
+         무게중심이 링크 원점, 즉 구동축(x=0) 바로 위에 얹혀 있었다 — 뒤로 넘어가려는
+         토크를 되돌리는 모멘트가 26.15kg x 9.81 x 0.0067m = 1.8 N.m 뿐이었다.
+         가속 1.5m/s^2 을 내려면 바퀴에 26.15 x 1.5 x 0.15 = 5.9 N.m 이 필요하고 그
+         반작용이 그대로 차체를 젖히므로, 복원 모멘트가 그보다 작으면 뒤집힌다.
+         x=0.125 면 복원 모멘트가 32 N.m 로 반작용의 5배가 넘는다.
+         z 는 0.3 으로 낮게 둔다: 실제 지게차도 배터리·카운터웨이트가 바닥에 있고,
+         높이면 (a) 코너에서 전복 여유가 줄고 (b) 가속 관성력의 팔 길이가 늘어
+         앞들림이 다시 심해진다(z=0.6 이면 젖히는 모멘트가 29 N.m 로 복원 32 N.m 에
+         육박한다). 관성 텐서 자체는 박스 전체 치수 기준 값을 그대로 쓴다. -->
+    <xacro:box_inertia m="${base_mass}" x="${body_len}" y="${body_wid}" z="${body_hgt}"
+                       px="${body_x}" pz="0.3"/>
   </link>
 
   <!-- ===== 구동 바퀴 매크로 ===== -->
@@ -191,13 +240,30 @@
   </joint>
 
   <!-- ===== 라이다 링크 ===== -->
+  <!-- 앞 범퍼, 다리 높이. gpu_lidar 는 collision 이 아니라 visual 을 렌더링해서
+       맞히므로, collision 박스를 피하는 것만으로는 자기 몸을 안 보게 할 수 없다.
+       위치를 시뮬레이션에서 후보별로 재 봤다(막힌 광선 비율 / 연속으로 트인 각):
+
+         (1.05, 0, 0.50) 이전 값   57% 막힘   ±75.7도
+         (1.25, 0, 0.35) 이 값     41% 막힘   ±105.8도
+         (1.25, 0, 0.60)           41% 막힘   ±105.8도
+         (0.125, 0, 2.40) 마스트 위 0% 막힘   완전 360도
+
+       마스트 위가 유일하게 진짜 360도지만, 지면 2.4m 높이의 수평 단면이라 사람도
+       팔레트도 콘도 그 아래로 지나간다. 신호수 안전이 목적인 1단계에는 못 쓴다.
+       실물 AGV 도 항법용 라이다는 마스트 위, 안전용 스캐너는 낮게 따로 단다.
+       그래서 안전용 쪽을 골랐다: x=1.25 는 차체 앞끝(1.10) 바로 앞이고,
+       z=0.35 는 사람 다리와 팔레트가 걸리는 높이다.
+       뒤쪽 41% 는 차체에 막혀 있다. 뒤 범퍼에 한 대를 더 다는 방법(실물 AGV 의
+       2대 배치)도 있지만, 후진할 일이 없다고 보고 대신 아래에서 스캔 각을
+       전방 180도로 잘랐다. -->
   <link name="lidar_link">
     <xacro:box_inertia m="0.1" x="0.05" y="0.05" z="0.05"/>
   </link>
   <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
     <child  link="lidar_link"/>
-    <origin xyz="0.3 0 1.1" rpy="0 0 0"/>
+    <origin xyz="1.25 0 0.35" rpy="0 0 0"/>
   </joint>
 
   <!-- ================= Gazebo (gz-sim / Harmonic) ================= -->
@@ -211,8 +277,13 @@
       <max_linear_acceleration>1.5</max_linear_acceleration>
       <topic>$(arg ns)/cmd_vel</topic>
       <odom_topic>$(arg ns)/odom</odom_topic>
-      <frame_id>odom</frame_id>
-      <child_frame_id>base_link</child_frame_id>
+      <!-- 프레임 이름에 ns 접두어를 붙인다. tf2_ros 가 토픽 이름을 절대 경로 "/tf" 로
+           박아 놓아서(transform_broadcaster.hpp) 로봇이 여러 대여도 tf 는 전부 한
+           토픽에 섞여 들어온다 — 토픽으로는 못 가르고 프레임 "이름"으로만 갈린다.
+           launch 의 robot_state_publisher 에 준 frame_prefix 와 같은 값이라야
+           odom→base_link 와 base_link→chassis 가 한 트리로 이어진다. -->
+      <frame_id>$(arg ns)/odom</frame_id>
+      <child_frame_id>$(arg ns)/base_link</child_frame_id>
       <tf_topic>$(arg ns)/tf</tf_topic>
     </plugin>
     <plugin filename="gz-sim-joint-state-publisher-system"
@@ -249,7 +320,9 @@
       <!-- gz_frame_id 를 반드시 넣는다: 없으면 ROS 로 넘어온 Image 의 frame_id 가
            "mecanum_lift_robot/camera_link/sim_camera" 같은 gz 내부 스코프 이름이 되어
            tf 조회(카메라 좌표 → base_link)가 실패한다. -->
-      <gz_frame_id>camera_link</gz_frame_id>
+      <!-- ns 접두어는 위 DiffDrive frame_id 와 같은 이유 — rsp 의 frame_prefix 가
+           만드는 이름(robot2/camera_link)과 글자 하나까지 같아야 tf 조회가 붙는다. -->
+      <gz_frame_id>$(arg ns)/camera_link</gz_frame_id>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image><width>640</width><height>480</height></image>
@@ -267,19 +340,44 @@
       <topic>$(arg ns)/scan</topic>
       <!-- 카메라와 같은 이유. 없으면 LaserScan 의 frame_id 가 gz 내부 스코프 이름이 되어
            Nav2 가 tf 조회에 실패한다. -->
-      <gz_frame_id>lidar_link</gz_frame_id>
-      <update_rate>5</update_rate>
+      <gz_frame_id>$(arg ns)/lidar_link</gz_frame_id>
+      <!-- 5Hz/180샘플에서 10Hz/360샘플로 올렸다. 이 스캔이 비상정지의 유일한
+           근거가 되면서 두 수치가 다 모자랐다:
+             - 5Hz 는 최악 200ms 지연이라 1m/s 로 달리면 20cm 를 눈 감고 간다.
+             - 180샘플을 360도에 뿌리면 2도 간격이라, 폭 0.4m 인 사람이 10m 에서
+               레이 1개에만 걸린다. 1도 간격이면 같은 거리에서 2개, 5m 에서 5개다.
+           라이다를 꺼도 real-time factor 가 그대로였다는 실측이 있어(병목은 월드의
+           소품 충돌 계산) 이 정도 증량은 감당 가능하다고 판단했다. -->
+      <update_rate>10</update_rate>
       <lidar>
+        <!-- 360도가 아니라 전방 180도(±90도)만 스캔한다. 위 실측대로 이 장착
+             위치에서 트인 구간은 ±105.8도 뿐이고 나머지 41% 는 자기 차체를
+             때리는 광선이었다 — 그 41% 는 정보가 아니라 노이즈다. ±90도 는 그
+             트인 구간 안에 완전히 들어가므로 자기 몸 반사가 남지 않는다.
+             각을 절반으로 줄이면서 샘플은 360 그대로 뒀더니 간격이 1도에서
+             0.5도가 됐고(10m 의 폭 0.4m 사람에 광선 2개 → 4개), 여기서 다시
+             720 으로 올려 0.25도로 좁혔다. 이유는 둘이다:
+               - 사거리 끝(20m)에서 같은 사람이 0.5도로는 광선 2개뿐이라, 이
+                 스캔만 보고 비상정지를 판단하기엔 표본이 너무 적었다.
+               - RViz 화면이 성기게 보였다. 이 월드는 사거리 20m 안에 맞을 게
+                 별로 없어서 대부분의 광선이 inf 로 돌아온다.
+             gpu_lidar 는 스캔마다 씬을 렌더하므로 samples 가 곧 GPU 부하지만,
+             360 과 720 의 RTF 를 재 보니 차이가 없었다 — 라이다를 아예 꺼도
+             RTF 가 그대로였던 것과 같은 결과다. 이 월드의 병목은 라이다가
+             아니라 소품 충돌 계산 쪽이라, 이 정도 증량은 공짜에 가깝다.
+             대신 뒤쪽은 영구히 못 본다 — 후진 계획이 없어서 고른
+             맞바꿈이고, 후진이 생기면 뒤 범퍼에 두 번째 라이다를 다는 쪽이지
+             이 각을 되돌리는 게 아니다(되돌려 봐야 자기 차체만 보인다). -->
         <scan>
           <horizontal>
-            <samples>180</samples>
-            <min_angle>-3.1416</min_angle>
-            <max_angle>3.1416</max_angle>
+            <samples>720</samples>
+            <min_angle>-1.5708</min_angle>
+            <max_angle>1.5708</max_angle>
           </horizontal>
         </scan>
         <range>
           <min>0.12</min>
-          <max>10.0</max>
+          <max>20.0</max>
         </range>
       </lidar>
       <always_on>true</always_on>

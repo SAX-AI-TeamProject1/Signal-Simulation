@@ -47,7 +47,7 @@ class MarkerVision(Node):
         weights_path = self.get_parameter('weights_path').value
         if not weights_path or not Path(weights_path).is_file():
             raise RuntimeError(
-                f"TrackMarker 가중치 파일을 찾을 수 없습니다: '{weights_path}'. "
+                f'TrackMarker 가중치 파일을 찾을 수 없습니다: {weights_path!r}. '
                 'Signal-transport-perception에서 capture_gazebo_dataset.py TrackMarker '
                 '→ prepare_dataset.py → train_kaggle.sh 로 먼저 학습해야 합니다. '
                 '당장 필요 없으면 enable_marker_vision:=false 로 끄세요.')
