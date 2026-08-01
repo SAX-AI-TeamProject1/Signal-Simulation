@@ -283,15 +283,24 @@ def generate_launch_description():
     #    -v 4 유무와 무관하게 재현됐다. 반면 태스크 2(run_gazebo.sh)처럼 'gz sim' 을
     #    ExecuteProcess 로 직접 부르면(ruby/shell 래핑 없이) 문제없이 계속 돈다. 그래서
     #    여기서도 태스크 2와 동일한 방식으로 직접 실행한다.
+    #    GUI 렌더 엔진이 ogre2 인 이유: 구버전 ogre(1.9)로 돌리면 실행 중 GUI 렌더
+    #    스레드가 Ogre 어서션으로 죽는 걸 실제로 겪었다(OgreAxisAlignedBox.h:251,
+    #    "min <= max" — 씬 노드의 바운딩 박스가 뒤집힌 채로 갱신됨). gz 가 죽으면
+    #    on_exit=Shutdown() 때문에 bringup 전체가 내려간다. ogre2 는 그 코드 경로
+    #    (Plugin_OctreeSceneManager)를 아예 안 지나간다. 예전에 ogre 를 쓰던 건
+    #    3D 가속이 안 되던 옛 VM 기준이고, 지금 머신에는 실물 GPU 가 있다.
     gz_sim_gui = ExecuteProcess(
         condition=UnlessCondition(headless),
-        cmd=['gz', 'sim', '--render-engine', 'ogre', world, '-r'],
+        cmd=['gz', 'sim', '--render-engine', 'ogre2', world, '-r'],
         # output='screen',
         output='log',
         on_exit=Shutdown(),
     )
     gz_sim_headless = ExecuteProcess(
         condition=IfCondition(headless),
+        # headless 쪽만 ogre 로 남겨 둔다: 죽은 건 GUI 렌더 스레드였고, 이 경로는
+        # 창 없이 센서만 돌리는 구성으로 오늘 여러 번 검증됐다(라이다 스캔 정상).
+        # 센서가 실제로 쓰는 엔진은 월드의 Sensors 플러그인이 지정한 ogre2 다.
         cmd=['gz', 'sim', '-s', '--render-engine', 'ogre', world, '-r'],
         # output='screen',
         output='log',
