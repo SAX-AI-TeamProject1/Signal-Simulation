@@ -47,7 +47,8 @@ def parse_pose_text(text):
 
 
 def compose(parent, child):
-    """부모 pose 위에 자식 pose 를 얹는다. 위치는 부모 yaw 로 돌리고 각도는 더한다.
+    """
+    부모 pose 위에 자식 pose 를 얹는다. 위치는 부모 yaw 로 돌리고 각도는 더한다.
 
     일반적인 3축 회전 합성이 아니라 이 형태로 충분한 근거: 이 월드의 pose 782개를
     세어 보니 roll 또는 pitch 가 0 이 아닌 것은 4개뿐이고 전부 말단 visual 이었다
@@ -83,7 +84,8 @@ def to_ros_pose(pose6):
 
 
 def dae_header(path):
-    """COLLADA 헤더에서 (단위 환산 계수, up_axis) 를 읽는다. DAE 가 아니면 (1.0, None).
+    """
+    COLLADA 헤더에서 (단위 환산 계수, up_axis) 를 읽는다. DAE 가 아니면 (1.0, None).
 
     gz 와 RViz 가 같은 파일을 다르게 해석할 때 그 차이를 메우려고 읽는다.
 
@@ -130,7 +132,8 @@ def parse_scale(mesh_element):
 
 
 def resolve_model_uri(uri, models_root):
-    """model://Foo/meshes/bar.dae 를 models_root 아래 절대경로로 푼다.
+    """
+    model://Foo/meshes/bar.dae 를 models_root 아래 절대경로로 푼다.
 
     RViz 의 resource_retriever 는 package://, file://, http:// 만 안다 — model:// 은
     gz 의 표기라 그대로 넘기면 아무것도 안 그려진다.
@@ -143,7 +146,8 @@ def resolve_model_uri(uri, models_root):
 
 
 def apply_up_axis_fix(marker):
-    """마커 자세를 로컬 X축으로 90도 더 돌려 Y_UP 메시를 세운다.
+    """
+    마커 자세를 로컬 X축으로 90도 더 돌려 Y_UP 메시를 세운다.
 
     SDF 회전 "뒤에" 곱해야 한다 — 메시 자체의 축을 고치는 것이지 배치를 바꾸는 게
     아니라서, 앞에 곱하면 배치 회전까지 같이 돌아간다.

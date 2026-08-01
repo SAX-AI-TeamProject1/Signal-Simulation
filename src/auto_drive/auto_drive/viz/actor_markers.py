@@ -151,7 +151,8 @@ class ActorMarkers(Node):
         return tracks
 
     def find_mesh(self, actor, models_root):
-        """이 actor 를 그릴 메시를 고른다: link 의 visual 이 먼저, 없으면 skin.
+        """
+        이 actor 를 그릴 메시를 고른다: link 의 visual 이 먼저, 없으면 skin.
 
         이 월드의 actor 8명 중 7명은 <skin> 이 없고 <link><visual> 로 그려진다.
         gz 도 같은 순서로 떨어진다 — skin 이 없으면 링크 visual 을 렌더한다

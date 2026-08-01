@@ -173,7 +173,8 @@ class WorldMarkers(Node):
         return marker
 
     def resolve_uri(self, uri, models_root):
-        """메시 경로를 풀되, 못 풀면 경고만 남기고 None 을 돌려준다.
+        """
+        메시 경로를 풀되, 못 풀면 경고만 남기고 None 을 돌려준다.
 
         여기서 예외를 올리지 않는 이유: 소품 하나가 빠질 뿐인데 노드가 죽으면
         나머지 200여 개도 같이 못 보게 된다.
