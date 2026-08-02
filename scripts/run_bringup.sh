@@ -85,6 +85,7 @@ ORPHAN_PATTERNS=(
     "bridge_node"
     "twist_mux"
     "auto_drive/lib/auto_drive/waypoint_follower"
+    "auto_drive/lib/auto_drive/mission_follower"
     "signal_vision/lib/signal_vision/camera_node"
     "robot_state_publisher.*robot_description"
 )

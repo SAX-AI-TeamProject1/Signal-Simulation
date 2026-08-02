@@ -1,43 +1,73 @@
-# config/tracks.yaml  (poses are x, y, yaw in world frame)
+# config/tracks.yaml  (좌표는 월드 프레임 x, y — 단위 m)
 #
-# navi_factory.sdf의 track_* 타일 pose를 실측해서 만든 왕복 트랙. 이 창고엔 실제로
-# 3개의 평행한 남북 간선(x=-2 nw_trunk / x=0 ne_entry / x=2 se_trunk)이 북쪽
-# 공용 허브(신호지점 근처, y≈35~42)에서 갈라지고, 허브 맨 위에는 반원 회차루프
-# (track_signal_u, 중심 (0,40) 반지름 3m, (3,40)→(0,43)→(-3,40))가 있다 —
-# nw_hub_merge(-2.5,38.6)/se_hub_merge(2.5,38.6)를 통해 각각 nw_trunk/se_trunk와
-# 이어진다. 이 지점들도 실측 스크립트로 좌표를 뽑은 것이다(눈대중 좌표 아님).
+# navi_factory.sdf 의 track_* 타일 pose 를 실측해서 만든 파견(dispatch) 경로 정의.
+# 월드가 dev/navi_world_set 병합으로 재구성되면서 트랙 레이아웃이 바뀌었다:
+#   - 수신호석(0,36.05)에서 V자 두 가지(track_signal_v_l/r)가 상단 트랙(y=40)으로 갈라짐
+#   - 상단 트랙은 좌우 코너(corner_tl/tr)를 거쳐 x=-18 / x=13 기둥으로 내려감
+#   - 기둥 중간(y=13)에 목적지 원판(zone_nw/ne_disc_orange)이 있음
+#   - 동쪽은 원판에서 y=13 통로(track_return_ne)로 척추(x=0, track_spine)에 합류
+#   - 서쪽은 원판을 지나 계속 남진, 좌하단 코너 → 하단(y=-18) 동진 → 척추 남단 합류
+#   - 척추(x=0)를 북진하면 수신호석으로 복귀 — 두 경로가 공유하는 "한길"이다
+# 예전 레이아웃(signal_u 반원 회차루프, ne_entry 간선)의 트랙 정의는 월드에 더 이상
+# 존재하지 않는 타일을 가리키므로 제거했다(git 이력에 있음).
 #
-# 지금은 "1차선"(x=0, ne_entry 간선)만 왕복시킨다: 출발 → 살짝 옆(x=2)으로 붙어
-# 회차루프를 한 바퀴 돈 뒤 → 다시 x=0으로 복귀해 1차선을 타고 남쪽 끝까지 → 왕복.
-# x=2/x=-2 쪽으로 잠깐 붙는 구간(허브 안쪽)은 타일이 없는 빈 바닥이라 정확한
-# 좌표가 없다 — 인접한 실타일 중심으로 근사했다.
-#
-# signal_point / stations: waypoint_follower.py(auto_drive)가 실제 주행 경로
-# (src/auto_drive/auto_drive/patrol/waypoint_follower.py의 WAYPOINTS)의 각 지점이
-# 목적지(station)인지 수신호를 받는 출발지점(signal_point)인지를 여기 좌표와 거리
-# 대조해서 판정한다. tracks_to_markers.py는 같은 필드를 바닥 마커 색으로도
-# 시각화한다(신호지점=빨강, 목적지=초록).
-signal_point: [0.0, 36.05]   # 출발 — track_signal_entry_2 타일 중심
+# 소비자:
+#   - mission_follower(auto_drive): routes 를 읽어 수신호 파견 주행을 한다.
+#   - camera_node 의 수신호 존 게이트: signal_point / hand_signal_spot 을 읽는다.
+#   - waypoint_follower(구 왕복 순찰): signal_point / stations 만 거리 대조에 쓴다 —
+#     WAYPOINTS 가 옛 레이아웃 하드코딩이라 이 월드에서는 mission_follower 를 쓸 것.
+#   - tools/tracks_to_markers.py: signal_point(빨강)/stations(초록) 원판 시각화.
+
+signal_point: [0.0, 36.05]   # 수신호석 — V자 꼭짓점(track_signal_v 수렴점)
 # 신호수가 서는 스팟(월드의 hand_signal_spot 모델 중심). camera_node의 수신호
 # 게이트가 "로봇이 이쪽을 보고 있는가" 판정에 쓴다. 월드 SDF의 <pose>와 이중
 # 기입이다 — 월드에서 스팟을 옮기면 이 값도 같이 고칠 것.
 hand_signal_spot: [0.0, 40.0]
+
 stations:
-  south_end: [0.0, -12.1]    # 도착점 — track_ne_entry_south_11 타일 중심(1차선 남쪽 끝)
-tracks:
-  ne_entry_patrol:
-    loop: true
+  # 수신호 파견 목적지 존 — 월드의 주황 원판(zone_*_disc_orange) 중심. 월드 SDF의
+  # <pose>와 이중 기입이라, 월드에서 원판을 옮기면 이 값도 같이 고칠 것.
+  # LEFT/RIGHT 라벨과 존의 짝은 신호수를 마주 본 로봇 자신의 좌/우 기준으로
+  # signal_vision 의 labels.py(LABEL_DISPATCH)가 정한다 — 뒤집으려면 그쪽을 고칠 것.
+  zone_nw: [-18.0, 13.0]     # 서쪽 존 — zone_nw_disc_orange
+  zone_ne: [13.0, 13.0]      # 동쪽 존 — zone_ne_disc_orange
+
+# 파견 경로. 키는 stations 의 존 이름과 같아야 한다 — camera_node 가
+# signal_dispatch(std_msgs/String)로 이 키를 그대로 보내고, mission_follower 가
+# 키로 경로를 찾는다. 모든 경로는 signal_point 에서 시작해 signal_point 로 끝난다
+# (파견 → 원판 정차 → 복귀가 한 경로에 다 들어 있다).
+# 좌표는 위 레이아웃 주석의 타일 실측값이고, 코너는 corner 타일 호를 3점으로 근사했다.
+routes:
+  zone_ne:
     waypoints:
-      - [0.0, 36.05, 0.5404]        # 출발(신호지점)
-      - [2.0, 37.25, 1.222]         # 허브 안, x=2(se_trunk) 쪽으로 붙음
-      - [2.5, 38.625, 1.222]        # se_hub_merge
-      - [3.0, 40.0, 1.8849]         # 회차루프 진입(signal_u_1, 동쪽 끝)
-      - [2.42705, 41.7634, 2.5133]  # 회차루프(signal_u_2)
-      - [0.927051, 42.8532, 3.1416] # 회차루프(signal_u_3)
-      - [-0.927051, 42.8532, -2.5133]  # 회차루프(signal_u_4)
-      - [-2.42705, 41.7634, -1.8849]   # 회차루프(signal_u_5)
-      - [-3.0, 40.0, -1.222]        # 회차루프 진출(signal_u_6, 서쪽 끝)
-      - [-2.5, 38.625, -1.222]      # nw_hub_merge
-      - [-2.0, 37.25, 0.0]          # 허브 안, x=0(1차선)으로 복귀
-      - [0.0, 37.25, -1.5708]       # 1차선(ne_entry) 진입
-      - [0.0, -12.1, -1.5708]       # 도착점(1차선 남쪽 끝)
+      - [0.0, 36.05]     # 수신호석 출발
+      - [3.0, 40.0]      # V 오른가지 꼭대기 → 상단 트랙 합류
+      - [9.6, 40.0]      # 상단 직선 동쪽 끝(track_loop_top_r_4)
+      - [11.5, 39.8]     # 우상단 코너 호(corner_tr)
+      - [12.5, 39.0]
+      - [13.0, 37.8]
+      - [13.0, 14.9]     # 동쪽 기둥 남단(track_loop_right_12)
+      - [13.0, 13.0]     # zone_ne 원판 — station 정차
+      - [11.3, 13.0]     # 복귀 통로(track_return_ne) 진입, 서진
+      - [0.5, 13.0]      # 척추 합류 직전
+      - [0.0, 14.3]      # 척추(x=0) 북진 시작
+      - [0.0, 33.9]      # 척추 북단(track_spine_1)
+      - [0.0, 36.05]     # 수신호석 복귀
+  zone_nw:
+    waypoints:
+      - [0.0, 36.05]     # 수신호석 출발
+      - [-3.0, 40.0]     # V 왼가지 꼭대기 → 상단 트랙 합류
+      - [-14.5, 40.0]    # 상단 직선 서쪽 끝(track_loop_top_l_1)
+      - [-16.5, 39.8]    # 좌상단 코너 호(corner_tl)
+      - [-17.5, 39.0]
+      - [-18.0, 37.8]
+      - [-18.0, 14.9]    # 서쪽 기둥, 원판 직전(track_nw_bridge_n)
+      - [-18.0, 13.0]    # zone_nw 원판 — station 정차
+      - [-18.0, -14.7]   # 서쪽 기둥 남단(track_loop_left_ext)
+      - [-17.8, -16.5]   # 좌하단 코너 호(corner_bl)
+      - [-17.0, -17.5]
+      - [-15.8, -18.0]
+      - [-1.0, -18.0]    # 하단 동쪽 끝(track_loop_bottom_l_1)
+      - [0.0, -16.0]     # 척추 남단 진입(track_spine_ext2)
+      - [0.0, 33.9]      # 척추 북진 → 북단(track_spine_1)
+      - [0.0, 36.05]     # 수신호석 복귀

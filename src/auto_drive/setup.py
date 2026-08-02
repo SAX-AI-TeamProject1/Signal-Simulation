@@ -39,7 +39,12 @@ setup(
         'console_scripts': [
             # 트랙 왕복 추종: pose_gt 를 보고 cmd_vel_auto 발행(twist_mux 최하위 우선순위).
             # 시스템 python3.12 로 실행된다 — rclpy 외에 별도 의존성이 없다.
+            # 옛 레이아웃(signal_u 루프) 하드코딩이라 새 월드에서는 mission_follower 를 쓴다.
             'waypoint_follower = auto_drive.patrol.waypoint_follower:main',
+            # 수신호 파견 주행: 수신호석에서 대기하다 signal_dispatch(존 이름)를 받으면
+            # tracks.yaml 의 해당 경로로 원판을 찍고 복귀한다. 제어 법칙은
+            # waypoint_follower 의 것을 import 해서 쓴다(튜닝 소스는 한 곳 유지).
+            'mission_follower = auto_drive.patrol.mission_follower:main',
             # 코너 표지(TrackMarker) 감속: 카메라로 마커를 보고 waypoint_follower의
             # cmd_vel_auto를 줄여 재발행. ultralytics가 필요해 시스템 python3.12로 실행된다.
             'marker_vision = auto_drive.patrol.marker_vision:main',

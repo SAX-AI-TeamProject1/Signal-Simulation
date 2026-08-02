@@ -26,9 +26,9 @@ def generate_launch_description():
     navi_dir = os.path.join(ws_root, 'worlds', 'navi_factory')
     default_world = os.path.join(navi_dir, 'world', 'navi_factory', 'navi_factory.sdf')
     models_path = os.path.join(navi_dir, 'models')  # GZ_SIM_RESOURCE_PATH 용
-    # 트랙 웨이포인트별 코너/목적지/신호 대기 지점 분류(waypoint_follower)의 유일한
-    # 소스 오브 트루스. world와 마찬가지로 어느 패키지도 소유하지 않는 저장소 루트
-    # 파일이라 절대경로를 여기서 계산해 넘긴다.
+    # 파견 경로(mission_follower 의 routes)와 수신호 존 게이트(camera_node 의
+    # signal_point/hand_signal_spot)의 유일한 소스 오브 트루스. world와 마찬가지로
+    # 어느 패키지도 소유하지 않는 저장소 루트 파일이라 절대경로를 여기서 계산해 넘긴다.
     tracks_yaml_path = os.path.join(ws_root, 'config', 'tracks.yaml')
 
     # 월드는 어느 패키지도 소유하지 않는다(worlds/ 는 ROS 패키지가 아니다). 외부에서 world 인자로 주입.
@@ -89,11 +89,15 @@ def generate_launch_description():
                                           '덮어쓴다. ls /dev/video* 로 확인. 비워 두면 '
                                           '모든 로봇이 robot_info 에 적힌 자기 값을 쓴다'),
         DeclareLaunchArgument('enable_patrol', default_value='true',
-                              description='true 면 트랙 왕복 노드(waypoint_follower)를 함께 띄운다'),
+                              description='true 면 수신호 파견 주행 노드(mission_follower)를 '
+                                          '함께 띄운다 — 수신호석 대기, signal_dispatch 수신 시 '
+                                          '존 왕복'),
         DeclareLaunchArgument('enable_flat_ground', default_value='true',
-                              description='false 면 안정용 flat_ground 를 스폰하지 않는다 '
-                                          '(DART+Bullet 에서 바퀴 접지를 막는 문제 있음 — '
-                                          '실제로 구르는 DiffDrive 로봇에는 false 권장)'),
+                              description='false 면 flat_ground 를 스폰하지 않는다. 주의: '
+                                          '병합된 월드의 warehouse 모델에는 collision 이 '
+                                          '하나도 없어서 끄면 로봇이 바닥을 뚫고 무한 낙하한다'
+                                          '(실측 z<-3000). 항상 켜 둘 것 — 끄라던 옛 권장은 '
+                                          '이전 월드(STL 바닥이 있던) 기준이다'),
         DeclareLaunchArgument('enable_estop', default_value='true',
                               description='false 면 비상정지 노드(estop_node)를 띄우지 '
                                           '않는다 — 정지 거리 측정처럼 일부러 안 세울 '
@@ -137,7 +141,9 @@ def generate_launch_description():
 
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
-         ('0.0', '32.25', '0.3', '-1.5708'),  # entry 트랙 진행 방향(남쪽)으로 정렬
+         # 수신호석(tracks.yaml signal_point)에서 신호수(0,40) 쪽(북쪽)을 보고 시작 —
+         # 이래야 camera_node 의 존 게이트가 스폰 직후부터 열려 있어 바로 파견을 받는다.
+         ('0.0', '36.05', '0.3', '1.5708'),
          0),
     ]
     robot_nodes = []
@@ -224,10 +230,15 @@ def generate_launch_description():
             output='screen',
         )
 
-        # 5) 왕복 트랙 팔로워 : odom 보고 cmd_vel_auto 발행 (twist_mux 최하위 우선순위로 들어감).
+        # 5) 수신호 파견 주행 : 수신호석에서 대기하다 camera_node 의 signal_dispatch
+        #    (존 이름)를 받으면 tracks.yaml 의 해당 경로로 원판을 찍고 복귀한다.
+        #    cmd_vel_auto 발행(twist_mux 최하위 우선순위) — estop 감속 링이 이 토픽을
+        #    깎아 재발행하는 구조도 waypoint_follower 시절 그대로 물려받는다.
+        #    (waypoint_follower 는 옛 레이아웃 하드코딩이라 launch 에서 뺐다.
+        #     수동 실행은 여전히 가능: ros2 run auto_drive waypoint_follower)
         patrol = Node(
             package='auto_drive',
-            executable='waypoint_follower',
+            executable='mission_follower',
             namespace=namespace,
             condition=IfCondition(enable_patrol),
             parameters=[{'use_sim_time': use_sim_time,
@@ -370,15 +381,15 @@ def generate_launch_description():
         output='screen',
     )
 
-    # 안정용 평평한 바닥판 스폰 (창고 STL 바닥 접촉 불안정 회피용).
-    # STL 바닥(z≈0.2)보다 살짝 위(0.25)에 깔아 로봇이 flat_ground 에 먼저 닿게 함 → 결함 STL 바닥 무시.
-    # (벽 충돌은 STL 유지, 바닥만 이 평면이 대신)
-    #
-    # 주의: 이 얇은 박스가 이 월드의 물리 설정(DART+Bullet 충돌 검출기)과 만나면
-    # 바퀴 접지가 사실상 고정돼(뒤틀린 접촉 해석으로 추정) 로봇이 cmd_vel 을 받아도
-    # 전혀 전진하지 못하는 문제가 있었다 — 빈 월드/이 월드의 STL 바닥에 직접 스폰했을
-    # 때는 정상 이동함을 확인. DiffDrive로 실제 굴러가야 하는 로봇(Method B)에는
-    # enable_flat_ground:=false 로 꺼서 STL 바닥에 직접 놓는다.
+    # 평평한 바닥판 스폰 — 병합된 월드에서는 이게 유일한 물리 바닥이다.
+    # 새 warehouse 건물 모델에는 collision 이 하나도 없어서(visual 뿐), 이 판을 끄면
+    # 로봇이 스폰 즉시 바닥을 뚫고 무한 낙하한다(실측 z<-3000, 2026-08-02).
+    # 예전 주석이 말하던 "결함 STL 바닥"과 "false 권장"은 이전 월드 기준이다 —
+    # 그 STL 은 더 이상 collision 으로 로드되지 않는다. 주행 자체는 이 판 위에서
+    # 정상(2026-08-02 헤드리스 실측: zone_nw 전 구간 75초 완주). 단, 시작 직후
+    # 정지 상태에서 로봇이 명령에 수 분간 반응하지 않는 현상이 간헐적으로 남아
+    # 있다(같은 날 2/4 회 재현, 원인 미확정 — 스폰 안착 불안정 또는 bullet+pgs
+    # 접촉 비결정성 의심). 재현 시 pose_gt 의 z/기울기와 RTF 를 함께 볼 것.
     ground_sdf = os.path.join(robot_share, 'config', 'flat_ground.sdf')
     ground = Node(
         package='ros_gz_sim',
@@ -458,7 +469,7 @@ def generate_launch_description():
 # rsp → 로봇당 1개 (URDF에 묶임)
 # spawn → 로봇당 1번 (각자 생성)
 # twist_mux → 로봇당 1개 (명령 소스 중재)
-# patrol → 로봇당 1개 (자기 트랙을 따라감)
+# patrol → 로봇당 1개 (수신호석 대기 + 파견 경로 주행, mission_follower)
 # camera → 로봇당 1개 (로봇 1대에 웹캠 1대, 네임스페이스로 분리)
 # 브릿지 → 1개 공유 (토픽만 나열)
 # gz → 1개 공유 (같은 월드)
