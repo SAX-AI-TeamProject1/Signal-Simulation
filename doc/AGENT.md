@@ -42,7 +42,7 @@ Signal-Simulation/
 ├── src/
 │   ├── robot_control/     # the robot's body and wiring: urdf + config, no nodes
 │   ├── signal_vision/     # gesture recognition: camera_node + the vendored model source
-│   ├── auto_drive/        # autonomous driving: waypoint_follower + scan_rays viewer (estop / detection to come)
+│   ├── auto_drive/        # autonomous driving: mission_follower (+ legacy waypoint_follower) + scan_rays viewer
 │   └── knavi_bringup/     # assembly only: the top-level launch, no nodes of its own
 ├── tools/                 # offline track editing / SDF generation (see requirements.txt)
 └── worlds/
@@ -71,7 +71,7 @@ Four `ament_python` packages, split by responsibility rather than by file type. 
 |---|---|---|
 | `robot_control` | `urdf/` (`robot.urdf.xacro`, `mecanum_lift_robot.urdf.xacro`), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
 | `signal_vision` | `camera_node/`, the vendored `vision_hand/`, `metrics.py`, `models/` (weights) | `camera_node` |
-| `auto_drive` | `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `waypoint_follower`, `scan_rays` |
+| `auto_drive` | `patrol/mission_follower.py`, `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `mission_follower`, `waypoint_follower` (legacy), `scan_rays` |
 | `knavi_bringup` | `launch/bringup.launch.py` | nothing of its own — it starts the other three |
 <!-- 위 표: 패키지 4개가 각각 무엇을 소유하고 무엇을 실행하는지. robot_control 과 knavi_bringup 은 실행 노드가 없음. -->
 
@@ -96,10 +96,10 @@ One node, one process, several files. `node.py` only wires the parts together an
   <!-- image_publisher.py — image_webcam(sensor_msgs/Image) 발행, 기본은 꺼져 있음 -->
 - `inference.py` — runs the vendored gesture model and produces an immutable render payload
   <!-- inference.py — 벤더링된 수신호 모델을 돌리고, 렌더용 불변 묶음(payload)을 만들어 냄 -->
-- `command_publisher.py` — maps a label to `gesture` (`std_msgs/String`) and `cmd_vel_gesture` (`geometry_msgs/Twist`)
-  <!-- command_publisher.py — 라벨을 gesture(std_msgs/String)와 cmd_vel_gesture(geometry_msgs/Twist)로 변환해 발행 -->
-- `labels.py` — the single source of truth for labels: `STOP`, `FORWARD`, `LEFT`, `RIGHT`
-  <!-- labels.py — 라벨의 단일 출처: STOP, FORWARD, LEFT, RIGHT -->
+- `command_publisher.py` — maps a label to `gesture` (`std_msgs/String`), motion labels to `cmd_vel_gesture` (`geometry_msgs/Twist`), and dispatch labels to `signal_dispatch` (`std_msgs/String`, a zone name)
+  <!-- command_publisher.py — 라벨을 gesture(std_msgs/String)로, 속도 라벨은 cmd_vel_gesture(geometry_msgs/Twist)로, 파견 라벨은 signal_dispatch(std_msgs/String, 존 이름)로 변환해 발행 -->
+- `labels.py` — the single source of truth for labels: motion `STOP`/`FORWARD`, dispatch `LEFT`→`zone_nw` / `RIGHT`→`zone_ne`
+  <!-- labels.py — 라벨의 단일 출처: 속도 라벨 STOP/FORWARD, 파견 라벨 LEFT→zone_nw / RIGHT→zone_ne -->
 - `shutdown.py`, `swap_frame.py` — shutdown detection and frame handoff helpers
   <!-- shutdown.py, swap_frame.py — 종료 감지와 프레임 인계용 헬퍼 -->
 
@@ -122,7 +122,7 @@ What `knavi_bringup/launch/bringup.launch.py` actually starts. One robot is spaw
 | `ros_gz_sim create` (robot) | one per robot | one-shot | reads `robot_description` from the topic and spawns the model |
 | `ros_gz_sim create` (`flat_ground`) | one | one-shot | spawns the collision-only ground plate at z = 0.25, unless `enable_flat_ground:=false` |
 | `twist_mux` (ns `/robot2`) | one per robot | resident | passes through the highest-priority live velocity source |
-| `waypoint_follower` (ns `/robot2`) | one per robot | resident | follows the track from `pose_gt`, publishes `cmd_vel_auto`; off with `enable_patrol:=false` |
+| `mission_follower` (ns `/robot2`) | one per robot | resident | waits at the signal point, drives a `tracks.yaml` route to the zone named on `signal_dispatch` and returns; publishes `cmd_vel_auto`; off with `enable_patrol:=false` |
 | `camera_node` (ns `/robot2`) | one per robot | resident | one physical webcam per robot; off with `enable_camera:=false` |
 | `scan_rays` (ns `/robot2`) | one per robot | resident | redraws `scan` as ray line segments on `scan_rays`; starts only when RViz does |
 | `ros_gz_bridge bridge_node` | one for the whole system | resident | translates the topics listed in `config/bridge.yaml` |
@@ -189,7 +189,7 @@ Velocity sources arbitrated by `twist_mux`, highest priority first:
 | `cmd_vel_estop` | 100 | 0.3 s | none yet |
 | `cmd_vel_gesture` | 50 | 0.5 s | that robot's own `camera_node`, in the same namespace |
 | `cmd_vel_teleop` | 20 | 0.5 s | `teleop_twist_keyboard`, for manual checks |
-| `cmd_vel_auto` | 10 | 0.5 s | `waypoint_follower` when `enable_patrol` is on |
+| `cmd_vel_auto` | 10 | 0.5 s | `mission_follower` when `enable_patrol` is on (only while driving a dispatch route) |
 <!-- 위 표: twist_mux 입력 4개의 우선순위·타임아웃·현재 발행자. estop 은 아직 발행자가 없음. -->
 
 Because `twist_mux` owns the output, nothing else may publish to `<ns>/cmd_vel` directly — manual driving goes into `cmd_vel_teleop`:
@@ -207,8 +207,8 @@ Driving by hand while `enable_patrol` is on means fighting the follower for the 
 `<ns>/scan_rays` (`visualization_msgs/MarkerArray`) is not bridged either — `scan_rays` builds it inside ROS from the scan that was already bridged, so it is a second view of existing data rather than a new sensor.
 <!-- <ns>/scan_rays(visualization_msgs/MarkerArray) 도 브리지 대상이 아님 — scan_rays 가 이미 브리지된 스캔을 ROS 안에서 다시 그린 것이라, 새 센서가 아니라 있는 데이터를 한 번 더 보는 것임. -->
 
-`camera_node` itself publishes `<ns>/gesture` (`std_msgs/String`, the recognized label, for logging and latency measurement), `<ns>/cmd_vel_gesture` (`geometry_msgs/Twist`), and `<ns>/image_webcam` (`sensor_msgs/Image`, off by default). These carry the robot namespace because `bringup` starts the node inside it; started bare with `ros2 run` the same topics appear at the root instead.
-<!-- camera_node 자체가 발행하는 것: <ns>/gesture(std_msgs/String — 인식된 라벨, 기록·지연시간 측정용), <ns>/cmd_vel_gesture(geometry_msgs/Twist), <ns>/image_webcam(sensor_msgs/Image, 기본 꺼짐). bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우기 때문에 네임스페이스가 붙는 것이며, ros2 run 으로 그냥 띄우면 같은 토픽들이 루트에 생김. -->
+`camera_node` itself publishes `<ns>/gesture` (`std_msgs/String`, the recognized label, for logging and latency measurement), `<ns>/cmd_vel_gesture` (`geometry_msgs/Twist`, motion labels only), `<ns>/signal_dispatch` (`std_msgs/String`, the destination zone for dispatch labels, read by `mission_follower`), and `<ns>/image_webcam` (`sensor_msgs/Image`, off by default). These carry the robot namespace because `bringup` starts the node inside it; started bare with `ros2 run` the same topics appear at the root instead.
+<!-- camera_node 자체가 발행하는 것: <ns>/gesture(std_msgs/String — 인식된 라벨, 기록·지연시간 측정용), <ns>/cmd_vel_gesture(geometry_msgs/Twist, 속도 라벨만), <ns>/signal_dispatch(std_msgs/String — 파견 라벨의 목적지 존 이름, mission_follower 가 읽음), <ns>/image_webcam(sensor_msgs/Image, 기본 꺼짐). bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우기 때문에 네임스페이스가 붙는 것이며, ros2 run 으로 그냥 띄우면 같은 토픽들이 루트에 생김. -->
 
 ## Build & run
 
@@ -254,8 +254,8 @@ Two ways it stays shut: `enable_rviz:=false`, or `headless:=true`, which wins ov
 That config carries no `RobotModel` display: the only link with a visual is `chassis`, and its mesh URI is `model://mecanum_lift/...`, which RViz's resource retriever cannot resolve — it handles `package://`, `file://` and `http://` only.
 <!-- 그 설정에는 RobotModel 디스플레이가 없음 — visual 을 가진 링크가 chassis 하나뿐인데 그 메시 URI 가 model://mecanum_lift/... 이고, RViz 의 resource retriever 는 package://, file://, http:// 만 풀 수 있어서 이걸 못 읽기 때문. -->
 
-`enable_flat_ground` defaults on, but a robot that actually has to roll needs it off: the thin plate and this world's collision detector together pin the wheels so the robot never moves. See `doc/design.md`.
-<!-- enable_flat_ground 는 기본이 켜짐이지만 실제로 굴러가야 하는 로봇에는 꺼야 함. 얇은 판과 이 월드의 충돌 검출기가 맞물리면 바퀴가 고정돼 로봇이 전혀 움직이지 않기 때문. doc/design.md 참고. -->
+`enable_flat_ground` must stay on in the merged world: the current `warehouse` model carries no `<collision>` at all, so with the plate off the robot falls through the floor forever (measured: z below −3000 within seconds). The old advice to turn it off dated from the previous world, whose defective STL floor still existed as a collision.
+<!-- enable_flat_ground 는 병합된 월드에서 반드시 켜 두어야 함. 지금 warehouse 모델에는 <collision> 이 하나도 없어서, 판을 끄면 로봇이 바닥을 뚫고 무한 낙하함(실측: 몇 초 만에 z가 -3000 아래). 끄라던 옛 안내는 결함 STL 바닥이나마 콜리전으로 존재하던 이전 월드 기준이었음. -->
 
 `ls /dev/video*` shows which webcam index exists; re-plugging a USB camera renumbers it.
 <!-- ls /dev/video* 로 실제 존재하는 웹캠 번호를 확인할 것. USB를 다시 꽂으면 번호가 다시 매겨짐. -->

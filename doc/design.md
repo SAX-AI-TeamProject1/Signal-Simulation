@@ -92,12 +92,16 @@ The command path today:
 <!-- 현재의 명령 경로: -->
 
 ```
-webcam → camera_node (capture → inference → label)
-                  → cmd_vel_gesture ─┐
-teleop            → cmd_vel_teleop ──┤
-waypoint_follower → cmd_vel_auto ────┼→ twist_mux → /robot2/cmd_vel → ros_gz_bridge → drive plugin
-(estop: reserved) ───────────────────┘
+webcam → camera_node (capture → inference → label, gated by the signal zone)
+   STOP/FORWARD → cmd_vel_gesture ──────────────────────────────┐
+   LEFT/RIGHT   → signal_dispatch → mission_follower            │
+                                      → cmd_vel_auto ───────────┤
+teleop          → cmd_vel_teleop ───────────────────────────────┤
+estop_node      → cmd_vel_estop (stop) / cmd_vel_estop_slow ────┤
+                                                                └→ twist_mux → /robot2/cmd_vel → ros_gz_bridge → drive plugin
 ```
+Motion labels stay velocity commands through `twist_mux`; dispatch labels (`LEFT`/`RIGHT`) instead name a destination zone, and `mission_follower` drives the matching `tracks.yaml` route to the zone's disc and back to the signal point. A dispatch outlives the gesture that triggered it, which is what removed the old failure where a released turn gesture let the patrol yank the robot back.
+<!-- 속도 라벨은 예전대로 twist_mux 를 지나는 속도 명령이고, 파견 라벨(LEFT/RIGHT)은 목적지 존 이름을 지목한다 — mission_follower 가 tracks.yaml 의 해당 경로로 원판을 찍고 수신호석으로 복귀한다. 파견은 그것을 일으킨 수신호보다 오래 살아남는데, 바로 이것이 "회전 신호를 놓는 순간 순찰이 로봇을 도로 틀어버리던" 옛 문제를 없앤 지점이다. -->
 <!-- 위 그림: 웹캠 → camera_node(캡처→추론→라벨) → cmd_vel_gesture, teleop → cmd_vel_teleop, waypoint_follower → cmd_vel_auto 가 twist_mux 로 모여 /robot2/cmd_vel 로 나가고, 브릿지를 거쳐 구동 플러그인에 도달함. estop 입력은 예약된 자리. -->
 
 Two ways the vision side can reach the simulation, both in use:
@@ -108,8 +112,8 @@ Two ways the vision side can reach the simulation, both in use:
 - **Over rosbridge.** `scripts/run_full_stack.sh` runs `rosbridge_server` next to `gz sim` so the Signal-Vision repository can send commands over a websocket from outside the ROS 2 graph.
   <!-- rosbridge 방식. scripts/run_full_stack.sh 가 gz sim 옆에 rosbridge_server 를 함께 띄워, Signal-Vision 리포지토리가 ROS 2 그래프 밖에서 웹소켓으로 명령을 보낼 수 있게 함. -->
 
-The world is `worlds/navi_factory`, built from the AWS RoboMaker warehouse models plus project-specific props. Its floor collision mesh is defective — the horizontal floor triangles have their normals flipped downward, and the mesh contains degenerate zero-area triangles — so a robot spawned on it fell through and toppled. The workaround is `config/flat_ground.sdf`, a collision-only plate spawned at z = 0.25 that the robot rests on; the warehouse mesh is kept for wall collisions.
-<!-- 월드는 worlds/navi_factory 이며, AWS RoboMaker 창고 모델에 프로젝트 전용 소품을 더해 만든 것임. 이 월드의 바닥 콜리전 메시가 결함이 있음 — 수평 바닥 삼각형들의 법선이 전부 아래로 뒤집혀 있고, 면적 0인 퇴화 삼각형도 섞여 있음 — 그래서 그 위에 스폰한 로봇이 파고들며 넘어졌음. 우회책으로 config/flat_ground.sdf(콜리전 전용 평면)를 z = 0.25 에 스폰해 로봇이 그 위에 서게 했고, 창고 메시는 벽 충돌용으로 그대로 둠. -->
+The world is `worlds/navi_factory`, rebuilt in the `dev/navi_world_set` merge around a new `warehouse` building model plus project props (track tiles, zone discs, actors). That building model has **no collision geometry at all** — only visuals — so `config/flat_ground.sdf` (a 200 × 200 m collision-only plate spawned at z = 0.25) is not a workaround anymore but the only floor there is: with `enable_flat_ground:=false` the robot falls through forever (measured: z below −3000). Walls have no physics either — the lidar still returns them because `gpu_lidar` renders visuals, but nothing physically stops a robot from driving through one.
+<!-- 월드는 worlds/navi_factory 이며, dev/navi_world_set 병합에서 새 warehouse 건물 모델과 프로젝트 소품(트랙 타일, 존 원판, 액터)으로 재구성됨. 이 건물 모델에는 콜리전이 하나도 없고 visual 뿐이라, config/flat_ground.sdf(z=0.25 에 스폰되는 200x200m 콜리전 전용 판)는 이제 우회책이 아니라 유일한 바닥임 — enable_flat_ground:=false 면 로봇이 바닥을 뚫고 무한 낙하함(실측: z -3000 아래). 벽에도 물리가 없음 — gpu_lidar 는 visual 을 렌더하므로 라이다에는 벽이 잡히지만, 로봇이 벽을 뚫고 지나가는 것을 물리적으로 막는 것은 없음. -->
 
 ## Open items
 
@@ -119,8 +123,10 @@ The world is `worlds/navi_factory`, built from the AWS RoboMaker warehouse model
   <!-- 비전 리포지토리와의 명령 인터페이스가 아직 합의되지 않음. 여기서 쓰는 라벨 집합(STOP, FORWARD, LEFT, RIGHT)과 토픽 이름은 이쪽에서 혼자 만든 초안임. 토픽 이름, 명령 종류, 신뢰도 값을 명령과 함께 보낼지 여부를 상대 쪽과 확정해야 함. -->
 - **No hold policy for a dropped label.** `twist_mux` drops the gesture source after 0.5 s without a message, so a brief recognition gap stops a moving robot. Holding the last label would smooth this, but the safe policy is probably asymmetric — hold `STOP` long, release `FORWARD` quickly — and that is a behavior decision, not a refactor.
   <!-- 라벨이 끊겼을 때의 유지 정책이 없음. twist_mux 는 0.5초 동안 메시지가 없으면 gesture 소스를 버리므로, 인식이 잠깐만 끊겨도 주행 중이던 로봇이 멈춤. 마지막 라벨을 유지하면 부드러워지지만, 안전한 정책은 아마 비대칭일 것임 — STOP은 오래 유지하고 FORWARD는 빨리 놓는 식 — 그리고 이건 리팩터링이 아니라 동작에 대한 결정임. -->
-- **Emergency stop has no publisher.** `cmd_vel_estop` is the highest-priority input but nothing publishes to it yet.
-  <!-- 비상정지에 발행자가 없음. cmd_vel_estop 이 최우선 입력이지만 아직 아무도 여기에 발행하지 않음. -->
+- **The LEFT/RIGHT ↔ zone pairing is provisional.** `labels.py` maps `LEFT`→`zone_nw` / `RIGHT`→`zone_ne` using the robot's own left and right while it faces the signaler; the robot and the signaler mirror each other, so if the team settles on the signaler's perspective, swap the two values in `LABEL_DISPATCH`. The `SLOW` label the vision side uses is still absent from this repo's label set — part of the unagreed command interface above.
+  <!-- LEFT/RIGHT 와 존의 짝은 잠정임. labels.py 가 신호수를 마주 본 로봇 자신의 좌우 기준으로 LEFT→zone_nw / RIGHT→zone_ne 로 매핑하는데, 로봇과 신호수는 거울상이라 팀이 신호수 기준으로 정하면 LABEL_DISPATCH 의 두 값만 맞바꾸면 됨. 비전 쪽이 쓰는 SLOW 라벨은 이 리포지토리 라벨 집합에 아직 없음 — 위의 미합의 명령 인터페이스의 일부임. -->
+- **Both dispatch routes come home on the same spine (x = 0), and multi-robot arbitration there is deferred.** With one robot the shared lane costs nothing; with two it is a bottleneck and a head-on risk that `estop_node` would only turn into a deadlock, not schedule. The direction discussed is a central traffic-manager node granting the shared segment to one robot at a time — postponed until a second robot is actually spawned (which itself waits on the `map` root frame below).
+  <!-- 두 파견 경로 모두 같은 척추(x=0)로 복귀하는데, 거기서의 다중 로봇 중재는 보류함. 로봇이 한 대면 공용 차선의 비용이 없지만, 두 대면 병목이자 정면 대치 위험이고 estop_node 는 그걸 스케줄링이 아니라 교착으로 만들 뿐임. 논의된 방향은 공용 구간을 한 번에 한 대에게만 허가하는 중앙 교통 관리 노드 — 두 번째 로봇이 실제로 스폰될 때까지 미룸(그것 자체도 아래 map 루트 프레임이 선행됨). -->
 - **Phase 2 navigation is only wired up to the sensor.** A 2D `gpu_lidar` is bridged as `<ns>/scan`. `waypoint_follower` drives a fixed track from ground-truth pose, which is not navigation: Nav2, SLAM, and the costmap configuration are not present yet, and nothing reads the scan. A 2D scan sees one horizontal slice, so low pallets and overhanging objects stay invisible until a depth sensor is added.
   <!-- 2단계 내비게이션은 센서까지만 연결되어 있음. 2D gpu_lidar 를 <ns>/scan 으로 브리지했음. waypoint_follower 는 ground-truth 좌표를 보고 고정된 트랙을 따라갈 뿐 내비게이션이 아님. Nav2·SLAM·코스트맵 설정은 아직 없고, 스캔을 읽는 것도 아직 없음. 2D 스캔은 수평 단면 한 장만 보므로 낮은 팔레트나 머리 위로 튀어나온 물체는 깊이 센서를 추가하기 전까지 보이지 않음. -->
 - **The lidar only sees forward, and that is the mount, not the sensor.** It used to sit at `(0.3, 0, 1.1)` on the chassis, which is inside the `mecanum_lift` visual mesh — every one of the 360 rays came back between 0.32 m and 1.43 m and no warehouse wall was ever visible. `gpu_lidar` renders visuals rather than collisions, so clearing the URDF collision box did nothing, and the mesh keeps its `x[-1.07, 0.99]` footprint at every height from 0 to 2.01 m, leaving no clear height inside the body. It now sits on the front bumper at `(1.25, 0, 0.35)` and reaches out past 9.9 m, but at 360° the body still blocked the rear: 148 of the 360 rays (41%) hit the robot itself, and the clear arc measured in simulation is −105.8° to +105.8°.
