@@ -19,6 +19,11 @@ def generate_launch_description():
     # urdf 와 config(bridge.yaml, twist_mux.yaml, flat_ground.sdf)는 robot_control 이 소유한다 —
     # 이 패키지는 "무엇을 어떤 순서로 띄울지"만 알고, 로봇의 몸과 배선 파일은 갖지 않는다.
     robot_share = get_package_share_directory('robot_control')
+    # 물체 판별 가중치는 auto_drive 가 소유한다(setup.py 의 data_files 가 models/ 를
+    # share 로 설치한다) — 이 패키지는 경로만 알고 파일은 갖지 않는다.
+    auto_drive_share = get_package_share_directory('auto_drive')
+    default_detect_weights = os.path.join(
+        auto_drive_share, 'models', 'obstacle_detector.pt')
 
     # 머신별 절대경로 하드코딩 제거 — 팀원 누구 경로에서도 동작하게.
     # 워크스페이스 루트 = 설치본에서 4단계 위 (install/knavi_bringup/share/knavi_bringup → WS).
@@ -60,6 +65,11 @@ def generate_launch_description():
     enable_rviz = LaunchConfiguration('enable_rviz')
     enable_marker_vision = LaunchConfiguration('enable_marker_vision')
     marker_weights = LaunchConfiguration('marker_weights')
+
+    # 시뮬 카메라에 뭐가 보이는지 판별해 박스를 그려 주는 뷰어 노드. 주행에는 관여하지
+    # 않지만 추론이 CPU 를 쓰므로(프레임당 51ms 실측) 기본은 꺼 둔다.
+    enable_detect = LaunchConfiguration('enable_detect')
+    detect_weights = LaunchConfiguration('detect_weights')
 
     # 웹캠 장치 번호. /dev/video0 이 늘 있다는 보장이 없어서 인자로 뺐다 —
     # USB 를 다시 꽂거나 다른 포트에 연결하면 커널이 번호를 다시 매긴다.
@@ -115,6 +125,16 @@ def generate_launch_description():
         DeclareLaunchArgument('marker_weights', default_value='',
                               description='TrackMarker YOLO 가중치(.pt) 절대경로 '
                                           '(Signal-transport-perception train_kaggle.sh 결과물)'),
+        # 기본 false: 추론이 CPU 를 쓰는데(프레임당 51ms 실측) 물리 시뮬레이션과 같은
+        # 기계에서 도므로, 판별 그림이 필요할 때만 켜서 주행 성능을 건드리지 않는다.
+        DeclareLaunchArgument('enable_detect', default_value='false',
+                              description='true 면 시뮬 카메라 물체 판별 노드(detect_node)를 '
+                                          '함께 띄운다 — 박스를 그린 영상을 '
+                                          '<ns>/detect_image 로 낸다. 주행에는 관여하지 '
+                                          '않지만 추론이 CPU 를 쓰므로 기본은 꺼짐'),
+        DeclareLaunchArgument('detect_weights', default_value=default_detect_weights,
+                              description='물체 판별 YOLO 가중치(.pt) 경로 '
+                                          '(기본: auto_drive 의 obstacle_detector.pt)'),
     ]
 
     # 이부분은 로봇이 여러대면 여러개 작성해야함
@@ -255,6 +275,19 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time, 'weights_path': marker_weights}],
             output='screen',
         )
+        # 6-1) 물체 판별(뷰어 전용) — 시뮬 카메라에 잡힌 것이 무엇인지 박스로 그려
+        #      <ns>/detect_image 로 낸다. marker_vision 과 같은 YOLO 를 쓰지만 속도
+        #      명령은 만들지 않으므로 twist_mux 에 끼어들지 않는다 — 주행에 영향 없음.
+        #      보려면: rqt_image_view /robot2/detect_image
+        detect = Node(
+            package='auto_drive',
+            executable='detect_node',
+            namespace=namespace,
+            condition=IfCondition(enable_detect),
+            parameters=[{'use_sim_time': use_sim_time,
+                         'weights_path': detect_weights}],
+            output='screen',
+        )
 
         # 7) 웹캠 노드 (P0 입력) : 로봇 1대에 카메라 1대. 그래서 로봇 루프 안에 있다.
         #    로봇마다 자기를 지휘하는 신호수를 자기 카메라로 본다는 뜻이고, 그 대응은
@@ -332,7 +365,7 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
-        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,
+        robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, detect, camera,
                         scan_rays, map_to_odom, estop]
 
     # 2) Gazebo(gz sim) 실행.

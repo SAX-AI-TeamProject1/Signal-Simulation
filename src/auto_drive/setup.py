@@ -48,6 +48,11 @@ setup(
             # 코너 표지(TrackMarker) 감속: 카메라로 마커를 보고 waypoint_follower의
             # cmd_vel_auto를 줄여 재발행. ultralytics가 필요해 시스템 python3.12로 실행된다.
             'marker_vision = auto_drive.patrol.marker_vision:main',
+            # 시뮬 카메라에 뭐가 보이는지 판별해 박스를 그려 재발행하는 뷰어 전용 노드.
+            # marker_vision과 같은 YOLO를 쓰지만 속도 명령은 만들지 않는다 — 주행에
+            # 영향이 없다. 무거워서 기본은 꺼져 있고(enable_detect), 구독자가 없으면
+            # 추론 자체를 건너뛴다.
+            'detect_node = auto_drive.perception.detect_node:main',
             # 라이다 스캔을 광선 선분(Marker)으로 다시 그리는 뷰어 전용 노드.
             # 주행에는 아무 영향이 없어서 RViz 를 띄울 때만 함께 뜬다.
             'scan_rays = auto_drive.viz.scan_rays:main',
