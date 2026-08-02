@@ -44,6 +44,15 @@
         timeout: 0.5
         priority: 20
 
+      # 장애물 감속 — estop_node가 감속 링(1.5~5m) 안에서 auto의 전진 속도를
+      # 제동 곡선 아래로 깎아 재발행. 순찰(10)·마커 감속(15)은 로봇이 만든
+      # 명령이라 이 상한이 덮어야 하고, teleop(20)·gesture(50)는 사람 개입이라
+      # 이겨야 하므로 그 사이(18)에 둔다. 정지(1.5m 이내)는 여전히 estop(100).
+      estop_slow:
+        topic: cmd_vel_estop_slow
+        timeout: 0.5
+        priority: 18
+
       # 코너 표지(TrackMarker) 감속 — marker_vision이 auto의 속도를 줄여 재발행.
       # auto보다는 위(전복 방지가 순찰 자체보다 중요)지만 teleop/gesture보다는 아래
       # (사람 개입이 항상 이겨야 함). 마커가 안 보이면 그냥 발행을 멈추므로 timeout이

@@ -18,6 +18,10 @@
 # 대조해서 판정한다. tracks_to_markers.py는 같은 필드를 바닥 마커 색으로도
 # 시각화한다(신호지점=빨강, 목적지=초록).
 signal_point: [0.0, 36.05]   # 출발 — track_signal_entry_2 타일 중심
+# 신호수가 서는 스팟(월드의 hand_signal_spot 모델 중심). camera_node의 수신호
+# 게이트가 "로봇이 이쪽을 보고 있는가" 판정에 쓴다. 월드 SDF의 <pose>와 이중
+# 기입이다 — 월드에서 스팟을 옮기면 이 값도 같이 고칠 것.
+hand_signal_spot: [0.0, 40.0]
 stations:
   south_end: [0.0, -12.1]    # 도착점 — track_ne_entry_south_11 타일 중심(1차선 남쪽 끝)
 tracks:

@@ -264,12 +264,19 @@ def generate_launch_description():
         #      ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
         #    주의: 로봇 수만큼 실물 웹캠이 꽂혀 있어야 한다. 장치가 모자라면 그 로봇의
         #    camera_node 만 못 뜨고, 나머지 로봇과 시뮬레이션은 그대로 돈다.
+        #
+        #    tracks_yaml_path 를 넘기는 이유: 수신호 존 게이트를 켠다. 로봇이 신호
+        #    대기 지점(signal_point) 반경 안에서 신호수 스팟(hand_signal_spot)
+        #    쪽을 보고 있을 때만 cmd_vel_gesture 가 나간다 — 트랙 주행 중에 웹캠
+        #    앞에서 손을 흔들어도 순찰을 덮지 못하게. 경로를 안 넘기는 단독
+        #    실행(run_camera_node.sh)은 게이트 없이 예전처럼 항상 발행한다.
         camera = Node(
             package='signal_vision',
             executable='camera_node',
             namespace=namespace,
             condition=IfCondition(enable_camera),
-            parameters=[{'device_id': ParameterValue(device_id, value_type=int)}],
+            parameters=[{'device_id': ParameterValue(device_id, value_type=int),
+                         'tracks_yaml_path': tracks_yaml_path}],
             output='screen',
         )
         # 8) 라이다 광선 뷰어 : <ns>/scan 을 읽어 <ns>/scan_rays 마커로 다시 그린다.
@@ -299,9 +306,12 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
-        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로에 장애물이 있으면 cmd_vel_estop 에
-        #     0 속도를 쏜다. twist_mux 최우선(100) 자리라 수신호·teleop·순찰을 전부
-        #     덮는다. 회피는 하지 않는다 — 길 위에 사람이 있으면 서고 지나가면 간다.
+        # 10) 비상정지 : <ns>/scan 을 읽어 진행 통로의 장애물 거리에 따라 두 단계로
+        #     반응한다 — 감속 링(1.5~5m)에서는 순찰 명령의 속도를 깎아
+        #     cmd_vel_estop_slow(18)로 재발행하고(수신호를 받으러 신호수에게 접근할
+        #     수 있도록), 정지 링(1.5m 이내)에서는 cmd_vel_estop(100)에 0 속도를
+        #     쏴서 수신호·teleop·순찰을 전부 덮는다. 회피는 하지 않는다 — 길 위에
+        #     사람이 있으면 서고 지나가면 간다.
         #     RViz 와 무관하게 항상 뜬다: 이건 뷰어가 아니라 안전 장치다.
         estop = Node(
             package='auto_drive',
