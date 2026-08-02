@@ -6426,7 +6426,7 @@
       </link>
       <pose>0 40 0.2497 0 0 0</pose>
     </model>
-    <!-- disabled temporarily (perf) : restore on request
+
     <actor name='path_prop_2_person'>
       <skin>
         <filename>model://MaleVisitor/meshes/MaleVisitorWalk.dae</filename>
@@ -6611,7 +6611,7 @@
         </trajectory>
       </script>
     </actor>
-    -->
+    
     <model name='mecanum_lift_east' xmlns:ignition='https://ignitionrobotics.org/schema'>
       <static>true</static>
       <link name='chassis'>
