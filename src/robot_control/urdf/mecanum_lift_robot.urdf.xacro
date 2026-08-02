@@ -142,9 +142,14 @@
   <!-- ===== 구동 바퀴 매크로 ===== -->
   <xacro:macro name="drive_wheel" params="prefix side_y">
     <link name="${prefix}_wheel">
+      <!-- collision 을 원통이 아니라 구(sphere)로 둔다. bullet 충돌 검출기는
+           원통-박스(바퀴-flat_ground) 접촉의 접촉점 생성이 불안정해서, 정지
+           상태에서 접촉력이 0 으로 풀리는 스톨(명령을 줘도 수 분간 출발/제자리
+           회전 불가, 2026-08-02 실측 287초)이 났다. 구는 어느 검출기에서도 접촉이
+           바닥 중앙 1점으로 유일하게 잡힌다. 반지름이 같아 차체 높이는 그대로고,
+           바닥이 평평한 이 월드(flat_ground)에서는 굴림 기하도 원통과 동일하다. -->
       <collision>
-        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
-        <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+        <geometry><sphere radius="${wheel_radius}"/></geometry>
       </collision>
       <xacro:cyl_inertia m="${wheel_mass}" r="${wheel_radius}" l="${wheel_width}"/>
     </link>
