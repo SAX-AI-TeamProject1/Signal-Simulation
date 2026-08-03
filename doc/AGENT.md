@@ -69,7 +69,7 @@ Four `ament_python` packages, split by responsibility rather than by file type. 
 
 | Package | Owns | Runs |
 |---|---|---|
-| `robot_control` | `urdf/` (`robot.urdf.xacro`, `mecanum_lift_robot.urdf.xacro`), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
+| `robot_control` | `urdf/` (`mecanum_lift_robot.urdf.xacro` is the one in use; `robot.urdf.xacro` sits next to it but nothing reads it), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
 | `signal_vision` | `camera_node/`, the vendored `vision_hand/`, `metrics.py`, `models/` (weights) | `camera_node` |
 | `auto_drive` | `patrol/mission_follower.py`, `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `mission_follower`, `waypoint_follower` (legacy), `scan_rays` |
 | `knavi_bringup` | `launch/bringup.launch.py` | nothing of its own — it starts the other three |
@@ -98,8 +98,8 @@ One node, one process, several files. `node.py` only wires the parts together an
   <!-- inference.py — 벤더링된 수신호 모델을 돌리고, 렌더용 불변 묶음(payload)을 만들어 냄 -->
 - `command_publisher.py` — maps a label to `gesture` (`std_msgs/String`), motion labels to `cmd_vel_gesture` (`geometry_msgs/Twist`), and dispatch labels to `signal_dispatch` (`std_msgs/String`, a zone name)
   <!-- command_publisher.py — 라벨을 gesture(std_msgs/String)로, 속도 라벨은 cmd_vel_gesture(geometry_msgs/Twist)로, 파견 라벨은 signal_dispatch(std_msgs/String, 존 이름)로 변환해 발행 -->
-- `labels.py` — the single source of truth for labels: motion `STOP`/`FORWARD`, dispatch `LEFT`→`zone_nw` / `RIGHT`→`zone_ne`
-  <!-- labels.py — 라벨의 단일 출처: 속도 라벨 STOP/FORWARD, 파견 라벨 LEFT→zone_nw / RIGHT→zone_ne -->
+- `labels.py` — the single source of truth for labels: motion `STOP` (the only one left), dispatch `LEFT`→`zone_nw` / `RIGHT`→`zone_ne`
+  <!-- labels.py — 라벨의 단일 출처: 속도 라벨 STOP(이제 이것 하나뿐), 파견 라벨 LEFT→zone_nw / RIGHT→zone_ne -->
 - `shutdown.py`, `swap_frame.py` — shutdown detection and frame handoff helpers
   <!-- shutdown.py, swap_frame.py — 종료 감지와 프레임 인계용 헬퍼 -->
 
