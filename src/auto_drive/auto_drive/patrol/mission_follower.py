@@ -13,8 +13,8 @@
 # 끝(수신호석)으로 복귀 → 다시 대기. 주행 중에 온 파견 명령은 무시한다.
 #
 # 대기 중에는 cmd_vel_auto 에 아무것도 발행하지 않는다 — 로봇은 어차피 서 있고,
-# 발행을 멈추면 twist_mux 가 timeout 으로 auto 소스를 버려서 수신호 STOP/FORWARD
-# (cmd_vel_gesture, 우선순위 50)가 그대로 통과한다.
+# 발행을 멈추면 twist_mux 가 timeout 으로 auto 소스를 버려서 수신호 STOP
+# (cmd_vel_gesture, 우선순위 50)이 그대로 통과한다.
 #
 # 조향/속도 제어는 waypoint_follower 와 동일한 법칙(pure-pursuit 조준점 + PD +
 # slew-rate 제한)을 그대로 import 한다. 거기서 실측으로 잡은 스톨/헌팅/휘청거림

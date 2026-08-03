@@ -22,7 +22,7 @@ class GestureCommandPublisher:
             rosbag 에 남겨야 "언제 무슨 수신호였나"를 알 수 있고,
             "인식→반응 지연시간" 측정도 이 타임스탬프가 있어야 한다.
 
-        cmd_vel_gesture (geometry_msgs/Twist) — 속도 라벨(STOP/FORWARD) 제어용.
+        cmd_vel_gesture (geometry_msgs/Twist) — 속도 라벨(지금은 STOP 하나) 제어용.
             twist_mux 의 gesture 입력(priority 50)으로 들어간다.
             리맵은 없다. bringup 이 이 노드를 로봇 네임스페이스 안에서 띄우므로
             발행 토픽이 자동으로 <ns>/cmd_vel_gesture 가 되고, 같은 네임스페이스의
@@ -46,16 +46,19 @@ class GestureCommandPublisher:
         퍼블리셔 2개를 만들고, 라벨별 Twist 를 미리 만들어 캐싱한다.
 
         인자:
-            linear_speed: FORWARD 전진 속도 (m/s)
+            linear_speed: 전진 속도 (m/s) — 지금은 전진 라벨이 없어 예약값이다.
+                유일한 입력이던 come 이 학습 라벨에서 빠져 FORWARD 를 지웠다
+                (배경은 labels.py 의 LABEL_MOTION 주석).
             angular_speed: 회전 속도 (rad/s) — 지금은 회전 라벨이 없어 예약값이다.
-                LEFT/RIGHT 가 파견 라벨이 되면서 쓰는 곳이 없어졌지만, 파라미터와
-                생성자 시그니처는 유지한다(회전 라벨이 다시 생기면 그대로 쓴다).
+                LEFT/RIGHT 가 파견 라벨이 되면서 쓰는 곳이 없어졌다.
+            둘 다 파라미터와 생성자 시그니처는 유지한다. 라벨이 다시 생기면
+            LABEL_MOTION 에 한 줄 넣는 것만으로 그대로 쓰인다.
             zone_gate: SignalZoneGate 또는 None. 있으면 allows() 가 참일 때만
                 cmd_vel_gesture/signal_dispatch 를 발행한다. gesture(String) 는
                 게이트와 무관하게 항상 나간다 — 관측·기록용이라 "존 밖에서 무슨
                 수신호가 잡혔나"도 rosbag 에 남아야 하기 때문이다.
 
-        Twist 를 미리 만드는 이유: 라벨이 4개뿐이라 매 프레임 새로 만들 이유가 없다.
+        Twist 를 미리 만드는 이유: 라벨이 몇 개 안 되어 매 프레임 새로 만들 이유가 없다.
         캐시된 객체를 재발행해도 되는 것은 publish() 가 내부에서 직렬화하기 때문이다
         (발행 후 그 객체를 고치지만 않으면 된다 → 이 클래스 밖으로 내보내지 않는다).
         """
@@ -93,16 +96,22 @@ class GestureCommandPublisher:
             True  — 발행했거나, 발행할 것이 없어 건너뛰었다
             False — 종료 중이다(호출자는 워커 루프를 빠져나와야 한다)
 
-        ┌─ 미해결 설계 이슈 (팀 결정 필요) ────────────────────────────────┐
+        ┌─ 라벨이 끊겨도 유지(hold/latch)하지 않는다 ──────────────────────┐
         │ twist_mux 의 gesture timeout 은 0.5초다. label 이 None 인 동안은  │
         │ 여기서 아무것도 발행하지 않으므로, 인식이 0.5초 넘게 끊기면        │
-        │ twist_mux 가 gesture 소스를 버리고 속도 0 으로 본다.              │
-        │ → 손이 잠깐 흔들려도 FORWARD 중이던 로봇이 덜컥거린다.            │
+        │ gesture 소스가 버려진다. 마지막 라벨을 붙잡아 둘 수도 있지만       │
+        │ 그러지 않기로 했다.                                                │
         │                                                                   │
-        │ 해결하려면 마지막 라벨을 일정 시간 유지(hold/latch)해야 하는데,    │
-        │ "STOP 은 오래 유지하고 FORWARD 는 빨리 놓는" 비대칭 정책이 안전상  │
-        │ 맞을 수 있다. 이건 동작을 바꾸는 결정이라 리팩토링 범위 밖으로     │
-        │ 두었다. 정책이 정해지면 이 클래스 안에서 처리하면 된다.            │
+        │ 남은 속도 라벨은 STOP 하나뿐이고, 그건 붙잡을 이유가 없는 쪽이다.  │
+        │ 신호수가 손을 들고 있는 동안은 매 프레임 다시 나가고, 손을 내리면  │
+        │ 그건 "이제 가도 된다"는 뜻이다. 유지하면 사람이 이미 낸 해제       │
+        │ 신호를 로봇이 무시하게 된다.                                       │
+        │                                                                   │
+        │ 놓쳐서 위험해지는 경우도 없다. 수신호가 로봇을 움직이는 라벨이     │
+        │ 없고, 파견 주행 중에는 zone_gate 가 닫혀 있어(in_zone and facing   │
+        │ — signal_zone.py) STOP 이 애초에 나가지 않는다. 대기 중이면        │
+        │ mission_follower 도 발행을 멈추므로 아무도 움직이지 않는다.        │
+        │ 주행 중 안전은 estop_node(우선순위 100)의 몫이다.                  │
         └───────────────────────────────────────────────────────────────────┘
         """
         if label is None:

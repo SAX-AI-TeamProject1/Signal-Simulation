@@ -27,8 +27,8 @@ bringup 이 tracks_yaml_path 를 넘길 때만 만들어지고, 그때 pose_gt �
 늘고 얻는 게 없다. 블로킹 read() 가 루프를 카메라 속도에 묶어 주므로 주기 관리도 없다.
 
 워커를 1개로 고정한 이유: 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다.
-라벨은 이벤트가 아니라 상태(STOP/FORWARD/...)라서, 낡은 라벨이 최신 라벨을 덮으면
-STOP 다음에 FORWARD 가 나가는 사고가 된다.
+라벨은 이벤트가 아니라 상태(STOP/LEFT/RIGHT)라서, 낡은 라벨이 최신 라벨을 덮으면
+사람이 STOP 을 냈는데 그 뒤에 지나간 LEFT 가 나가 로봇이 파견을 떠나는 사고가 된다.
 
 렌더를 추론 워커에서 분리한 이유: GUI 갱신이 느리면 추론 처리율이 그만큼 깎인다.
 분리하되 **자유 실행이 아니라 신호 기반**이다 — 아무도 상태를 갱신하지 않았는데 다시
@@ -231,8 +231,12 @@ class CameraNode(Node):
         # 올렸던 적이 있는데, 진짜 원인은 navi_factory.sdf의 물리 스텝 크기였다
         # — max_step_size를 0.001→0.01로 늘려 real-time factor≈1로 고쳤으니
         # 이제 정상적인 속도값을 쓰면 된다.)
-        self.declare_parameter('linear_speed', 0.5)         # FORWARD 전진 속도 (m/s)
-        self.declare_parameter('angular_speed', 0.8)         # LEFT/RIGHT 회전 속도 (rad/s)
+        # 지금은 둘 다 예약값이다. 남은 속도 라벨이 STOP(0.0, 0.0) 하나뿐이라 어느
+        # 쪽을 곱해도 0 이 나온다. 그래도 선언을 유지하는 이유는, 전진이나 회전
+        # 라벨이 다시 생기면 labels.LABEL_MOTION 에 한 줄 넣는 것만으로 살아나기
+        # 때문이다. 지운 배경은 labels.py 의 LABEL_MOTION 주석 참고.
+        self.declare_parameter('linear_speed', 0.5)          # 전진 속도 (m/s)
+        self.declare_parameter('angular_speed', 0.8)         # 회전 속도 (rad/s)
         # 수신호 존 게이트. tracks.yaml 경로가 비어 있으면 게이트 없이 항상 발행
         # (단독 실행용). 켜고 끄는 배경은 signal_zone.py 독스트링 참고.
         self.declare_parameter('tracks_yaml_path', '')
