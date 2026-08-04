@@ -1,0 +1,387 @@
+{
+  "auto_drive/auto_drive/__init__.py": {
+    "mtime": 1785540853.2949698,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/localization/__init__.py": {
+    "mtime": 1785727238.7640014,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/localization/ground_truth_tf.py": {
+    "mtime": 1785727238.76416,
+    "ast_hash": "9555de2a716584ed22cad219aa53b9b5",
+    "semantic_hash": "9555de2a716584ed22cad219aa53b9b5"
+  },
+  "auto_drive/auto_drive/patrol/__init__.py": {
+    "mtime": 1785540853.295097,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/patrol/marker_vision.py": {
+    "mtime": 1785727238.7644806,
+    "ast_hash": "cc2b712bcb6f5dc5df65c4c7ed10924b",
+    "semantic_hash": "cc2b712bcb6f5dc5df65c4c7ed10924b"
+  },
+  "auto_drive/auto_drive/patrol/mission_follower.py": {
+    "mtime": 1785727247.0758717,
+    "ast_hash": "ac8f53dd4bf925adec7f8d85263734ef",
+    "semantic_hash": "ac8f53dd4bf925adec7f8d85263734ef"
+  },
+  "auto_drive/auto_drive/patrol/track_follow.py": {
+    "mtime": 1785727238.764645,
+    "ast_hash": "03aff408c2f4763adb0455bd5544bdee",
+    "semantic_hash": "03aff408c2f4763adb0455bd5544bdee"
+  },
+  "auto_drive/auto_drive/patrol/track_marker_infer.py": {
+    "mtime": 1785540853.295491,
+    "ast_hash": "df0d6b665207741200d6c5e061764d1d",
+    "semantic_hash": "df0d6b665207741200d6c5e061764d1d"
+  },
+  "auto_drive/auto_drive/patrol/waypoint_follower.py": {
+    "mtime": 1785727238.7648919,
+    "ast_hash": "e7298369ebd5f7bb5f386d192e061b06",
+    "semantic_hash": "e7298369ebd5f7bb5f386d192e061b06"
+  },
+  "auto_drive/auto_drive/perception/__init__.py": {
+    "mtime": 1785727247.0759718,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/perception/detect_node.py": {
+    "mtime": 1785727247.0763192,
+    "ast_hash": "649de0852372964f1a017778e15c58f1",
+    "semantic_hash": "649de0852372964f1a017778e15c58f1"
+  },
+  "auto_drive/auto_drive/safety/__init__.py": {
+    "mtime": 1785727238.7649615,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/safety/estop_node.py": {
+    "mtime": 1785727238.7651634,
+    "ast_hash": "9f6e71d7a5d38ea0f70dfec339afe2d9",
+    "semantic_hash": "9f6e71d7a5d38ea0f70dfec339afe2d9"
+  },
+  "auto_drive/auto_drive/transforms.py": {
+    "mtime": 1785727238.7652407,
+    "ast_hash": "3f6fef41f677da5849994a6074551446",
+    "semantic_hash": "3f6fef41f677da5849994a6074551446"
+  },
+  "auto_drive/auto_drive/viz/__init__.py": {
+    "mtime": 1785727238.7653098,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "auto_drive/auto_drive/viz/actor_markers.py": {
+    "mtime": 1785727238.765435,
+    "ast_hash": "55ae1636ca3d32c5f76c8738896a90b7",
+    "semantic_hash": "55ae1636ca3d32c5f76c8738896a90b7"
+  },
+  "auto_drive/auto_drive/viz/scan_rays.py": {
+    "mtime": 1785727238.7655218,
+    "ast_hash": "3c5bc5d204277c88758fcf1c55153c75",
+    "semantic_hash": "3c5bc5d204277c88758fcf1c55153c75"
+  },
+  "auto_drive/auto_drive/viz/sdf_geometry.py": {
+    "mtime": 1785727238.7656078,
+    "ast_hash": "4d3f67f7e379a3dea87233cdf3ecbf7a",
+    "semantic_hash": "4d3f67f7e379a3dea87233cdf3ecbf7a"
+  },
+  "auto_drive/auto_drive/viz/world_markers.py": {
+    "mtime": 1785727238.7656908,
+    "ast_hash": "94b5c0b856bfebc3fb540f5478fd21f9",
+    "semantic_hash": "94b5c0b856bfebc3fb540f5478fd21f9"
+  },
+  "auto_drive/setup.py": {
+    "mtime": 1785727247.0766602,
+    "ast_hash": "f3cad753e560349f7a68eb97c9d28e0e",
+    "semantic_hash": "f3cad753e560349f7a68eb97c9d28e0e"
+  },
+  "auto_drive/test/test_copyright.py": {
+    "mtime": 1785540853.3125217,
+    "ast_hash": "4996344e5b6b7ac0c99a267f121398f4",
+    "semantic_hash": "4996344e5b6b7ac0c99a267f121398f4"
+  },
+  "auto_drive/test/test_flake8.py": {
+    "mtime": 1785540853.312583,
+    "ast_hash": "aa129cddddd383a922ed54000fb385e5",
+    "semantic_hash": "aa129cddddd383a922ed54000fb385e5"
+  },
+  "auto_drive/test/test_mission_routes.py": {
+    "mtime": 1785727247.0767603,
+    "ast_hash": "276806d48767f33f25a33f5c03adab38",
+    "semantic_hash": "276806d48767f33f25a33f5c03adab38"
+  },
+  "auto_drive/test/test_pep257.py": {
+    "mtime": 1785540853.3126335,
+    "ast_hash": "1a5086842153d5f68611ba9f8cb7e443",
+    "semantic_hash": "1a5086842153d5f68611ba9f8cb7e443"
+  },
+  "auto_drive/test/test_waypoint_types.py": {
+    "mtime": 1785727238.7660692,
+    "ast_hash": "a2a6b979bf03a1ed416f34892f3a84ad",
+    "semantic_hash": "a2a6b979bf03a1ed416f34892f3a84ad"
+  },
+  "knavi_bringup/knavi_bringup/__init__.py": {
+    "mtime": 1785540853.3127759,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "knavi_bringup/launch/bringup.launch.py": {
+    "mtime": 1785727247.0771139,
+    "ast_hash": "7efa8a94c02b5502f1f37bb3dc65fdde",
+    "semantic_hash": "7efa8a94c02b5502f1f37bb3dc65fdde"
+  },
+  "knavi_bringup/setup.py": {
+    "mtime": 1785540853.3132398,
+    "ast_hash": "0b2516060667a8ff9dc6539a44c5f8d6",
+    "semantic_hash": "0b2516060667a8ff9dc6539a44c5f8d6"
+  },
+  "knavi_bringup/test/test_copyright.py": {
+    "mtime": 1785540853.3133118,
+    "ast_hash": "4996344e5b6b7ac0c99a267f121398f4",
+    "semantic_hash": "4996344e5b6b7ac0c99a267f121398f4"
+  },
+  "knavi_bringup/test/test_flake8.py": {
+    "mtime": 1785540853.3133633,
+    "ast_hash": "aa129cddddd383a922ed54000fb385e5",
+    "semantic_hash": "aa129cddddd383a922ed54000fb385e5"
+  },
+  "knavi_bringup/test/test_pep257.py": {
+    "mtime": 1785540853.3134139,
+    "ast_hash": "1a5086842153d5f68611ba9f8cb7e443",
+    "semantic_hash": "1a5086842153d5f68611ba9f8cb7e443"
+  },
+  "robot_control/robot_control/__init__.py": {
+    "mtime": 1785420226.24253,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "robot_control/setup.py": {
+    "mtime": 1785540853.313796,
+    "ast_hash": "efc2d86954684fda325546a77fe6b76f",
+    "semantic_hash": "efc2d86954684fda325546a77fe6b76f"
+  },
+  "robot_control/test/test_copyright.py": {
+    "mtime": 1785420226.2472384,
+    "ast_hash": "4996344e5b6b7ac0c99a267f121398f4",
+    "semantic_hash": "4996344e5b6b7ac0c99a267f121398f4"
+  },
+  "robot_control/test/test_flake8.py": {
+    "mtime": 1785420226.24747,
+    "ast_hash": "ec7f6c30662fea1480f4f44c8f45db16",
+    "semantic_hash": "ec7f6c30662fea1480f4f44c8f45db16"
+  },
+  "robot_control/test/test_pep257.py": {
+    "mtime": 1785420226.2475238,
+    "ast_hash": "b63a7a52144cadccb6daa71a52d03938",
+    "semantic_hash": "b63a7a52144cadccb6daa71a52d03938"
+  },
+  "signal_vision/setup.py": {
+    "mtime": 1785540853.3149867,
+    "ast_hash": "a8ae71db1c1001de945277fd1b15beb6",
+    "semantic_hash": "a8ae71db1c1001de945277fd1b15beb6"
+  },
+  "signal_vision/signal_vision/__init__.py": {
+    "mtime": 1785540853.3150403,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "signal_vision/signal_vision/camera_node/__init__.py": {
+    "mtime": 1785540853.3151658,
+    "ast_hash": "3875c5e74fb46108dd8e69e1252b6aae",
+    "semantic_hash": "3875c5e74fb46108dd8e69e1252b6aae"
+  },
+  "signal_vision/signal_vision/camera_node/command_publisher.py": {
+    "mtime": 1785727247.0776129,
+    "ast_hash": "198e2f8d22f587c95e6c56a8c5bc9449",
+    "semantic_hash": "198e2f8d22f587c95e6c56a8c5bc9449"
+  },
+  "signal_vision/signal_vision/camera_node/frame_source.py": {
+    "mtime": 1785540853.3154335,
+    "ast_hash": "a15fcc7c448b9a7809d0e58671b456ce",
+    "semantic_hash": "a15fcc7c448b9a7809d0e58671b456ce"
+  },
+  "signal_vision/signal_vision/camera_node/image_publisher.py": {
+    "mtime": 1785540853.31549,
+    "ast_hash": "1d4dbb8962532b4cd0b7cbf94da19c68",
+    "semantic_hash": "1d4dbb8962532b4cd0b7cbf94da19c68"
+  },
+  "signal_vision/signal_vision/camera_node/inference.py": {
+    "mtime": 1785540853.3156192,
+    "ast_hash": "3ebce980105736d126b32ea27b4e4d2f",
+    "semantic_hash": "3ebce980105736d126b32ea27b4e4d2f"
+  },
+  "signal_vision/signal_vision/camera_node/labels.py": {
+    "mtime": 1785727247.0777757,
+    "ast_hash": "7f45025c72574519f593335092c5a55b",
+    "semantic_hash": "7f45025c72574519f593335092c5a55b"
+  },
+  "signal_vision/signal_vision/camera_node/node.py": {
+    "mtime": 1785727238.7681022,
+    "ast_hash": "aea45fe987bd31b194b647a47bbc7f83",
+    "semantic_hash": "aea45fe987bd31b194b647a47bbc7f83"
+  },
+  "signal_vision/signal_vision/camera_node/shutdown.py": {
+    "mtime": 1785540853.315845,
+    "ast_hash": "3a0b0ac220d1884b92fcb65c1e6a577d",
+    "semantic_hash": "3a0b0ac220d1884b92fcb65c1e6a577d"
+  },
+  "signal_vision/signal_vision/camera_node/signal_zone.py": {
+    "mtime": 1785727238.7682009,
+    "ast_hash": "0e70308f472cf9218db2b2992961668c",
+    "semantic_hash": "0e70308f472cf9218db2b2992961668c"
+  },
+  "signal_vision/signal_vision/camera_node/swap_frame.py": {
+    "mtime": 1785540853.3159547,
+    "ast_hash": "a61c409daef18b4cb270b0b03c3e67dc",
+    "semantic_hash": "a61c409daef18b4cb270b0b03c3e67dc"
+  },
+  "signal_vision/signal_vision/metrics.py": {
+    "mtime": 1785540853.3160524,
+    "ast_hash": "6fbfa925c82e1729e818b839c5ef3112",
+    "semantic_hash": "6fbfa925c82e1729e818b839c5ef3112"
+  },
+  "signal_vision/signal_vision/vision_hand/__init__.py": {
+    "mtime": 1785556389.2744377,
+    "ast_hash": "a8d4603db782647186ccabe5922e88cb",
+    "semantic_hash": "a8d4603db782647186ccabe5922e88cb"
+  },
+  "signal_vision/signal_vision/vision_hand/capture/__init__.py": {
+    "mtime": 1785556389.2745593,
+    "ast_hash": "a8d4603db782647186ccabe5922e88cb",
+    "semantic_hash": "a8d4603db782647186ccabe5922e88cb"
+  },
+  "signal_vision/signal_vision/vision_hand/capture/extractor.py": {
+    "mtime": 1785727238.7699158,
+    "ast_hash": "e8171df61b8e8f5276508ce26ec9af79",
+    "semantic_hash": "e8171df61b8e8f5276508ce26ec9af79"
+  },
+  "signal_vision/signal_vision/vision_hand/capture/landmark_viewer.py": {
+    "mtime": 1785556389.292696,
+    "ast_hash": "6d41f31155c05d481b8150ead7268456",
+    "semantic_hash": "6d41f31155c05d481b8150ead7268456"
+  },
+  "signal_vision/signal_vision/vision_hand/console.py": {
+    "mtime": 1785556389.2748652,
+    "ast_hash": "0ea06484ac0f7e7d14e7b10c665226cb",
+    "semantic_hash": "0ea06484ac0f7e7d14e7b10c665226cb"
+  },
+  "signal_vision/signal_vision/vision_hand/dataset/__init__.py": {
+    "mtime": 1785556389.2749827,
+    "ast_hash": "a8d4603db782647186ccabe5922e88cb",
+    "semantic_hash": "a8d4603db782647186ccabe5922e88cb"
+  },
+  "signal_vision/signal_vision/vision_hand/dataset/collect.py": {
+    "mtime": 1785727238.7702208,
+    "ast_hash": "d2d2984a0bb3dc2f4c2240c20e8b7873",
+    "semantic_hash": "d2d2984a0bb3dc2f4c2240c20e8b7873"
+  },
+  "signal_vision/signal_vision/vision_hand/dataset/ui.py": {
+    "mtime": 1785556389.2936246,
+    "ast_hash": "0b68237141988c3a5aed05affc6261c6",
+    "semantic_hash": "0b68237141988c3a5aed05affc6261c6"
+  },
+  "signal_vision/signal_vision/vision_hand/inference/__init__.py": {
+    "mtime": 1785556389.2752552,
+    "ast_hash": "a8d4603db782647186ccabe5922e88cb",
+    "semantic_hash": "a8d4603db782647186ccabe5922e88cb"
+  },
+  "signal_vision/signal_vision/vision_hand/inference/function.py": {
+    "mtime": 1785556389.2948127,
+    "ast_hash": "5ed1ed5742c6f36e7ee8ac65975c02f2",
+    "semantic_hash": "5ed1ed5742c6f36e7ee8ac65975c02f2"
+  },
+  "signal_vision/signal_vision/vision_hand/inference/predict.py": {
+    "mtime": 1785556389.2945821,
+    "ast_hash": "38218a4d606856a6d398ad8cf1a8551f",
+    "semantic_hash": "38218a4d606856a6d398ad8cf1a8551f"
+  },
+  "signal_vision/signal_vision/vision_hand/inference/publish.py": {
+    "mtime": 1785556389.2755961,
+    "ast_hash": "bfef25b4d5720641b9666627376df22d",
+    "semantic_hash": "bfef25b4d5720641b9666627376df22d"
+  },
+  "signal_vision/signal_vision/vision_hand/inference/ui.py": {
+    "mtime": 1785556389.2756875,
+    "ast_hash": "dd861a58a905cb531f50287ad4cc0d79",
+    "semantic_hash": "dd861a58a905cb531f50287ad4cc0d79"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/check_env.py": {
+    "mtime": 1785727238.770313,
+    "ast_hash": "daa351743a7c8d43dddaa2a309793d4f",
+    "semantic_hash": "daa351743a7c8d43dddaa2a309793d4f"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/install_deps.py": {
+    "mtime": 1785727238.7703855,
+    "ast_hash": "602b649b94f88ef3b18a3c34adccc65c",
+    "semantic_hash": "602b649b94f88ef3b18a3c34adccc65c"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/setup_venv.py": {
+    "mtime": 1785727238.770454,
+    "ast_hash": "156ddd854220ab2a8161bed1a8ea3221",
+    "semantic_hash": "156ddd854220ab2a8161bed1a8ea3221"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/task_output.py": {
+    "mtime": 1785727238.7705147,
+    "ast_hash": "592443b000fe63be088551db1bd86ac5",
+    "semantic_hash": "592443b000fe63be088551db1bd86ac5"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/update_date_header.py": {
+    "mtime": 1785727238.7705743,
+    "ast_hash": "656c67b72845084391147e8829108534",
+    "semantic_hash": "656c67b72845084391147e8829108534"
+  },
+  "signal_vision/signal_vision/vision_hand/tools/watch_py_saves.py": {
+    "mtime": 1785727238.7706337,
+    "ast_hash": "6fe87eaf1c16a7096ff45a6ccffe1646",
+    "semantic_hash": "6fe87eaf1c16a7096ff45a6ccffe1646"
+  },
+  "signal_vision/signal_vision/vision_hand/training/__init__.py": {
+    "mtime": 1785556389.2762394,
+    "ast_hash": "a8d4603db782647186ccabe5922e88cb",
+    "semantic_hash": "a8d4603db782647186ccabe5922e88cb"
+  },
+  "signal_vision/signal_vision/vision_hand/training/augment.py": {
+    "mtime": 1785727238.7707787,
+    "ast_hash": "bc09245acbf0f555e861de5924b783fc",
+    "semantic_hash": "bc09245acbf0f555e861de5924b783fc"
+  },
+  "signal_vision/signal_vision/vision_hand/training/stress_test.py": {
+    "mtime": 1785556389.2942512,
+    "ast_hash": "1b955ac21a9d35700cffca93805de5bc",
+    "semantic_hash": "1b955ac21a9d35700cffca93805de5bc"
+  },
+  "signal_vision/signal_vision/vision_hand/training/train.py": {
+    "mtime": 1785727238.7709174,
+    "ast_hash": "53ec39b981a26865afb73ee0b9795e52",
+    "semantic_hash": "53ec39b981a26865afb73ee0b9795e52"
+  },
+  "signal_vision/test/test_copyright.py": {
+    "mtime": 1785540853.3471022,
+    "ast_hash": "4996344e5b6b7ac0c99a267f121398f4",
+    "semantic_hash": "4996344e5b6b7ac0c99a267f121398f4"
+  },
+  "signal_vision/test/test_flake8.py": {
+    "mtime": 1785540853.3471532,
+    "ast_hash": "aa129cddddd383a922ed54000fb385e5",
+    "semantic_hash": "aa129cddddd383a922ed54000fb385e5"
+  },
+  "signal_vision/test/test_pep257.py": {
+    "mtime": 1785540853.3472044,
+    "ast_hash": "8c23891ffbcf8ccb8458c4271044b1d1",
+    "semantic_hash": "8c23891ffbcf8ccb8458c4271044b1d1"
+  },
+  "robot_control/config/bridge.yaml": {
+    "mtime": 1785727238.7669673,
+    "ast_hash": "ae95a530c134f847c2429934aa8b8c84",
+    "semantic_hash": "ae95a530c134f847c2429934aa8b8c84"
+  },
+  "robot_control/config/twist_mux.yaml": {
+    "mtime": 1785727238.7673635,
+    "ast_hash": "cc1792950606d23857c77a649e0223a4",
+    "semantic_hash": "cc1792950606d23857c77a649e0223a4"
+  }
+}
