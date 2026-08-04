@@ -1,4 +1,4 @@
-# Last updated: 2026-07-27
+# Last updated: 2026-08-02
 
 '''
     collect.py
@@ -40,7 +40,7 @@ from signal_vision.vision_hand.dataset.ui import WINDOW, ButtonBar, show
 DATA_DIR = Path(__file__).resolve().parents[2] / "asset"
 MIN_DETECTED_RATIO = 0.5  # 손 감지 프레임이 이 비율 미만이면 SKIP
 
-KNOWN_LABELS = ["stop", "slow", "come", "back", "left_go", "right_go", "idle"] # 신호수집 라벨
+KNOWN_LABELS = ["stop","left_go", "right_go", "idle"] # 신호수집 라벨
 
 def choose_label(preset: str | None) -> str:
     '''label을 줬으면 그대로 쓰되, 알려진 목록(KNOWN_LABELS)에 없으면 오타일 수 있다고
@@ -135,7 +135,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="수신호 특징 시퀀스 수집 (자동 연속)")
     parser.add_argument("--label", default=None,
                         help="수신호 라벨 (예: stop). 생략하면 번호로 고르는 메뉴가 뜬다")
-    parser.add_argument("--samples", type=int, default=30, help="수집할 시퀀스 개수")
+    parser.add_argument("--samples", type=int, default=90, help="수집할 시퀀스 개수")
     parser.add_argument("--frames", type=int, default=30, help="시퀀스당 프레임 수")
     parser.add_argument("--prep", type=float, default=1.5, help="녹화 전 준비 시간(초)")
     parser.add_argument("--idle", action="store_true",
