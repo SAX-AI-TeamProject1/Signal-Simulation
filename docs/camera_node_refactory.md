@@ -4,10 +4,12 @@
 
 `camera_node`를 클래스 단위로 나눈 리팩토링, 그 과정에서 고친 결함, 그리고 결정하지 않고 남겨둔 것들을 기록한다.
 
-- **새 파일**: `src/robot_control/robot_control/camera_node_refactory.py`
-- **원본 `camera_node.py`는 그대로 둔다.** 설치도 유지해서 두 방식을 나란히 돌려 비교할 수 있다.
-- `setup.py`에 `console_scripts` 항목 하나(`camera_node_refactory`)를 추가했다. 패키지의 다른 부분은 바꾸지 않았다.
-- `launch/bringup.launch.py`는 **의도적으로 아직 원본 `camera_node`를 띄운다.** 이유는 9장 참고.
+> [!NOTE]
+> **이 리팩토링은 이미 반영됐다.** 아래 본문은 작업 당시의 기록이라 "새 파일"·"원본과 나란히"·"launch 는 아직 원본을 띄운다" 같은 서술이 남아 있지만, 지금은 전부 지난 이야기다. 현재 위치는 이렇다:
+>
+> - 코드는 `robot_control` 이 아니라 **`src/signal_vision/signal_vision/camera_node/`** 패키지다 (`node.py`, `inference.py`, `frame_source.py`, `command_publisher.py`, `labels.py`, `signal_zone.py`, …).
+> - 원본 `camera_node.py` 도 `camera_node_refactory.py` 도 더는 없다. `console_scripts` 는 `camera_node = signal_vision.camera_node.node:main` 하나뿐이고, `bringup.launch.py` 가 그것을 띄운다.
+> - 설계 의도(클래스 경계, 스레드 구조, 결정 근거)는 그대로 유효하다 — 읽을 가치가 있는 것은 그 부분이다.
 
 ---
 
@@ -57,7 +59,7 @@ CameraNode(Node)            배선 + 타이머 + 워커 스레드     (조립자
 이미 올바르고, 실전에서 어렵게 얻어낸 부분이기 때문이다.
 
 - 실행기 스레드가 캡처해서 큐에 넣고, **워커 스레드 정확히 1개**가 추론하고 발행한다.
-- **워커는 반드시 1개여야 한다.** 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다. 라벨은 이벤트가 아니라 **상태**라서, 낡은 라벨이 최신 라벨을 덮으면 `STOP` 다음에 `FORWARD`가 나가는 사고가 된다.
+- **워커는 반드시 1개여야 한다.** 2개 이상이면 추론 시간 편차 때문에 완료 순서가 뒤바뀐다. 라벨은 이벤트가 아니라 **상태**라서, 낡은 라벨이 최신 라벨을 덮으면 `STOP` 다음에 낡은 주행 라벨이 나가는 사고가 된다.
 - **이중 종료 방어**를 유지했다: 발행 전에 컨텍스트가 살아 있는지 확인하고, 확인과 발행 사이에 종료가 끼어들 경우를 대비해 발행을 `RuntimeError`로 한 번 더 감싼다.
 
 ---
@@ -109,16 +111,16 @@ Linux가 아닌 개발 머신에서는 장치가 아예 안 열린다. → `capt
 
 아래는 **정리가 아니라 동작을 바꾸는 일**이라, 리팩토링 범위 밖으로 뒀다.
 
-### ⚠️ 라벨 유지(hold) 정책 — 실제 주행 문제
+### ~~라벨 유지(hold) 정책~~ — 결론: 유지하지 않는다
 
-`twist_mux`의 `gesture` 입력은 **timeout이 0.5초**다. 그런데 `infer()`가 `None`을 반환하는 동안에는 아무것도 발행되지 않는다.
+당시 우려는 이랬다. `twist_mux`의 `gesture` 입력은 timeout이 0.5초인데 `infer()`가 `None`을 반환하는 동안에는 아무것도 발행되지 않으니, 인식 공백이 0.5초를 넘으면 주행 중이던 로봇이 덜컥거린다는 것.
 
-→ 인식 공백이 0.5초를 넘으면 `twist_mux`가 gesture 소스를 버리고 **속도 0으로 돌아간다.**
-→ `FORWARD`로 주행 중인 로봇이 인식이 흔들릴 때마다 **덜컥거린다.**
+**이후 유지하지 않기로 정리됐다.** 이유는 둘이다:
 
-마지막 라벨을 유지하면 해결되지만, **대칭적으로 유지하는 것은 아마 틀렸다.** 안전 관점에서는 `STOP`을 `FORWARD`보다 오래 유지해야 한다. 이건 안전 정책 결정이라 제 판단으로 정하지 않았다.
+- **유지는 이미 상류에 있다.** 추론은 확정 라벨을 약 71 ms 마다 다시 발행하고, `SignalStabilizer`가 `release_grace=1.0`을 들고 있어 신뢰도가 잠깐 떨어져도 `confirmed_idx`를 유지한다 — 1.0초는 twist_mux timeout 0.5초보다 길다. `command_publisher`에서 또 물면 유지를 두 겹으로 얹는 셈이다.
+- **`STOP` 을 물어두는 것 자체가 틀린 동작이다.** 신호수가 손을 내렸다는 건 "가도 된다"는 뜻이다. 주행 중 안전은 `estop_node`(우선순위 100)의 몫이지 수신호가 겸할 일이 아니다.
 
-결정 지점은 소스의 `GestureCommandPublisher.publish` 독스트링에 박스 주석으로 표시해 뒀다.
+배경은 `doc/design.md` 의 명령 경로 절에 있다.
 
 ### 런타임 파라미터 반영
 
@@ -180,8 +182,8 @@ def _build_inference(self):
 | `enable_inference` | `true` | 끄면 순수 카메라 노드 |
 | `publish_image` | `false` | 이미지 토픽 발행 |
 | `stats_period` | `1.0` | 통계 출력 주기(초). 0 이하면 끔 |
-| `linear_speed` | `0.2` | `FORWARD` 전진 속도 (m/s) |
-| `angular_speed` | `0.5` | `LEFT`/`RIGHT` 회전 속도 (rad/s) |
+| `linear_speed` | `0.5` | 전진 속도 (m/s) — 전진 라벨이 없어진 지금은 곱해질 곳이 없다 |
+| `angular_speed` | `0.8` | 회전 속도 (rad/s) — `LEFT`/`RIGHT` 가 파견 라벨이 되면서 예약값이 됐다 |
 
 Linux가 아닌 곳에서 개발한다면 `capture_backend`를 `any`나 해당 플랫폼 값으로 바꾼다.
 
@@ -235,7 +237,7 @@ ros2 run robot_control camera_node_refactory --ros-args -p enable_inference:=fal
 ROS도 OpenCV도 없는 Windows 머신에서, `cv2`·`rclpy`·`cv_bridge`·메시지 모듈을 **가짜로 대체해 노드를 실행**하여 확인했다.
 
 - 큐 깊이가 1이고, `CAP_PROP_BUFFERSIZE`가 1로 설정되며, 타이머 2개가 0.05초/1.0초 주기로 생성됨
-- 캐시된 `Twist` 4개가 기본 속도에서 의도한 매핑과 일치 (`STOP`/`FORWARD`/`LEFT`/`RIGHT`)
+- 캐시된 `Twist` 가 기본 속도에서 의도한 매핑과 일치 (당시 `STOP`/`FORWARD`/`LEFT`/`RIGHT` — 지금은 속도 라벨이 `STOP` 하나뿐이고 `LEFT`/`RIGHT` 는 파견으로 나간다)
 - 프레임 유실이 집계되고, 큐가 **가장 오래된 것이 아니라 최신 프레임**을 유지함
 - 정의되지 않은 라벨은 경고만 남기고 발행되지 않으며, 어디서도 `fatal`이 나오지 않음
 - `publish_image`가 기본 꺼짐이고 아무것도 발행하지 않음. 유효한 라벨은 `gesture` → `cmd_vel_gesture` 순으로 발행됨

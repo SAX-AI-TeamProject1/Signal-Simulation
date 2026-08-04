@@ -15,7 +15,8 @@ STOP 도 존 밖에서는 안 나간다. 주행 중 안전은 estop_node(우선�
 몫이고, 수신호를 안전 장치로 겸용하면 "웹캠 앞에 누가 지나갔다"가 주행을
 세우는 오작동이 된다.
 
-좌표의 출처는 config/tracks.yaml(waypoint_follower 와 같은 파일)이다. 경로가
+좌표의 출처는 worlds/navi_factory/world/navi_factory/tracks.yaml
+(waypoint_follower 와 같은 파일, 월드 SDF 옆에 있다)이다. 경로가
 비어 있으면 게이트 자체가 만들어지지 않고 기존처럼 항상 발행한다 —
 run_camera_node.sh 단독 실행(웹캠→수신호 단위 점검)이 pose_gt 없이도
 돌아야 하기 때문이다.

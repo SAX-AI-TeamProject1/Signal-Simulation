@@ -30,7 +30,7 @@ LABEL_MOTION = {
     'STOP': (0.0, 0.0),
 }
 
-# 파견 라벨 → 목적지 존 이름(config/tracks.yaml 의 stations/routes 키).
+# 파견 라벨 → 목적지 존 이름(월드 SDF 옆 tracks.yaml 의 stations/routes 키).
 #
 # LEFT/RIGHT 는 원래 회전 Twist 였는데(angular.z ±), 신호가 끊긴 0.5초 뒤
 # twist_mux 가 gesture 소스를 버리고 순찰이 도로 잡아 로봇을 트랙 방향으로

@@ -144,7 +144,8 @@ class MissionFollower(Node):
             # 이 노드는 경로가 곧 임무라서 없으면 존재 이유가 없다 → 즉시 실패.
             raise RuntimeError(
                 'tracks_yaml_path 파라미터가 비어 있습니다. 파견 경로(routes)가 '
-                '있는 config/tracks.yaml 경로를 넘겨야 합니다.')
+                '있는 tracks.yaml 경로를 넘겨야 합니다 '
+                '(worlds/navi_factory/world/navi_factory/tracks.yaml).')
         self._signal_point, stations, self._routes = (
             load_dispatch_routes(tracks_yaml_path))
         self._station_dwell_sec = self.get_parameter('station_dwell_sec').value

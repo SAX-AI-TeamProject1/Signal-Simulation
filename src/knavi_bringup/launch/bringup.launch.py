@@ -24,12 +24,20 @@ def generate_launch_description():
     # 워크스페이스 루트 = 설치본에서 4단계 위 (install/knavi_bringup/share/knavi_bringup → WS).
     ws_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(pkg_share))))
     navi_dir = os.path.join(ws_root, 'worlds', 'navi_factory')
-    default_world = os.path.join(navi_dir, 'world', 'navi_factory', 'navi_factory.sdf')
+    world_dir = os.path.join(navi_dir, 'world', 'navi_factory')
+    default_world = os.path.join(world_dir, 'navi_factory.sdf')
     models_path = os.path.join(navi_dir, 'models')  # GZ_SIM_RESOURCE_PATH 용
     # 파견 경로(mission_follower 의 routes)와 수신호 존 게이트(camera_node 의
-    # signal_point/hand_signal_spot)의 유일한 소스 오브 트루스. world와 마찬가지로
-    # 어느 패키지도 소유하지 않는 저장소 루트 파일이라 절대경로를 여기서 계산해 넘긴다.
-    tracks_yaml_path = os.path.join(ws_root, 'config', 'tracks.yaml')
+    # signal_point/hand_signal_spot)의 유일한 소스 오브 트루스.
+    #
+    # 월드 SDF 옆에 두는 이유: 이 좌표는 navi_factory.sdf 의 track_* 타일 pose 를
+    # 실측한 값이고, tools/tracks_to_{markers,actors}.py 는 이 파일에서 다시 그
+    # SDF 로 마커·actor 를 생성해 넣는다. 즉 월드에 종속된 배치 기술서지 특정
+    # ROS 패키지의 튜닝 파라미터가 아니다 — 월드가 바뀌면 같이 바뀐다.
+    #
+    # 한계: world 인자를 다른 월드로 덮어써도 tracks 는 여기(navi_factory)를 계속
+    # 본다. 월드가 실제로 둘이 되면 world 경로의 dirname 에서 찾도록 고칠 것.
+    tracks_yaml_path = os.path.join(world_dir, 'tracks.yaml')
 
     # 월드는 어느 패키지도 소유하지 않는다(worlds/ 는 ROS 패키지가 아니다). 외부에서 world 인자로 주입.
     # 창고 월드로 띄우려면:

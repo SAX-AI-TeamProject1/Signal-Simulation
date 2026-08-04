@@ -7,13 +7,14 @@ Reads the tracks.yaml produced by tools/track_editor.py and emits one scripted
 tracks (e.g. the approach track) are skipped — those belong to real vehicles.
 
 Usage:
-    # print the actor SDF snippet
-    python3 tools/tracks_to_actors.py --tracks config/tracks.yaml
+    # print the actor SDF snippet (--tracks defaults to navi_factory's tracks.yaml,
+    # which sits next to the world SDF it describes)
+    python3 tools/tracks_to_actors.py
 
     # write/replace the actors inside a world file, between the markers
     # <!-- BEGIN GENERATED ACTORS --> ... <!-- END GENERATED ACTORS -->
     # (markers are added before </world> if missing)
-    python3 tools/tracks_to_actors.py --tracks config/tracks.yaml \
+    python3 tools/tracks_to_actors.py \
         --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 """
 
@@ -119,7 +120,9 @@ def inject(world_path, snippet):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--tracks", default="config/tracks.yaml")
+    parser.add_argument(
+        "--tracks",
+        default="worlds/navi_factory/world/navi_factory/tracks.yaml")
     parser.add_argument("--speed", type=float, default=0.75, help="m/s")
     parser.add_argument("--turn-time", type=float, default=1.0,
                         help="seconds spent rotating at each corner")
