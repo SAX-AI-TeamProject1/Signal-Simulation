@@ -21,7 +21,7 @@ import rclpy
 from rclpy.node import Node
 import yaml
 
-# navi_factory.sdf의 track_* 타일 pose 실측 결과(config/tracks.yaml 상단 주석 참고):
+# navi_factory.sdf의 track_* 타일 pose 실측 결과(같은 폴더의 tracks.yaml 상단 주석 참고):
 # 북쪽 공용 허브(신호지점 근처)에 반원 회차루프(signal_u, 중심(0,40) 반지름 3m)가 있고,
 # 그 양 끝이 nw_hub_merge/se_hub_merge를 통해 각각 x=-2/x=2 간선에 연결된다. x=0
 # 간선("1차선")은 허브 루프에 직접 붙은 타일이 없어서, 루프를 타려면 허브 안쪽(빈
@@ -76,7 +76,7 @@ MIN_LOOKAHEAD_DISTANCE = 1.0    # m — 정지에 가까울 때(코너 근처)�
 LOOKAHEAD_TIME_FACTOR = 1.5     # 제어 주기 대비 몇 배 앞을 조준할지
 
 # WAYPOINTS의 각 점이 코너/목적지(station)/신호 대기 지점(signal_point) 중 무엇인지는
-# config/tracks.yaml의 signal_point/stations 좌표와 거리 대조해서 정한다(아래
+# tracks.yaml의 signal_point/stations 좌표와 거리 대조해서 정한다(아래
 # classify_waypoints 참고) — 두 목록이 같은 물리 지점을 가리키지만, WAYPOINTS는 코너
 # 완화를 위해 세분화된 실주행 경로라 인덱스를 그대로 맞출 수 없기 때문이다.
 POINT_TYPE_TOLERANCE = 0.5  # m — 이 거리 이내면 같은 지점으로 본다
@@ -186,7 +186,8 @@ class WaypointFollower(Node):
             self.get_logger().warn(
                 'tracks_yaml_path 파라미터가 비어 있어 모든 웨이포인트를 코너로 취급합니다 '
                 '(신호 대기/목적지 정차 없이 예전처럼 곧바로 되돌아감). launch에서 '
-                'config/tracks.yaml 경로를 넘기면 활성화됩니다.')
+                'worlds/navi_factory/world/navi_factory/tracks.yaml 경로를 '
+                '넘기면 활성화됩니다.')
 
         self._waypoint_types = classify_waypoints(WAYPOINTS, signal_point, stations)
         self.get_logger().info(

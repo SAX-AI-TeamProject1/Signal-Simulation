@@ -30,8 +30,13 @@
         timeout: 0.3
         priority: 100
 
-      # 수신호(P0 핵심) — AI 라벨을 command_node 가 Twist 로 바꿔 발행할 자리.
-      # 아직 command_node 가 없어 이 토픽에는 발행자가 없다.
+      # 수신호(P0 핵심) — 같은 네임스페이스의 camera_node 가 발행한다
+      # (command_publisher.py. 별도 command_node 로 떼지 않은 이유는 그 파일 참고).
+      #
+      # timeout 0.5초의 여유: 추론이 14.1회/초라 발행 간격이 ~71ms 다(7배 여유).
+      # 신뢰도가 흔들려도 SignalStabilizer 의 release_grace(1.0초)가 확정을
+      # 붙잡아 계속 발행하므로, 이 타임아웃이 먼저 닿는 경우는 사실상 없다.
+      # 뒤집어 말하면 추론이 2회/초 아래로 떨어지면 매 프레임 발행해도 버려진다.
       gesture:
         topic: cmd_vel_gesture
         timeout: 0.5

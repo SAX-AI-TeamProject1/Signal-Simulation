@@ -18,7 +18,7 @@
   <exec_depend>geometry_msgs</exec_depend>      <!-- Twist(cmd_vel_gesture). 라벨을 속도 명령으로 -->
   <exec_depend>cv_bridge</exec_depend>          <!-- sensor_msgs/Image ↔ OpenCV ndarray 변환 -->
   <exec_depend>python3-opencv</exec_depend>     <!-- 웹캠 캡처(cv2.VideoCapture). rosdep 키(apt: python3-opencv) -->
-  <exec_depend>python3-yaml</exec_depend>       <!-- signal_zone: config/tracks.yaml(수신호 존 좌표) 파싱 -->
+  <exec_depend>python3-yaml</exec_depend>       <!-- signal_zone: 월드 SDF 옆 tracks.yaml(수신호 존 좌표) 파싱 -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -20,6 +20,7 @@ from pathlib import Path
 import time
 
 import numpy as np
+from signal_vision.camera_node.labels import LABELS
 from signal_vision.vision_hand.capture.extractor import draw_detections, FeatureExtractor, HAND_DIM
 from signal_vision.vision_hand.inference.predict import load_model as load_signal_model
 from signal_vision.vision_hand.inference.predict import SignalStabilizer
@@ -58,13 +59,96 @@ RenderPayload = namedtuple(
 #       get_package_share_directory('signal_vision') 기준으로 다시 잡아야 한다.
 MODEL_PATH = Path(__file__).resolve().parents[1] / 'models' / 'sign_classifier.pt'
 
-# signal-vision 라벨 -> LABELS 매핑. 없는 키(back/slow/idle)는 .get()이 알아서 None.
+# signal-vision 라벨 -> LABELS 매핑. 여기 없는 키는 .get()이 알아서 None 을 준다.
+#
+# 'come': 'FORWARD' 가 있었지만 뺐다. 상류가 수집 라벨에서 come 을 빼면서
+# 모델이 낼 수 없는 키가 됐고, 그 결과 FORWARD 가 도달 불가가 돼 있었다.
+# 아래 validate_labels() 는 이런 항목을 다시 만들면 기동할 때 잡아낸다.
 LABEL_MAP = {
     'stop': 'STOP',
-    'come': 'FORWARD',
     'left_go': 'LEFT',
     'right_go': 'RIGHT',
 }
+
+# 모델이 낼 수 있지만 일부러 매핑하지 않는 라벨.
+#
+# idle 은 "신호 없음"이라 대응하는 명령 자체가 없다. 아래 검증에서 이걸 빼두지
+# 않으면 매 기동마다 idle 을 "매핑 누락"으로 지적해서, 진짜 누락이 묻힌다.
+IGNORED_MODEL_LABELS = ('idle',)
+
+
+def validate_labels(model_labels, logger):
+    """
+    학습된 라벨 · 수집 라벨 · LABEL_MAP 셋을 대조해 어긋난 곳을 기동 로그에 남긴다.
+
+    왜 필요한가:
+        라벨 목록이 세 군데에 있고 서로 다른 시점에 바뀐다 — 체크포인트 안의
+        labels(학습할 때 고정), 수집 스크립트의 KNOWN_LABELS(데이터를 모을 때),
+        이 파일의 LABEL_MAP(제어를 붙일 때). 어긋나도 _infer_impl() 의 .get() 이
+        None 을 돌려주며 조용히 넘어가므로 아무 증상이 없다. 실제로 'come' 이
+        학습 라벨에서 빠진 뒤에도 매핑에 남아, 수신호 FORWARD 가 통째로 죽어
+        있는데 로그 한 줄 나지 않았다.
+
+        경고만 하고 예외를 던지지는 않는다. 라벨 하나가 어긋났다고 나머지 신호까지
+        못 쓰게 만드는 건 손해가 더 크고, 어차피 판단은 사람이 해야 한다.
+
+    인자:
+        model_labels: 체크포인트에서 읽은 라벨 목록(load_model 의 두 번째 반환값).
+            런타임의 유일한 진실이다 — 로봇이 실제로 받는 라벨은 이것뿐이다.
+        logger: .info/.warn 을 가진 객체(rclpy 로거를 그대로 받는다).
+    """
+    trained = set(model_labels)
+
+    # 1. 학습된 적 없는 라벨을 가리키는 매핑 → 그 항목은 영원히 발동하지 않는다.
+    dead = sorted(set(LABEL_MAP) - trained)
+    if dead:
+        logger.warn(f'학습되지 않은 라벨을 가리키는 매핑입니다(발동하지 않음): {dead}')
+
+    # 2. 그래서 수신호로는 낼 수 없게 된 내부 명령. 1번의 결과를 제어 쪽 말로 옮긴 것 —
+    #    "come 매핑이 죽었다"보다 "FORWARD 를 낼 수 없다"가 증상에 가깝다.
+    reachable = {LABEL_MAP[name] for name in trained & set(LABEL_MAP)}
+    unreachable = sorted(set(LABELS) - reachable)
+    if unreachable:
+        logger.warn(f'수신호로 낼 수 없는 명령입니다: {unreachable}')
+
+    # 3. 모델은 내는데 매핑에 없는 라벨 → 인식돼도 무시된다.
+    unmapped = sorted(trained - set(LABEL_MAP) - set(IGNORED_MODEL_LABELS))
+    if unmapped:
+        logger.warn(f'매핑이 없어 무시되는 라벨입니다: {unmapped}')
+
+    # 4. 매핑의 목적지가 labels.LABELS 밖이면 command_publisher 가 경고하며 버린다.
+    #    거기서 잡히면 이미 주행 중이라, 기동할 때 먼저 알려 준다.
+    stray = sorted(set(LABEL_MAP.values()) - set(LABELS))
+    if stray:
+        logger.warn(f'LABELS 에 없는 곳으로 가는 매핑입니다: {stray}')
+
+    _compare_collect_labels(trained, logger)
+
+
+def _compare_collect_labels(trained, logger):
+    """
+    수집 스크립트의 KNOWN_LABELS 와 체크포인트 라벨을 대조한다.
+
+    KNOWN_LABELS 는 런타임의 진실이 아니다 — "무엇을 모으기로 했나"의 기록일 뿐이고,
+    로봇이 실제로 받는 건 체크포인트 쪽이다. 그런데도 보는 이유는, 둘이 어긋나면
+    가중치가 수집 목록보다 오래됐다는(재학습을 안 했다는) 신호이기 때문이다.
+
+    import 를 함수 안에 넣고 try 로 감싼 이유: collect.py 는 이 리포지토리 소유가
+    아니라 setup_infer_env.py 가 덮어쓰는 벤더 사본이다. 상류가 그 상수를 옮기거나
+    이름을 바꾸면 여기서 먼저 죽는데, 진단 로그 한 줄 때문에 노드가 못 뜨면 손해다.
+    """
+    try:
+        from signal_vision.vision_hand.dataset.collect import KNOWN_LABELS
+    except ImportError as exc:
+        logger.info(f'수집 라벨 목록을 읽지 못해 대조를 건너뜁니다: {exc}')
+        return
+
+    collected = set(KNOWN_LABELS)
+    if collected != trained:
+        logger.warn(
+            '수집 라벨과 학습 라벨이 다릅니다 — 가중치가 최신인지 확인하세요. '
+            f'수집에만 있음: {sorted(collected - trained)}, '
+            f'학습에만 있음: {sorted(trained - collected)}')
 # ===================================================================================
 
 
@@ -195,6 +279,9 @@ class GestureInference(InferenceBase):
         """
         self._device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self._model, self._labels, self._num_frames = load_signal_model(MODEL_PATH, self._device)
+        # 라벨을 손에 넣은 바로 이 자리에서 대조한다. 여기가 체크포인트의 라벨이
+        # 프로세스 안으로 들어오는 유일한 지점이라, 검사를 놓칠 수 없는 위치다.
+        validate_labels(self._labels, self._logger)
         self._extractor = FeatureExtractor()
         self._window = deque(maxlen=self._num_frames)
         self._stabilizer = SignalStabilizer(

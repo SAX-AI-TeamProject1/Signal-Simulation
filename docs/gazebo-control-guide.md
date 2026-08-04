@@ -57,7 +57,7 @@ Do not type waypoint coordinates by hand — author them by clicking on the occu
 ```bash
 .venv/bin/python tools/track_editor.py \
   --map <path-to-map.yaml> \
-  --out config/tracks.yaml
+  --out worlds/navi_factory/world/navi_factory/tracks.yaml
 # left click = add, right click = undo, n = new track, t = switch, l = toggle loop, s = save
 # p = place signal point, m = add station point, d = delete nearest station
 ```
@@ -83,7 +83,8 @@ Prefix every tool invocation with `.venv/bin/python` (as in the commands above a
 <!-- 셸에 잡혀 있는 아무 python3에 의존하지 말고, 모든 툴 실행은 (위와 4~5장의 명령처럼) .venv/bin/python으로 시작할 것. -->
 
 ```yaml
-# config/tracks.yaml  (poses are x, y, yaw in world frame; tune on the real map)
+# worlds/navi_factory/world/navi_factory/tracks.yaml
+# (poses are x, y, yaw in world frame; tune on the real map)
 signal_point: [0.0, -4.0, 1.5708]
 
 tracks:
@@ -141,7 +142,7 @@ To make the layout visible on the warehouse floor, generate painted markers from
 <!-- 배치를 창고 바닥에 눈에 보이게 하려면 tools/tracks_to_markers.py로 tracks.yaml에서 도색 마커를 생성한다: 트랙마다 색 라인, 수신호 포인트에 빨간 원판, 경유 지점마다 초록 원판. 충돌체가 없는 시각 전용이라 물리·라이다에는 영향이 없다. 주입은 5장의 actor 생성기와 마찬가지로 재실행 시 기존 블록을 교체하는 멱등 방식이다. -->
 
 ```bash
-.venv/bin/python tools/tracks_to_markers.py --tracks config/tracks.yaml \
+.venv/bin/python tools/tracks_to_markers.py \
   --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 ```
 
@@ -152,7 +153,7 @@ Do not write actor SDF by hand — generate it from `tracks.yaml` with `tools/tr
 <!-- actor SDF를 손으로 쓰지 말 것 — tools/tracks_to_actors.py로 tracks.yaml에서 생성한다. loop 트랙마다 actor를 하나씩 만들어 월드 파일에 바로 써 넣을 수 있고, 다시 실행하면 마커 사이의 기존 생성 블록을 교체하므로 반복 실행해도 안전하다. -->
 
 ```bash
-.venv/bin/python tools/tracks_to_actors.py --tracks config/tracks.yaml --speed 0.75 \
+.venv/bin/python tools/tracks_to_actors.py --speed 0.75 \
   --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 ```
 

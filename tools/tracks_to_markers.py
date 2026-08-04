@@ -11,12 +11,13 @@ The visuals have no <collision>, so they change nothing physically — vehicles
 and LiDAR rays are unaffected; they only make the layout visible on the floor.
 
 Usage:
-    # print the marker model SDF
-    python3 tools/tracks_to_markers.py --tracks config/tracks.yaml
+    # print the marker model SDF (--tracks defaults to navi_factory's tracks.yaml,
+    # which sits next to the world SDF it describes)
+    python3 tools/tracks_to_markers.py
 
     # write/replace it inside a world file, between the markers
     # <!-- BEGIN GENERATED TRACK MARKERS --> ... <!-- END GENERATED TRACK MARKERS -->
-    python3 tools/tracks_to_markers.py --tracks config/tracks.yaml \
+    python3 tools/tracks_to_markers.py \
         --inject worlds/navi_factory/world/navi_factory/navi_factory.sdf
 """
 
@@ -140,7 +141,9 @@ def inject(world_path, snippet):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--tracks", default="config/tracks.yaml")
+    parser.add_argument(
+        "--tracks",
+        default="worlds/navi_factory/world/navi_factory/tracks.yaml")
     parser.add_argument("--width", type=float, default=0.15,
                         help="track line width in meters")
     parser.add_argument("--inject", default=None,

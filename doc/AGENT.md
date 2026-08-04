@@ -46,17 +46,23 @@ Signal-Simulation/
 │   └── knavi_bringup/     # assembly only: the top-level launch, no nodes of its own
 ├── tools/                 # offline track editing / SDF generation (see requirements.txt)
 └── worlds/
-    └── navi_factory/      # the world bringup uses: world/ + models/
+    └── navi_factory/      # the world bringup uses
+        ├── models/        # warehouse props
+        └── world/navi_factory/
+            ├── navi_factory.sdf   # the world itself
+            └── tracks.yaml        # dispatch routes & zone coords — single source of truth
 ```
-<!-- 위 트리: 루트에 개인 로컬 CLAUDE.md와 README, 팀 공용 doc/ 와 docs/, 연습용 examples/, 실행 스크립트 scripts/, ROS 2 패키지 4개가 든 src/, 오프라인 도구 tools/, 그리고 월드 worlds/navi_factory. -->
+<!-- 위 트리: 루트에 개인 로컬 CLAUDE.md와 README, 팀 공용 doc/ 와 docs/, 연습용 examples/, 실행 스크립트 scripts/, ROS 2 패키지 4개가 든 src/, 오프라인 도구 tools/, 그리고 월드 worlds/navi_factory (월드 SDF와 tracks.yaml이 같은 폴더에 있음). -->
 
-Three layout facts that differ from a plain ROS 2 workspace:
-<!-- 일반적인 ROS 2 워크스페이스와 다른 세 가지: -->
+Four layout facts that differ from a plain ROS 2 workspace:
+<!-- 일반적인 ROS 2 워크스페이스와 다른 네 가지: -->
 
 - The world is **not** a ROS 2 package and does not live under `src/`. `worlds/navi_factory/models/` holds the warehouse props (AWS RoboMaker warehouse models, OGV, cones, carts, shelves) and `worlds/navi_factory/world/navi_factory/navi_factory.sdf` is the world itself. Gazebo finds them through `GZ_SIM_RESOURCE_PATH`, which the launch file sets from the workspace root.
   <!-- 월드는 ROS 2 패키지가 아니고 src/ 아래에 있지도 않음. worlds/navi_factory/models/ 에 창고 소품(AWS 창고 모델, OGV, 콘, 카트, 선반)이 있고, 월드 본체는 worlds/navi_factory/world/navi_factory/navi_factory.sdf. Gazebo는 launch가 워크스페이스 루트 기준으로 설정하는 GZ_SIM_RESOURCE_PATH로 이들을 찾음. -->
 - The previously vendored `aws-robomaker-small-warehouse-world-ros2` package is gone from `src/`; its models were folded into `worlds/navi_factory/models/`.
   <!-- 예전에 벤더링해 두었던 aws-robomaker-small-warehouse-world-ros2 패키지는 src/ 에서 사라졌고, 그 모델들은 worlds/navi_factory/models/ 안으로 흡수됨. -->
+- `tracks.yaml` sits **next to the world SDF**, not in any package. Its coordinates are measured off `navi_factory.sdf`'s `track_*` tile poses, and `tools/tracks_to_{markers,actors}.py` generate discs and actors from it straight back into that same SDF — it is a world-bound layout description, not a package's tuning parameters. Two packages read it (`auto_drive` for routes, `signal_vision` for the gesture-zone gate), so neither can own it; the launch file resolves the path and passes it to both as the `tracks_yaml_path` parameter.
+  <!-- tracks.yaml 은 어떤 패키지도 아닌 월드 SDF 옆에 있음. 좌표가 navi_factory.sdf 의 track_* 타일 pose 실측값이고, tools/tracks_to_{markers,actors}.py 가 이 파일에서 다시 그 SDF 로 원판과 actor 를 생성해 넣기 때문 — 월드에 종속된 배치 기술서지 특정 패키지의 튜닝 파라미터가 아님. 읽는 쪽이 둘(auto_drive 는 경로, signal_vision 은 수신호 존 게이트)이라 어느 쪽도 소유할 수 없고, launch 가 경로를 계산해 tracks_yaml_path 파라미터로 양쪽에 넘김. -->
 - The package that owns a file and the package that reads it are usually different. `knavi_bringup` holds the launch but no urdf and no config; `robot_control` holds urdf and config but starts nothing. Expect to edit two packages for one change.
   <!-- 파일을 가진 패키지와 그 파일을 읽는 패키지가 대체로 다름. knavi_bringup 은 launch 만 갖고 urdf·config 는 없으며, robot_control 은 urdf·config 를 갖지만 아무것도 실행하지 않음. 변경 하나에 패키지 두 개를 고치게 되는 걸 예상할 것. -->
 
@@ -69,7 +75,7 @@ Four `ament_python` packages, split by responsibility rather than by file type. 
 
 | Package | Owns | Runs |
 |---|---|---|
-| `robot_control` | `urdf/` (`robot.urdf.xacro`, `mecanum_lift_robot.urdf.xacro`), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
+| `robot_control` | `urdf/` (`mecanum_lift_robot.urdf.xacro` is the one in use; `robot.urdf.xacro` sits next to it but nothing reads it), `config/` (`bridge.yaml`, `twist_mux.yaml`, `flat_ground.sdf`) | nothing — no console script, no launch |
 | `signal_vision` | `camera_node/`, the vendored `vision_hand/`, `metrics.py`, `models/` (weights) | `camera_node` |
 | `auto_drive` | `patrol/mission_follower.py`, `patrol/waypoint_follower.py`, `viz/scan_rays.py` | `mission_follower`, `waypoint_follower` (legacy), `scan_rays` |
 | `knavi_bringup` | `launch/bringup.launch.py` | nothing of its own — it starts the other three |
@@ -98,8 +104,8 @@ One node, one process, several files. `node.py` only wires the parts together an
   <!-- inference.py — 벤더링된 수신호 모델을 돌리고, 렌더용 불변 묶음(payload)을 만들어 냄 -->
 - `command_publisher.py` — maps a label to `gesture` (`std_msgs/String`), motion labels to `cmd_vel_gesture` (`geometry_msgs/Twist`), and dispatch labels to `signal_dispatch` (`std_msgs/String`, a zone name)
   <!-- command_publisher.py — 라벨을 gesture(std_msgs/String)로, 속도 라벨은 cmd_vel_gesture(geometry_msgs/Twist)로, 파견 라벨은 signal_dispatch(std_msgs/String, 존 이름)로 변환해 발행 -->
-- `labels.py` — the single source of truth for labels: motion `STOP`/`FORWARD`, dispatch `LEFT`→`zone_nw` / `RIGHT`→`zone_ne`
-  <!-- labels.py — 라벨의 단일 출처: 속도 라벨 STOP/FORWARD, 파견 라벨 LEFT→zone_nw / RIGHT→zone_ne -->
+- `labels.py` — the single source of truth for labels: motion `STOP` (the only one left), dispatch `LEFT`→`zone_nw` / `RIGHT`→`zone_ne`
+  <!-- labels.py — 라벨의 단일 출처: 속도 라벨 STOP(이제 이것 하나뿐), 파견 라벨 LEFT→zone_nw / RIGHT→zone_ne -->
 - `shutdown.py`, `swap_frame.py` — shutdown detection and frame handoff helpers
   <!-- shutdown.py, swap_frame.py — 종료 감지와 프레임 인계용 헬퍼 -->
 

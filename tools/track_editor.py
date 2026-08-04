@@ -10,7 +10,7 @@ direction, so you only click x/y positions).
 Usage:
     python3 tools/track_editor.py \
         --map <path-to-map.yaml> \
-        --out config/tracks.yaml
+        --out worlds/navi_factory/world/navi_factory/tracks.yaml
 
 Controls (in the plot window):
     left click   add waypoint to the active track
@@ -211,7 +211,10 @@ class TrackEditor:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--map", required=True, help="path to map.yaml")
-    parser.add_argument("--out", default="config/tracks.yaml", help="tracks.yaml path")
+    parser.add_argument(
+        "--out",
+        default="worlds/navi_factory/world/navi_factory/tracks.yaml",
+        help="tracks.yaml path (기본값은 월드 SDF 옆)")
     args = parser.parse_args()
     TrackEditor(args.map, args.out)
     plt.show()

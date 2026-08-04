@@ -13,8 +13,8 @@
 # 끝(수신호석)으로 복귀 → 다시 대기. 주행 중에 온 파견 명령은 무시한다.
 #
 # 대기 중에는 cmd_vel_auto 에 아무것도 발행하지 않는다 — 로봇은 어차피 서 있고,
-# 발행을 멈추면 twist_mux 가 timeout 으로 auto 소스를 버려서 수신호 STOP/FORWARD
-# (cmd_vel_gesture, 우선순위 50)가 그대로 통과한다.
+# 발행을 멈추면 twist_mux 가 timeout 으로 auto 소스를 버려서 수신호 STOP
+# (cmd_vel_gesture, 우선순위 50)이 그대로 통과한다.
 #
 # 조향/속도 제어는 waypoint_follower 와 동일한 법칙(pure-pursuit 조준점 + PD +
 # slew-rate 제한)을 그대로 import 한다. 거기서 실측으로 잡은 스톨/헌팅/휘청거림
@@ -144,7 +144,8 @@ class MissionFollower(Node):
             # 이 노드는 경로가 곧 임무라서 없으면 존재 이유가 없다 → 즉시 실패.
             raise RuntimeError(
                 'tracks_yaml_path 파라미터가 비어 있습니다. 파견 경로(routes)가 '
-                '있는 config/tracks.yaml 경로를 넘겨야 합니다.')
+                '있는 tracks.yaml 경로를 넘겨야 합니다 '
+                '(worlds/navi_factory/world/navi_factory/tracks.yaml).')
         self._signal_point, stations, self._routes = (
             load_dispatch_routes(tracks_yaml_path))
         self._station_dwell_sec = self.get_parameter('station_dwell_sec').value

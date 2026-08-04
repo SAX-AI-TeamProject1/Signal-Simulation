@@ -1,4 +1,9 @@
-# config/tracks.yaml  (좌표는 월드 프레임 x, y — 단위 m)
+# worlds/navi_factory/world/navi_factory/tracks.yaml  (좌표는 월드 프레임 x, y — 단위 m)
+#
+# 이 파일이 navi_factory.sdf 옆에 있는 이유: 아래 좌표는 그 SDF 의 track_* 타일
+# pose 를 실측한 값이고, tools/tracks_to_{markers,actors}.py 는 여기서 다시 그
+# SDF 로 마커·actor 를 생성해 넣는다. 월드에 종속된 배치 기술서지 특정 ROS
+# 패키지의 파라미터가 아니다 — 월드를 바꾸면 이 파일도 같이 바뀐다.
 #
 # navi_factory.sdf 의 track_* 타일 pose 를 실측해서 만든 파견(dispatch) 경로 정의.
 # 월드가 dev/navi_world_set 병합으로 재구성되면서 트랙 레이아웃이 바뀌었다:
