@@ -21,7 +21,7 @@ import time
 
 import numpy as np
 from signal_vision.camera_node.labels import LABELS
-from signal_vision.vision_hand.capture.extractor import draw_detections, FeatureExtractor, HAND_DIM
+from signal_vision.vision_hand.capture.extractor import draw_detections, FeatureExtractor, HAND_DIM, LensHealthMonitor
 from signal_vision.vision_hand.inference.predict import load_model as load_signal_model
 from signal_vision.vision_hand.inference.predict import SignalStabilizer
 from signal_vision.vision_hand.inference.ui import Hud
@@ -271,7 +271,7 @@ class GestureInference(InferenceBase):
 
         여기서 만든 객체는 **용도별로 한 스레드에만 묶인다.** 워커는 추론/렌더 둘이지만
         둘이 같은 객체를 건드리지는 않는다:
-            추론 워커 전용 — _model, _extractor, _window, _stabilizer, _device, _t0
+            추론 워커 전용 — _model, _extractor, _lens_monitor, _window, _stabilizer, _device, _t0
             렌더 워커 전용 — _hud
             양쪽이 읽음   — _labels (만든 뒤 바뀌지 않으므로 안전)
         그래서 MediaPipe Hands 처럼 스레드 안전하지 않은 객체도 그대로 써도 된다.
@@ -283,6 +283,9 @@ class GestureInference(InferenceBase):
         # 프로세스 안으로 들어오는 유일한 지점이라, 검사를 놓칠 수 없는 위치다.
         validate_labels(self._labels, self._logger)
         self._extractor = FeatureExtractor()
+        # 렌즈 블러 진단기(추론 워커 전용). 매 프레임 update() 로 선명도 추이를 보고,
+        # 블러 상태를 stabilizer 에 넘겨 emergency 판정에 쓴다. function.py 와 동일.
+        self._lens_monitor = LensHealthMonitor()
         self._window = deque(maxlen=self._num_frames)
         self._stabilizer = SignalStabilizer(
             threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
@@ -343,6 +346,10 @@ class GestureInference(InferenceBase):
         timestamp_ms = int((time.monotonic() - self._t0) * 1000)
         hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
         draw_detections(frame, hand_result, pose_result)   # 렌더용 — 손/포즈 랜드마크를 프레임에 직접 그린다
+        # 블러 판정은 윈도우 충족 여부와 무관하게 매 프레임 돌려야 한다 — 초기
+        # BLUR_CALIBRATION_FRAMES 동안 기준치를 잡기 때문에, 여기서 매번 update() 해야
+        # 렌즈가 막혔을 때 emergency 로 이어진다. function.py 와 같은 자리/순서다.
+        is_blurred = self._lens_monitor.update(frame)
         self._window.append(FeatureExtractor.vector(hand_result, pose_result))
 
         if len(self._window) < self._num_frames:
@@ -351,13 +358,13 @@ class GestureInference(InferenceBase):
         arr = np.stack(self._window)
         pose_ratio = float((arr[:, HAND_DIM * 2:] != 0).any(axis=1).mean())
         if pose_ratio < 0.3:
-            self._stabilizer.mark_person_absent(is_blurred=False)
+            self._stabilizer.mark_person_absent(is_blurred)
             return None
 
         x = torch.from_numpy(arr[None]).to(self._device)
         with torch.no_grad():
             raw_probs = torch.softmax(self._model(x), dim=1)[0].cpu().numpy()
-        self._stabilizer.update(raw_probs, self._labels, is_blurred=False)
+        self._stabilizer.update(raw_probs, self._labels, is_blurred)
 
         idx = self._stabilizer.confirmed_idx
         if idx is None:

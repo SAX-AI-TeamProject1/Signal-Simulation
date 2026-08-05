@@ -113,6 +113,15 @@ def _ensure_python_dotenv_installed() -> int:
     if result.returncode != 0:
         banner(False, "python-dotenv 설치 실패")
         return 1
+    # --user site-packages 디렉터리가 인터프리터 시작 시점에 없었으면 sys.path에
+    # 안 들어가 있어서, 방금 설치했어도 같은 프로세스에서는 import가 안 된다.
+    # user site 경로를 지금 sys.path에 반영해 재실행 없이 바로 쓸 수 있게 한다.
+    import site
+    import importlib
+    user_site = site.getusersitepackages()
+    if user_site not in sys.path:
+        site.addsitedir(user_site)
+    importlib.invalidate_caches()
     return 0
 
 
