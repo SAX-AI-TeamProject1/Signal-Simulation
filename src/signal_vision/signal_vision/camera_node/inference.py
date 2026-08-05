@@ -21,10 +21,12 @@ import time
 
 import numpy as np
 from signal_vision.camera_node.labels import LABELS
-from signal_vision.vision_hand.capture.extractor import draw_detections, FeatureExtractor, HAND_DIM, LensHealthMonitor
+from signal_vision.vision_hand.capture.extractor import (
+    draw_detections, FeatureExtractor, FrameLivenessMonitor, HAND_DIM, LensHealthMonitor,
+    NO_POSE_FRAMES, quality_status_text)
 from signal_vision.vision_hand.inference.predict import load_model as load_signal_model
 from signal_vision.vision_hand.inference.predict import SignalStabilizer
-from signal_vision.vision_hand.inference.ui import Hud
+from signal_vision.vision_hand.inference.ui import header_for, Hud
 import torch
 
 
@@ -43,9 +45,13 @@ import torch
 #
 # frame 도 여기 들어간다: Hud.render() 는 프레임 위에 패널을 in-place 로 그린다.
 # 스냅샷 이후 추론 쪽은 이 프레임을 다시 건드리지 않으므로 소유권이 렌더로 넘어간 셈이다.
+#
+# state/lens 도 여기 들어간다: 둘 다 추론 워커 쪽 객체(_stabilizer, _lens_monitor)를
+# 읽어야 나오는 값인데, 렌더 스레드는 그 객체를 건드리면 안 된다. 그래서 스냅샷 시점에
+# 문자열로 확정해 넘긴다.
 RenderPayload = namedtuple(
     'RenderPayload',
-    'frame labels probs top confirmed_idx threshold confirmed status emergency')
+    'frame labels probs top confirmed_idx threshold confirmed status emergency state lens')
 
 # 가중치는 파이썬 패키지 안의 models/ 에 있다(camera_node/, vision_hand/ 와 형제).
 #   .../src/signal_vision/signal_vision/camera_node/inference.py
@@ -271,7 +277,8 @@ class GestureInference(InferenceBase):
 
         여기서 만든 객체는 **용도별로 한 스레드에만 묶인다.** 워커는 추론/렌더 둘이지만
         둘이 같은 객체를 건드리지는 않는다:
-            추론 워커 전용 — _model, _extractor, _lens_monitor, _window, _stabilizer, _device, _t0
+            추론 워커 전용 — _model, _extractor, _lens_monitor, _liveness, _window,
+                             _stabilizer, _device, _t0
             렌더 워커 전용 — _hud
             양쪽이 읽음   — _labels (만든 뒤 바뀌지 않으므로 안전)
         그래서 MediaPipe Hands 처럼 스레드 안전하지 않은 객체도 그대로 써도 된다.
@@ -283,9 +290,13 @@ class GestureInference(InferenceBase):
         # 프로세스 안으로 들어오는 유일한 지점이라, 검사를 놓칠 수 없는 위치다.
         validate_labels(self._labels, self._logger)
         self._extractor = FeatureExtractor()
-        # 렌즈 블러 진단기(추론 워커 전용). 매 프레임 update() 로 선명도 추이를 보고,
-        # 블러 상태를 stabilizer 에 넘겨 emergency 판정에 쓴다. function.py 와 동일.
+        # 화질 진단기와 생존 진단기(둘 다 추론 워커 전용). 둘의 성격이 다르다 —
+        # 화질은 "인식이 안 될 때만" 비상으로 올라가고, 정지는 단독으로 올라간다.
+        # 그 갈래는 _infer_impl() 에 있다.
         self._lens_monitor = LensHealthMonitor()
+        self._liveness = FrameLivenessMonitor()
+        self._frozen = False        # 직전 프레임의 정지 판정 (스냅샷에 실어 보낸다)
+        self._no_pose = 0           # 연속으로 포즈를 못 잡은 프레임 수
         self._window = deque(maxlen=self._num_frames)
         self._stabilizer = SignalStabilizer(
             threshold=0.8, consecutive=5, ema=0.4, release_grace=1.0)
@@ -329,7 +340,9 @@ class GestureInference(InferenceBase):
         return RenderPayload(
             frame=frame, labels=self._labels, probs=s.probs, top=s.top,
             confirmed_idx=s.confirmed_idx, threshold=s.threshold,
-            confirmed=s.confirmed, status=s.status, emergency=s.emergency)
+            confirmed=s.confirmed, status=s.status, emergency=s.emergency,
+            state=s.display_state,
+            lens=quality_status_text(self._lens_monitor, self._frozen))
 
     def take_render_payload(self):
         """직전 infer() 의 스냅샷을 꺼내고 비운다. 추론 스레드에서만 부른다."""
@@ -345,26 +358,45 @@ class GestureInference(InferenceBase):
         """infer() 의 실제 본문. 계약과 주의사항은 infer() 독스트링 참고."""
         timestamp_ms = int((time.monotonic() - self._t0) * 1000)
         hand_result, pose_result = self._extractor.detect(frame, timestamp_ms)
+        # 화질·생존 판정은 윈도우 충족 여부와 무관하게 매 프레임 돌려야 한다 — 초기
+        # BLUR_CALIBRATION_FRAMES 동안 기준치를 잡기 때문이다.
+        #
+        # **draw_detections 보다 반드시 먼저** 잰다. 스켈레톤 선은 인공적인 고대비 엣지라
+        # 그린 뒤에 재면 선명도가 실측보다 크게 부풀려지고(predict.py 실측 평균 +157%),
+        # 하필 사람이 잡히는 동안에만 그렇게 된다 — 즉 신호수가 화면에 있는 내내 렌즈
+        # 판정이 무뎌진다. 예전 순서가 반대였고, 주석은 predict.py 와 같다고 적혀 있었다.
+        poor_quality = self._lens_monitor.update(frame)
+        frozen = self._liveness.update(frame)
+        self._frozen = frozen
         draw_detections(frame, hand_result, pose_result)   # 렌더용 — 손/포즈 랜드마크를 프레임에 직접 그린다
-        # 블러 판정은 윈도우 충족 여부와 무관하게 매 프레임 돌려야 한다 — 초기
-        # BLUR_CALIBRATION_FRAMES 동안 기준치를 잡기 때문에, 여기서 매번 update() 해야
-        # 렌즈가 막혔을 때 emergency 로 이어진다. function.py 와 같은 자리/순서다.
-        is_blurred = self._lens_monitor.update(frame)
         self._window.append(FeatureExtractor.vector(hand_result, pose_result))
+        # 창(pose_ratio)과 별개로 "방금 연속 몇 장"을 센다 — 창 비율은 사람이 사라진 뒤
+        # 21프레임이나 지나야 임계값 밑으로 내려와서 비상 판정에 쓰기엔 너무 느리다.
+        self._no_pose = 0 if pose_result.pose_landmarks else self._no_pose + 1
 
         if len(self._window) < self._num_frames:
             return None
 
         arr = np.stack(self._window)
         pose_ratio = float((arr[:, HAND_DIM * 2:] != 0).any(axis=1).mean())
-        if pose_ratio < 0.3:
-            self._stabilizer.mark_person_absent(is_blurred)
+        if pose_ratio < 0.3 or (poor_quality and self._no_pose >= NO_POSE_FRAMES):
+            # 사람이 안 잡힌다. 화질이 무너져 있으면 그게 원인이므로 비상, 화질이
+            # 멀쩡하면 그냥 신호수가 자리에 없는 것이므로 대기다. 이 갈래가 "인식
+            # 실패 = 고장"과 "화질 저하 = 무조건 고장" 양쪽을 다 피하는 자리다.
+            self._stabilizer.mark_person_absent(frozen or poor_quality)
             return None
 
+        # 여기 왔다는 건 관절이 잡히고 있다는 뜻 = 대체로 인식은 되고 있다. 그래서
+        # 적당한 흐림이나 해상도 저하(poor_quality)로 로봇을 세우지는 않는다.
+        # 두 가지만 예외로 그대로 올린다 — 둘 다 "관절이 잡힌다"는 신호를 못 믿는 경우다:
+        #   frozen   — 얼어붙은 화면 속 사람도 계속 검출된다.
+        #   critical — 선명도가 인식을 신뢰할 수 없는 수준. 이때 잡히는 관절 좌표는
+        #              잡혔다는 사실과 무관하게 신뢰할 수 없다.
         x = torch.from_numpy(arr[None]).to(self._device)
         with torch.no_grad():
             raw_probs = torch.softmax(self._model(x), dim=1)[0].cpu().numpy()
-        self._stabilizer.update(raw_probs, self._labels, is_blurred)
+        self._stabilizer.update(raw_probs, self._labels,
+                                frozen or self._lens_monitor.critical)
 
         idx = self._stabilizer.confirmed_idx
         if idx is None:
@@ -386,13 +418,14 @@ class GestureInference(InferenceBase):
             return False
 
         # 허재성 여기 렌더코드 떔빵인데, 기존 show_gui 함수 수정해서 해주면 됨.
-        # 확정된 신호가 있으면 초록, 없으면 붉은 기 — 헤더 색으로 한눈에 구분한다.
-        header_color = (0, 220, 0) if payload.confirmed_idx is not None else (80, 80, 255)
+        # 문구·색 규칙은 ui.header_for 한 곳에 있다 — 상태 3종(비상/확정/대기)을
+        # 세 실행 경로가 똑같이 보여야 하므로 여기서 다시 분기하지 않는다.
+        header, header_color = header_for(payload.state, payload.confirmed)
         return self._hud.render(
             payload.frame, payload.labels, payload.probs, payload.top,
             payload.confirmed_idx, payload.threshold,
-            header=f'확정: {payload.confirmed}', header_color=header_color,
-            status=payload.status, emergency=payload.emergency)
+            header=header, header_color=header_color,
+            status=f'{payload.status}  |  {payload.lens}', emergency=payload.emergency)
 
     def close(self):
         """HUD 창을 닫는다. 렌더 스레드가 끝난 뒤 조립자가 부른다."""
