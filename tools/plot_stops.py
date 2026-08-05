@@ -170,15 +170,27 @@ def selftest():
 
 
 def newest_log():
-    """~/.ros 의 가장 최근 stop_log_*.csv. stop_logger 가 실행마다 새 파일을 만든다."""
-    found = sorted((pathlib.Path.home() / '.ros').glob('stop_log_*.csv'))
-    return str(found[-1]) if found else ''
+    """
+    가장 최근 stop_log_*.csv 의 경로.
+
+    bringup 은 <워크스페이스>/log/stops/ 에 남기므로 거기를 먼저 본다 — 이
+    스크립트 자신의 위치(tools/) 기준이라 어느 디렉터리에서 실행해도 같은 곳을
+    찾는다. ~/.ros 는 launch 없이 노드를 단독 실행했을 때의 fallback 위치라
+    두 번째로 본다. 파일 이름이 시각으로 끝나므로 이름 정렬 = 시간 정렬이다.
+    """
+    ws_logs = pathlib.Path(__file__).resolve().parent.parent / 'log' / 'stops'
+    for directory in (ws_logs, pathlib.Path.home() / '.ros'):
+        found = sorted(directory.glob('stop_log_*.csv'))
+        if found:
+            return str(found[-1])
+    return ''
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
     parser.add_argument('csv', nargs='?', default=newest_log(),
-                        help='stop_logger 가 남긴 CSV (기본: ~/.ros 의 가장 최근 것)')
+                        help='stop_logger 가 남긴 CSV (기본: log/stops → ~/.ros '
+                             '순서로 찾은 가장 최근 것)')
     parser.add_argument('--out', help='창을 열지 않고 이 경로에 PNG 로 저장')
     parser.add_argument('--selftest', action='store_true',
                         help='구간 만드는 로직만 검사하고 끝낸다')
@@ -188,7 +200,8 @@ def main():
         selftest()
         return
     if not args.csv:
-        parser.error('~/.ros 에 stop_log_*.csv 가 없다 — 경로를 직접 넘길 것')
+        parser.error('log/stops 에도 ~/.ros 에도 stop_log_*.csv 가 없다 — '
+                     '경로를 직접 넘길 것')
 
     intervals = build_intervals(load(pathlib.Path(args.csv)))
     if not intervals:

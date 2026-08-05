@@ -1,6 +1,7 @@
 # K-NAVI 시스템 bringup — robot_control(몸/배선) + signal_vision(수신호) + auto_drive(주행)를 조립한다.
 #   흐름: xacro→URDF → robot_state_publisher(tf) → gz sim(월드) → 로봇 스폰 → ros_gz_bridge(토픽 변환)
 #   검증: 이걸 띄운 뒤 teleop_twist_keyboard 로 /cmd_vel 을 주면 로봇이 움직여야 한다(핸드오프 §6-1).
+import datetime
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -38,6 +39,16 @@ def generate_launch_description():
     # 한계: world 인자를 다른 월드로 덮어써도 tracks 는 여기(navi_factory)를 계속
     # 본다. 월드가 실제로 둘이 되면 world 경로의 dirname 에서 찾도록 고칠 것.
     tracks_yaml_path = os.path.join(world_dir, 'tracks.yaml')
+
+    # 정지 기록(stop_logger)의 CSV 를 워크스페이스 log/stops/ 에 모은다.
+    # 노드에 상대 경로를 주지 않는 이유: 상대 경로는 노드의 CWD(명령을 친 위치)
+    # 기준이라 실행 위치마다 기록이 흩어진다. 워크스페이스를 아는 건 여기이므로
+    # ws_root 기준 절대 경로를 만들어 파라미터로 내려보낸다 — tracks_yaml_path 와
+    # 같은 패턴. log/ 는 colcon 산출물 자리라 이미 gitignore 대상이다.
+    # 시각은 launch 한 번에 한 번 찍는다 — 실행마다 새 파일(노드 쪽 주석 참고),
+    # 로봇이 여럿이면 파일 이름의 로봇 이름으로 갈린다.
+    stop_log_stamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    stop_log_dir = os.path.join(ws_root, 'log', 'stops')
 
     # 월드는 어느 패키지도 소유하지 않는다(worlds/ 는 ROS 패키지가 아니다). 외부에서 world 인자로 주입.
     # 창고 월드로 띄우려면:
@@ -115,7 +126,8 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_stop_log', default_value='true',
                               description='false 면 정지 기록 노드(stop_logger)를 '
                                           '띄우지 않는다. 켜져 있으면 실행마다 '
-                                          '~/.ros/stop_log_<시각>.csv 가 하나씩 '
+                                          '<워크스페이스>/log/stops/ 에 '
+                                          'stop_log_<로봇>_<시각>.csv 가 하나씩 '
                                           '생긴다 — tools/plot_stops.py 로 본다'),
         DeclareLaunchArgument('enable_rviz', default_value='true',
                               description='false 면 RViz2 를 띄우지 않는다 '
@@ -357,7 +369,10 @@ def generate_launch_description():
             executable='stop_logger',
             namespace=namespace,
             condition=IfCondition(enable_stop_log),
-            parameters=[{'use_sim_time': use_sim_time}],
+            parameters=[{'use_sim_time': use_sim_time,
+                         'csv_path': os.path.join(
+                             stop_log_dir,
+                             f'stop_log_{name}_{stop_log_stamp}.csv')}],
             output='screen',
         )
         robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,

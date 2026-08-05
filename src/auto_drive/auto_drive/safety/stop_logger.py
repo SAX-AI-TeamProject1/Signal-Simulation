@@ -60,8 +60,11 @@ class StopLogger(Node):
     def __init__(self):
         super().__init__('stop_logger')
 
-        # 빈 값이면 ~/.ros/stop_log_<시각>.csv. ROS 가 이미 쓰는 자리라 새 폴더를
-        # 만들 필요가 없고, 워크스페이스를 지워도 기록이 남는다.
+        # 빈 값이면 ~/.ros/stop_log_<시각>.csv — launch 없이 단독 실행할 때의
+        # fallback. bringup 은 워크스페이스의 log/stops/ 절대 경로를 만들어 이
+        # 파라미터로 넘긴다. 노드가 상대 경로를 스스로 풀지 않는 이유: 상대
+        # 경로는 프로세스 CWD(명령을 친 위치) 기준이라 실행 위치마다 기록이
+        # 흩어진다 — 앵커를 아는 건 launch 쪽이다.
         # 파일 이름에 시각을 넣어 실행마다 새 파일이 되게 한다 — 한 파일에 이어
         # 붙이면 t_sim 이 매 실행 0 부터 다시 시작해 구간이 서로 엉킨다.
         self.declare_parameter('csv_path', '')
