@@ -84,7 +84,13 @@ class StopLogger(Node):
         self._csv_path = (pathlib.Path(path) if path
                           else pathlib.Path.home() / '.ros' / f'stop_log_{stamp}.csv')
         self._csv_path.parent.mkdir(parents=True, exist_ok=True)
-        if not self._csv_path.exists():
+        # 헤더 판정은 열기 전에 해야 한다 — 'a' 로 여는 순간 파일이 생겨 버린다.
+        # (기본 경로는 실행마다 새 이름이라 항상 새 파일이지만, csv_path 를 직접
+        #  넘겨 이어 쓰는 경우에 헤더가 중간에 또 박히면 안 된다)
+        is_new = not self._csv_path.exists()
+        self._file = self._csv_path.open('a', newline='', encoding='utf-8')
+        self._writer = csv.writer(self._file)
+        if is_new:
             self._write_row(CSV_HEADER)
 
         # None = 아직 판정 전. 첫 메시지에서 정해지고 그때 한 줄이 남는다.
@@ -109,20 +115,24 @@ class StopLogger(Node):
         return self.get_clock().now().nanoseconds * 1e-9
 
     def _on_odom(self, msg):
-        # 각속도도 본다. 제자리 회전은 이동은 아니지만 정지도 아니다.
+        # 각속도도 함께 본다 — 제자리 회전은 이동이 아니지만 정지도 아니다.
+        # 둘 중 큰 쪽으로 재면 '둘 다 느리다'와 '하나라도 빠르다'가 그대로 나온다.
         speed = math.hypot(msg.twist.twist.linear.x, msg.twist.twist.linear.y)
-        turn = abs(msg.twist.twist.angular.z)
-        stop_speed = self.get_parameter('stop_speed').value
-        move_speed = self.get_parameter('move_speed').value
+        fastest = max(speed, abs(msg.twist.twist.angular.z))
 
-        if self._stopped is None:
-            self._set_motion(speed < stop_speed and turn < stop_speed)
-        elif self._stopped and (speed > move_speed or turn > move_speed):
-            self._set_motion(False)
-        elif not self._stopped and speed < stop_speed and turn < stop_speed:
+        if fastest < self.get_parameter('stop_speed').value:
             self._set_motion(True)
+        elif fastest > self.get_parameter('move_speed').value:
+            self._set_motion(False)
+        # 두 임계값 사이는 불감대라 직전 상태를 그대로 둔다. 임계값이 하나면
+        # 그 값 근처에서 흔들릴 때마다 stop/move 가 번갈아 쏟아진다.
 
     def _set_motion(self, stopped):
+        # odom 은 초당 수십 번 들어오지만 남기는 건 뒤집힐 때 한 줄뿐이다.
+        # 판정은 부르는 쪽이 하고, '바뀌었을 때만'은 상태를 가진 여기가 맡는다.
+        # 처음 한 번은 _stopped 가 None 이라 무엇이 오든 전이로 잡힌다.
+        if stopped == self._stopped:
+            return
         self._stopped = stopped
         self._write_event('motion', 'stop' if stopped else 'move')
 
@@ -158,10 +168,17 @@ class StopLogger(Node):
         self._write_row([f'{self._now():.3f}', wall, stream, event])
 
     def _write_row(self, row):
-        # 매번 열고 닫는다. 전환할 때만 쓰니 초당 몇 줄이 아니고, 핸들을 들고
-        # 있다가 노드가 죽으면 버퍼에 남은 줄이 통째로 사라진다.
-        with self._csv_path.open('a', newline='', encoding='utf-8') as handle:
-            csv.writer(handle).writerow(row)
+        self._writer.writerow(row)
+        # 파일에 남기는 건 close 가 아니라 flush 다. 전환할 때만 쓰니 한 줄마다
+        # 흘려보내도 비용이 없고, 이러면 노드가 죽어도 그때까지의 줄은 파일에
+        # 있다. fsync 까지는 안 한다 — 프로세스가 죽는 건 flush 로 막히고,
+        # 그 위(전원 차단)는 이 기록으로 지킬 값이 아니다.
+        self._file.flush()
+
+    def destroy_node(self):
+        """파일 핸들을 닫고 노드를 내린다."""
+        self._file.close()
+        return super().destroy_node()
 
 
 def main(args=None):

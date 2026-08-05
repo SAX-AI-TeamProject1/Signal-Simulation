@@ -64,6 +64,10 @@ setup(
             # 진행 통로 안의 장애물을 보고 세운다: <ns>/scan → cmd_vel_estop.
             # 회피는 하지 않는다 — 길 위에 사람이 있으면 서고, 지나가면 다시 간다.
             'estop_node = auto_drive.safety.estop_node:main',
+            # 정지 기록 전용 관측 노드: odom(실제로 섰는가)과 estop·cmd_vel_gesture
+            # (왜 섰는가)의 전환 순간만 CSV 로 남긴다. 주행에는 관여하지 않는다.
+            # 구간으로 잇고 그리는 건 tools/plot_stops.py 몫.
+            'stop_logger = auto_drive.safety.stop_logger:main',
             # detect_node(YOLO)와 slowdown_node 는 구현하면서 추가한다.
             #   YOLO 노드는 ros2 run 으로는 venv 에 못 닿는다(설치 스크립트 shebang 이 /usr/bin/python3).
             #   launch 에서 Node(prefix='<venv>/bin/python') 로 띄워야 한다 — 검증 완료.

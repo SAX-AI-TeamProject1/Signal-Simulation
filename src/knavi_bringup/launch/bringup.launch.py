@@ -61,6 +61,8 @@ def generate_launch_description():
     enable_flat_ground = LaunchConfiguration('enable_flat_ground')
     # 비상정지. 기본 on — 끄는 건 정지 거리를 재는 것 같은 의도된 실험일 때뿐이다.
     enable_estop = LaunchConfiguration('enable_estop')
+    # 정지 기록. 구독만 하는 관측 노드라 주행에 영향이 없어서 기본 on.
+    enable_stop_log = LaunchConfiguration('enable_stop_log')
 
     # 라이다 스캔을 눈으로 보는 뷰어. gz GUI 에서는 레이저가 로봇 주변 선으로만 보이고
     # ROS 쪽으로 실제로 넘어왔는지는 알 수 없어서, 스캔을 확인하려면 어차피 이게 필요하다.
@@ -110,6 +112,11 @@ def generate_launch_description():
                               description='false 면 비상정지 노드(estop_node)를 띄우지 '
                                           '않는다 — 정지 거리 측정처럼 일부러 안 세울 '
                                           '때만 쓸 것'),
+        DeclareLaunchArgument('enable_stop_log', default_value='true',
+                              description='false 면 정지 기록 노드(stop_logger)를 '
+                                          '띄우지 않는다. 켜져 있으면 실행마다 '
+                                          '~/.ros/stop_log_<시각>.csv 가 하나씩 '
+                                          '생긴다 — tools/plot_stops.py 로 본다'),
         DeclareLaunchArgument('enable_rviz', default_value='true',
                               description='false 면 RViz2 를 띄우지 않는다 '
                                           '(라이다 스캔·tf 뷰어, config/knavi.rviz)'),
@@ -340,8 +347,21 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen',
         )
+        # 11) 정지 기록 : odom(실제로 섰는가)과 estop·cmd_vel_gesture(왜 섰는가)의
+        #     전환 순간만 CSV 로 남긴다. 발행하는 토픽이 없어 주행에 영향이 없고,
+        #     구간으로 잇고 그리는 건 tools/plot_stops.py 가 나중에 한다.
+        #     estop 과 달리 안전 장치가 아니라 관측 도구지만, 켜 두는 비용이
+        #     구독 셋뿐이라 기본으로 띄운다 — 끄고 달리면 그 주행 기록이 없다.
+        stop_log = Node(
+            package='auto_drive',
+            executable='stop_logger',
+            namespace=namespace,
+            condition=IfCondition(enable_stop_log),
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+        )
         robot_nodes += [rsp, spawn, twist_mux, patrol, marker_vision, camera,
-                        scan_rays, map_to_odom, estop]
+                        scan_rays, map_to_odom, estop, stop_log]
 
     # 2) Gazebo(gz sim) 실행.
     #    ros_gz_sim 이 제공하는 gz_sim.launch.py 를 include 하던 걸 걷어냈다 — 그건
