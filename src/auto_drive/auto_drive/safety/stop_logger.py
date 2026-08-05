@@ -15,7 +15,7 @@
     그리는 스크립트만 고쳐 다시 돌리면 된다.
 
 두 스트림:
-  motion — 실제로 섰는지. odom 의 속도가 임계값 아래면 stop, 위면 move.
+  motion — 실제로 섰는지. odom 의 속도가 임계값 아래면 stop, 위면 move_start.
       명령(cmd_vel)이 아니라 실측을 쓰는 이유는 '얼마나 정지했는지'가 물리
       시간이기 때문이다. 명령만 보면 명령은 갔는데 못 움직인 경우를 놓친다.
   reason — 정지를 만들 수 있는 소스가 켜져 있는지. estop(라이다·스캔 끊김)과
@@ -137,7 +137,7 @@ class StopLogger(Node):
         if stopped == self._stopped:
             return
         self._stopped = stopped
-        self._write_event('motion', 'stop' if stopped else 'move')
+        self._write_event('motion', 'stop' if stopped else 'move_start')
 
     def _on_estop(self, msg):
         # estop_node 는 True/False 를 20Hz 로 계속 쏜다. 바뀔 때만 한 줄 남긴다.
@@ -159,6 +159,11 @@ class StopLogger(Node):
             self._write_event('reason', 'gesture_off')
 
     def _on_timer(self):
+        # 수신호 구간을 닫는 유일한 경로가 이 타이머다. STOP 의 끝은 '침묵'이라
+        # _on_gesture 는 그 순간을 볼 수 없고(콜백은 메시지가 와야 불린다),
+        # 거기의 elif 는 0 이 아닌 명령이 왔을 때만 타는데 지금 라벨로는 안 온다.
+        # timeout 이 곧 정상적인 off 라서 이벤트도 gesture_off 하나로 남긴다 —
+        # 이름을 나누면 그리는 쪽이 같은 것을 두 번 배워야 한다.
         if not self._gesture_on:
             return
         if self._now() - self._last_gesture_sec > \

@@ -25,7 +25,9 @@ def to_lane(event):
     """이벤트 이름을 (레인, 켜짐인가) 로 바꾼다."""
     if event == 'stop':
         return 'stopped', True
-    if event == 'move':
+    # move_start 가 현재 이름. move 는 옛 CSV 호환 — 이미 남은 기록은 다시
+    # 주행해서 만들 수 없으므로 읽는 쪽이 두 이름을 다 받는다.
+    if event in ('move_start', 'move'):
         return 'stopped', False
     if event.endswith('_on'):
         return event[:-3], True
@@ -147,7 +149,7 @@ def load(path):
 def selftest():
     """구간 잇기와 겹침 판정만 검사한다. ROS 도 matplotlib 도 필요 없다."""
     events = [(1.0, 'estop_on'), (1.5, 'stop'), (4.0, 'estop_off'),
-              (4.5, 'move'), (9.0, 'gesture_on'), (9.2, 'stop')]
+              (4.5, 'move_start'), (9.0, 'gesture_on'), (9.2, 'stop')]
     intervals = build_intervals(events)
 
     assert ('estop', 1.0, 4.0, True) in intervals
@@ -159,7 +161,8 @@ def selftest():
     assert overlaps((1.5, 4.5), (1.0, 4.0))
     assert not overlaps((1.5, 4.5), (4.5, 9.0))     # 맞닿기만 한 건 겹침이 아니다
     assert build_intervals([]) == []
-    # 중복 on 은 상태 변화가 아니므로 처음 것만 남는다.
+    # 중복 on 은 상태 변화가 아니므로 처음 것만 남는다. 옛 이름 'move' 도
+    # 그대로 읽혀야 한다(기존 CSV 호환).
     assert build_intervals([(1.0, 'stop'), (2.0, 'stop'), (3.0, 'move')]) == \
         [('stopped', 1.0, 3.0, True)]
 
