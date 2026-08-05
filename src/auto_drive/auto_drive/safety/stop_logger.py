@@ -23,6 +23,11 @@
       각자 찍힌다 — 우선순위로 하나만 남기면 '라이다가 안 세웠으면 수신호가
       세웠을' 상황이 기록에서 사라진다.
 
+tick 스트림은 '전환만 남긴다'의 유일한 예외다 — 전환이 없어도 0.5초마다
+생존 신호 한 줄을 남긴다. 이게 없으면 마지막 전환 뒤 조용히 유지된 구간은
+길이가 잘려 나오고(그리는 쪽이 마지막 타임스탬프를 로그의 끝으로 보므로),
+'상태가 그대로였던 것'과 '이 노드가 죽은 것'을 로그만 보고 구분할 수 없다.
+
 라이다 정지와 스캔 끊김은 나누지 않는다. 그림에서 둘 다 'estop 이 로봇을
 붙잡고 있던 구간'으로 똑같이 그려지므로 구분이 결과를 바꾸지 않는다. 나중에
 '스캔이 끊겨서 선 적이 몇 번인가'를 실제로 묻게 되면, estop_node 의
@@ -51,6 +56,19 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from std_msgs.msg import Bool
 
+# CSV 한 줄 = 상태 전환 한 번. 네 열의 의미:
+#   t_sim  — 시뮬레이션 시각(초, /clock 기준). gz 의 일시정지·배속과 함께
+#            움직이므로 구간 길이 계산은 이 열로 한다.
+#   t_wall — 벽시계 시각(ISO 8601, ms 까지). '몇 시에 있었던 일인지' 사람이
+#            찾을 때와, /clock 이 오기 전 t_sim 이 0 근처인 구간을 가를 때 쓴다.
+#   stream — 이 줄이 속한 계열. motion(odom 실측으로 실제로 섰는가),
+#            reason(정지를 만들 수 있는 소스가 켜져 있는가),
+#            tick(전환 없는 생존 신호 — 구간이 아니라 로그의 끝을 알린다).
+#            전부 한 파일에 섞어 두고 이 열로 구분한다 — 파일이 하나여야
+#            시간축 정렬이 공짜다.
+#   event  — 줄의 내용. motion 이면 stop/move_start,
+#            reason 이면 estop_on/estop_off/gesture_on/gesture_off,
+#            tick 이면 alive.
 CSV_HEADER = ['t_sim', 't_wall', 'stream', 'event']
 
 
@@ -82,6 +100,11 @@ class StopLogger(Node):
         # 여기도 같이 바꿔야 한다.
         self.declare_parameter('gesture_timeout_sec', 0.5)
 
+        # 생존 신호 주기. 열린 구간의 끝이 최대 이만큼 짧게 잡히므로, 수신호
+        # timeout(0.5초)과 같은 해상도로 맞춘다. 0.5초 = 시간당 7200줄,
+        # 수백 KB — 부담 없는 크기다. 0 이하면 끈다.
+        self.declare_parameter('tick_sec', 0.5)
+
         path = self.get_parameter('csv_path').value
         stamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
         self._csv_path = (pathlib.Path(path) if path
@@ -111,6 +134,12 @@ class StopLogger(Node):
         # 수신호 구간을 닫기 위한 타이머. timeout 보다 촘촘해야 닫히는 시점이
         # timeout 을 한 주기 이상 넘기지 않는다.
         self.create_timer(0.1, self._on_timer)
+
+        # use_sim_time 이면 이 타이머도 sim 시계를 따르므로, 첫 /clock 이 오기
+        # 전에는 tick 이 찍히지 않는다 — t_sim 0 짜리 줄이 쌓이는 일은 없다.
+        tick_sec = self.get_parameter('tick_sec').value
+        if tick_sec > 0.0:
+            self.create_timer(tick_sec, self._on_tick)
 
         self.get_logger().info(f'정지 기록: {self._csv_path}')
 
@@ -171,16 +200,21 @@ class StopLogger(Node):
             self._gesture_on = False
             self._write_event('reason', 'gesture_off')
 
+    def _on_tick(self):
+        # 내용 없는 생존 신호. 그리는 쪽은 이 줄로 구간을 만들지 않고
+        # '로그가 여기까지 살아 있었다'로만 쓴다(plot_stops.load 가 걸러 읽는다).
+        self._write_event('tick', 'alive')
+
     def _write_event(self, stream, event):
         wall = datetime.datetime.now().isoformat(timespec='milliseconds')
         self._write_row([f'{self._now():.3f}', wall, stream, event])
 
     def _write_row(self, row):
         self._writer.writerow(row)
-        # 파일에 남기는 건 close 가 아니라 flush 다. 전환할 때만 쓰니 한 줄마다
-        # 흘려보내도 비용이 없고, 이러면 노드가 죽어도 그때까지의 줄은 파일에
-        # 있다. fsync 까지는 안 한다 — 프로세스가 죽는 건 flush 로 막히고,
-        # 그 위(전원 차단)는 이 기록으로 지킬 값이 아니다.
+        # 파일에 남기는 건 close 가 아니라 flush 다. 전환 + 0.5초 tick 수준의
+        # 빈도라 한 줄마다 흘려보내도 비용이 없고, 이러면 노드가 죽어도
+        # 그때까지의 줄은 파일에 있다. fsync 까지는 안 한다 — 프로세스가 죽는
+        # 건 flush 로 막히고, 그 위(전원 차단)는 이 기록으로 지킬 값이 아니다.
         self._file.flush()
 
     def destroy_node(self):

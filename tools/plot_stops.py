@@ -36,16 +36,19 @@ def to_lane(event):
     raise ValueError(f'모르는 이벤트: {event!r}')
 
 
-def build_intervals(events):
+def build_intervals(events, end=None):
     """
     (시각, 이벤트) 목록을 (레인, 시작, 끝, 닫혔는가) 구간 목록으로 잇는다.
 
-    닫히지 않은 채 로그가 끝난 구간은 마지막 타임스탬프까지 이어 그린다 —
+    닫히지 않은 채 로그가 끝난 구간은 로그의 끝(end)까지 이어 그린다 —
     노드가 죽거나 시뮬레이션이 끝난 것이지 구간이 없었던 게 아니다.
+    end 는 tick(생존 신호)의 마지막 시각이다. 없이 부르면 마지막 전환
+    시각으로 대신하는데, 그러면 마지막 전환 뒤 조용히 유지된 시간이 잘린다.
     """
     if not events:
         return []
-    end = events[-1][0]
+    if end is None:
+        end = events[-1][0]
     open_at = {}
     intervals = []
     for stamp, event in events:
@@ -138,12 +141,22 @@ def draw(intervals, out_path):
 
 
 def load(path):
-    """CSV 를 (시각, 이벤트) 목록으로 읽는다. 시각순으로 정렬해 돌려준다."""
+    """
+    CSV 를 (전환 목록, 로그 끝 시각) 으로 읽는다. 전환은 시각순 정렬.
+
+    tick 줄은 구간을 만들지 않는 생존 신호라 전환에서 걸러 내고, '로그가
+    언제까지 살아 있었나'(끝 시각)를 정하는 데만 쓴다. tick 이 없는 옛
+    CSV 는 끝 시각이 마지막 전환과 같아져 예전과 동일하게 동작한다.
+    """
     with path.open(newline='', encoding='utf-8') as handle:
         rows = list(csv.DictReader(handle))
-    events = [(float(row['t_sim']), row['event']) for row in rows]
+    if not rows:
+        return [], None
+    events = [(float(row['t_sim']), row['event'])
+              for row in rows if row['stream'] != 'tick']
     events.sort(key=lambda row: row[0])
-    return events
+    end = max(float(row['t_sim']) for row in rows)
+    return events, end
 
 
 def selftest():
@@ -157,6 +170,11 @@ def selftest():
     # 닫히지 않은 둘은 마지막 타임스탬프(9.2)까지 이어진다.
     assert ('gesture', 9.0, 9.2, False) in intervals
     assert ('stopped', 9.2, 9.2, False) in intervals
+
+    # tick 이 로그의 끝을 정한다 — 열린 구간은 마지막 전환이 아니라 마지막
+    # tick 까지 이어진다.
+    assert build_intervals([(1.0, 'stop')], end=6.0) == \
+        [('stopped', 1.0, 6.0, False)]
 
     assert overlaps((1.5, 4.5), (1.0, 4.0))
     assert not overlaps((1.5, 4.5), (4.5, 9.0))     # 맞닿기만 한 건 겹침이 아니다
@@ -206,7 +224,8 @@ def main():
         parser.error('log/stops 에도 ~/.ros 에도 stop_log_*.csv 가 없다 — '
                      '경로를 직접 넘길 것')
 
-    intervals = build_intervals(load(pathlib.Path(args.csv)))
+    events, end = load(pathlib.Path(args.csv))
+    intervals = build_intervals(events, end)
     if not intervals:
         print('구간이 없다 — CSV 가 비었거나 전환이 한 번도 없었다')
         return
