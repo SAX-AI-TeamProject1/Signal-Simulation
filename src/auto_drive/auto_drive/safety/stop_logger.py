@@ -1,0 +1,184 @@
+"""
+로봇이 언제 섰고, 그때 어떤 정지 사유가 켜져 있었는지를 CSV 에 남긴다.
+
+주행에는 관여하지 않는다 — 이미 발행 중인 토픽만 구독하는 관측 노드다.
+그래서 estop_node 도 camera_node 도 고치지 않는다.
+
+기록 형식은 '구간'이 아니라 '상태가 바뀐 순간'이다. 한 줄이 곧 한 전환이고,
+구간으로 잇는 일은 tools/plot_stops.py 가 나중에 한다. 구간을 여기서 만들지
+않는 이유가 둘 있다:
+  - 정지와 사유는 같은 것이 아니다. 사유가 켜져 있던 시간을 정지 시간으로
+    적으면, 이미 서 있는 로봇 앞으로 사람이 지나갈 때 정지가 중복으로 잡히고,
+    사유가 켜지고 실제로 서기까지의 지연은 아예 기록에 안 남는다. 둘을 따로
+    남기고 타임스탬프로 맞춰 보면 그 지연이 그대로 보인다.
+  - 판정 규칙이 틀렸을 때 다시 주행하지 않아도 된다. CSV 는 그대로 두고
+    그리는 스크립트만 고쳐 다시 돌리면 된다.
+
+두 스트림:
+  motion — 실제로 섰는지. odom 의 속도가 임계값 아래면 stop, 위면 move.
+      명령(cmd_vel)이 아니라 실측을 쓰는 이유는 '얼마나 정지했는지'가 물리
+      시간이기 때문이다. 명령만 보면 명령은 갔는데 못 움직인 경우를 놓친다.
+  reason — 정지를 만들 수 있는 소스가 켜져 있는지. estop(라이다·스캔 끊김)과
+      cmd_vel_gesture(수신호 STOP) 둘이다. 서로 독립이라 동시에 켜져 있어도
+      각자 찍힌다 — 우선순위로 하나만 남기면 '라이다가 안 세웠으면 수신호가
+      세웠을' 상황이 기록에서 사라진다.
+
+라이다 정지와 스캔 끊김은 나누지 않는다. 그림에서 둘 다 'estop 이 로봇을
+붙잡고 있던 구간'으로 똑같이 그려지므로 구분이 결과를 바꾸지 않는다. 나중에
+'스캔이 끊겨서 선 적이 몇 번인가'를 실제로 묻게 되면, estop_node 의
+_last_reason 을 String 으로 발행하고(그 값은 거기 이미 있다) 여기서 그 토픽을
+받으면 된다 — 스캔을 다시 구독해 판정을 되풀이할 일이 아니다.
+
+시각은 두 벌을 남긴다. t_sim 은 use_sim_time 으로 받는 /clock 기준이라 gz 의
+일시정지·배속과 함께 움직이고, t_wall 은 사람이 '몇 시에 있었던 일'인지
+찾을 때 쓴다. 노드가 gz 보다 먼저 뜨면 첫 /clock 이 오기 전까지 t_sim 이 0
+근처로 찍히는데, 그 구간은 t_wall 로 갈라 볼 수 있다.
+
+사유 문자열이 한글이 아닌 이유: tools/plot_stops.py 의 matplotlib 기본 폰트에
+한글이 없어 축 라벨이 네모로 깨진다.
+"""
+
+import csv
+import datetime
+import math
+import pathlib
+
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+import rclpy
+from rclpy.executors import ExternalShutdownException
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from std_msgs.msg import Bool
+
+CSV_HEADER = ['t_sim', 't_wall', 'stream', 'event']
+
+
+class StopLogger(Node):
+    """정지(odom)와 정지 사유(estop·수신호)의 전환 순간을 CSV 에 남긴다."""
+
+    def __init__(self):
+        super().__init__('stop_logger')
+
+        # 빈 값이면 ~/.ros/stop_log_<시각>.csv. ROS 가 이미 쓰는 자리라 새 폴더를
+        # 만들 필요가 없고, 워크스페이스를 지워도 기록이 남는다.
+        # 파일 이름에 시각을 넣어 실행마다 새 파일이 되게 한다 — 한 파일에 이어
+        # 붙이면 t_sim 이 매 실행 0 부터 다시 시작해 구간이 서로 엉킨다.
+        self.declare_parameter('csv_path', '')
+
+        # 정지/주행 판정 임계값을 다르게 둔다(히스테리시스). 같은 값이면 로봇이
+        # 그 속도 근처에서 흔들릴 때 stop/move 가 초당 수십 줄씩 쏟아진다.
+        # 0.03 은 정지 중 수치 잡음보다 크고, 0.08 은 순항(3.33 m/s)의 2.4% 라
+        # '움직이기 시작했다'를 놓치지 않는다.
+        self.declare_parameter('stop_speed', 0.03)
+        self.declare_parameter('move_speed', 0.08)
+
+        # 수신호 정지의 끝은 메시지가 아니라 '침묵'이다. 그 침묵의 길이는
+        # config/twist_mux.yaml 의 gesture timeout 과 같은 값을 쓴다 — 실제로
+        # 로봇이 붙잡혀 있던 시간과 어긋나지 않게 하려는 것. 저쪽을 바꾸면
+        # 여기도 같이 바꿔야 한다.
+        self.declare_parameter('gesture_timeout_sec', 0.5)
+
+        path = self.get_parameter('csv_path').value
+        stamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        self._csv_path = (pathlib.Path(path) if path
+                          else pathlib.Path.home() / '.ros' / f'stop_log_{stamp}.csv')
+        self._csv_path.parent.mkdir(parents=True, exist_ok=True)
+        if not self._csv_path.exists():
+            self._write_row(CSV_HEADER)
+
+        # None = 아직 판정 전. 첫 메시지에서 정해지고 그때 한 줄이 남는다.
+        self._stopped = None
+        self._estop_on = None
+        self._gesture_on = False
+        self._last_gesture_sec = 0.0
+
+        # odom 은 ground_truth_tf 가 쓰는 것과 같은 QoS 로 받는다(같은 발행자).
+        self.create_subscription(Odometry, 'odom', self._on_odom,
+                                 qos_profile_sensor_data)
+        self.create_subscription(Bool, 'estop', self._on_estop, 10)
+        self.create_subscription(Twist, 'cmd_vel_gesture', self._on_gesture, 10)
+
+        # 수신호 구간을 닫기 위한 타이머. timeout 보다 촘촘해야 닫히는 시점이
+        # timeout 을 한 주기 이상 넘기지 않는다.
+        self.create_timer(0.1, self._on_timer)
+
+        self.get_logger().info(f'정지 기록: {self._csv_path}')
+
+    def _now(self):
+        return self.get_clock().now().nanoseconds * 1e-9
+
+    def _on_odom(self, msg):
+        # 각속도도 본다. 제자리 회전은 이동은 아니지만 정지도 아니다.
+        speed = math.hypot(msg.twist.twist.linear.x, msg.twist.twist.linear.y)
+        turn = abs(msg.twist.twist.angular.z)
+        stop_speed = self.get_parameter('stop_speed').value
+        move_speed = self.get_parameter('move_speed').value
+
+        if self._stopped is None:
+            self._set_motion(speed < stop_speed and turn < stop_speed)
+        elif self._stopped and (speed > move_speed or turn > move_speed):
+            self._set_motion(False)
+        elif not self._stopped and speed < stop_speed and turn < stop_speed:
+            self._set_motion(True)
+
+    def _set_motion(self, stopped):
+        self._stopped = stopped
+        self._write_event('motion', 'stop' if stopped else 'move')
+
+    def _on_estop(self, msg):
+        # estop_node 는 True/False 를 20Hz 로 계속 쏜다. 바뀔 때만 한 줄 남긴다.
+        if msg.data == self._estop_on:
+            return
+        self._estop_on = msg.data
+        self._write_event('reason', 'estop_on' if msg.data else 'estop_off')
+
+    def _on_gesture(self, msg):
+        # 지금 수신호 라벨은 STOP 하나뿐이라 항상 0 이지만, 전진 라벨이 다시
+        # 생기면 그건 정지가 아니다. 값으로 판정해 둔다.
+        if msg.linear.x == 0.0 and msg.angular.z == 0.0:
+            self._last_gesture_sec = self._now()
+            if not self._gesture_on:
+                self._gesture_on = True
+                self._write_event('reason', 'gesture_on')
+        elif self._gesture_on:
+            self._gesture_on = False
+            self._write_event('reason', 'gesture_off')
+
+    def _on_timer(self):
+        if not self._gesture_on:
+            return
+        if self._now() - self._last_gesture_sec > \
+                self.get_parameter('gesture_timeout_sec').value:
+            self._gesture_on = False
+            self._write_event('reason', 'gesture_off')
+
+    def _write_event(self, stream, event):
+        wall = datetime.datetime.now().isoformat(timespec='milliseconds')
+        self._write_row([f'{self._now():.3f}', wall, stream, event])
+
+    def _write_row(self, row):
+        # 매번 열고 닫는다. 전환할 때만 쓰니 초당 몇 줄이 아니고, 핸들을 들고
+        # 있다가 노드가 죽으면 버퍼에 남은 줄이 통째로 사라진다.
+        with self._csv_path.open('a', newline='', encoding='utf-8') as handle:
+            csv.writer(handle).writerow(row)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = StopLogger()
+    try:
+        rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
+    finally:
+        # 닫히지 않은 구간을 여기서 마무리할 필요가 없다. 전환만 남기는 형식이라
+        # '마지막 줄 이후로 계속 그 상태였다'가 이미 기록이고, 그리는 쪽이
+        # 마지막 타임스탬프까지 이어 그린다.
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
