@@ -63,7 +63,12 @@ def generate_launch_description():
 
     # sim time: Gazebo 가 /clock 을 발행하고, ROS 노드들은 그 시계를 따라야 tf 타임스탬프가 맞는다.
     use_sim_time = LaunchConfiguration('use_sim_time')
-    # headless: 테스트/서버 환경에선 GUI 없이(-s) 돌리려고 노출.
+    # headless: gz 를 창 없이 서버만(-s) 돌린다. 끄는 건 gz 창 하나뿐이고 RViz 는
+    # 건드리지 않는다 — 그건 enable_rviz 가 따로 맡는다. 이 둘을 갈라 놓는 이유는
+    # 무거운 쪽이 gz 창이라서다: 스캔은 RViz 로 보되 gz 창만 안 띄우는 게 실제로
+    # 자주 쓰는 조합인데, headless 가 GUI 를 전부 내리면 그 조합을 표현할 수 없다.
+    # 화면이 아예 없는 서버에서 돌릴 땐 둘 다 꺼야 한다:
+    #   headless:=true enable_rviz:=false
     headless = LaunchConfiguration('headless')
     # 인식 파이프라인은 실물 웹캠이 필요해서 기본 off.
     # 웹캠 없는 머신에서 bringup 이 실패하지 않도록 기존 시뮬 경로의 동작을 그대로 유지한다.
@@ -100,7 +105,10 @@ def generate_launch_description():
     declare_args = [
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('headless', default_value='false',
-                              description='true 면 gz 를 GUI 없이 서버만(-s) 실행'),
+                              description='true 면 gz 를 창 없이 서버만(-s) 실행한다. '
+                                          '끄는 건 gz 창뿐이고 RViz 는 그대로 뜬다 — '
+                                          'RViz 까지 끄려면 enable_rviz:=false 를 '
+                                          '함께 줄 것'),
         DeclareLaunchArgument('world', default_value=default_world,
                               description='이번 프로젝트의 월드를 넘김(기본: navi_factory, 절대경로 자동계산)'),
         DeclareLaunchArgument('enable_camera', default_value='true',
@@ -161,10 +169,11 @@ def generate_launch_description():
     # world_markers 가 내는 마커는 월드 좌표라서 그걸 놓을 프레임이 있어야 하고,
     # 그 프레임과 로봇을 잇는 게 여기 정적 변환이다.
     # 나중에 SLAM 이 들어오면 이 정적 변환을 로봇별로 대체한다(doc/design.md).
-    # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz 노드가 같은
-    # 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
-    show_rviz = PythonExpression(
-        ["'", enable_rviz, "' == 'true' and '", headless, "' != 'true'"])
+    # RViz 를 실제로 띄우는 조건. 로봇 루프 안의 scan_rays 와 아래 rviz·마커 노드가
+    # 같은 조건을 써야 한다 — 뷰어가 없는데 뷰어용 마커만 발행되는 상태를 막는다.
+    # headless 는 보지 않는다: 그건 gz 창만 끄는 인자이고, RViz 를 끄는 건
+    # enable_rviz 하나뿐이다(위 headless 주석 참고).
+    show_rviz = enable_rviz
 
     robot_info = [
         ('mecanum_lift_robot.urdf.xacro', 'robot2', 'mecanum_lift_robot',
@@ -448,9 +457,9 @@ def generate_launch_description():
     #
     # use_sim_time 을 주는 이유: 스캔과 tf 의 타임스탬프가 Gazebo 시계다. RViz 가 벽시계로
     # 돌면 "메시지가 미래에서 왔다 / 너무 오래됐다"로 판단해 스캔이 안 그려진다.
-    # headless 를 함께 보는 이유: enable_rviz 가 기본 켜짐이라, 그것만 보면
-    # 'headless:=true' (GUI 없이 서버만) 를 준 실행에서도 RViz 창이 떠 버린다 —
-    # headless 를 준 사람이 원한 것과 정반대다. 두 인자 중 headless 를 이기게 둔다.
+    # headless 는 보지 않는다: gz 창을 끈 실행에서도 스캔은 RViz 로 봐야 하는 경우가
+    # 많고(오히려 gz 창이 없으면 RViz 말고는 볼 창이 없다), 창을 하나도 띄우지 않는
+    # 실행은 enable_rviz:=false 로 명시한다.
     # 월드 형상 뷰어. 창고의 visual 을 읽어 map 프레임 마커로 한 번 발행한다.
     # RViz 에는 라이다 점과 선만 떠 있어서 그 점이 벽인지 선반인지 카트인지 알 수
     # 없었다. gz 쪽 Visualize Lidar 플러그인으로 광선을 창고 위에 겹쳐 보려 했지만

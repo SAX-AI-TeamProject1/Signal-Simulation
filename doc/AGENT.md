@@ -132,7 +132,7 @@ What `knavi_bringup/launch/bringup.launch.py` actually starts. One robot is spaw
 | `camera_node` (ns `/robot2`) | one per robot | resident | one physical webcam per robot; off with `enable_camera:=false` |
 | `scan_rays` (ns `/robot2`) | one per robot | resident | redraws `scan` as ray line segments on `scan_rays`; starts only when RViz does |
 | `ros_gz_bridge bridge_node` | one for the whole system | resident | translates the topics listed in `config/bridge.yaml` |
-| `rviz2` | one for the whole system | resident | views `/tf`, `<ns>/scan` and `<ns>/scan_rays`; off with `enable_rviz:=false` or `headless:=true` |
+| `rviz2` | one for the whole system | resident | views `/tf`, `<ns>/scan` and `<ns>/scan_rays`; off with `enable_rviz:=false`, which is the only argument that closes it |
 | `gz sim` process | one | resident | physics; **not** a ROS node, so it never appears in `ros2 node list` |
 <!-- 위 표: bringup이 띄우는 구성요소별 개수·수명·역할. gz sim은 ROS 노드가 아니라 별도 프로세스라 ros2 node list에 안 나옴. -->
 
@@ -243,7 +243,7 @@ ros2 launch knavi_bringup bringup.launch.py camera_device_id:=1
 ros2 launch knavi_bringup bringup.launch.py enable_rviz:=false
 ros2 run signal_vision camera_node --ros-args -p enable_inference:=false
 ```
-<!-- 위 명령: bringup 기본 실행, GUI·카메라 없이 실행, 웹캠 장치 번호 지정 실행, RViz 창 없이 실행, 그리고 camera_node 단독 실행(추론 끔). -->
+<!-- 위 명령: bringup 기본 실행, gz 창·카메라 없이 실행, 웹캠 장치 번호 지정 실행, RViz 창 없이 실행, 그리고 camera_node 단독 실행(추론 끔). -->
 
 Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from the workspace root), `use_sim_time` (`true`), `headless` (`false`), `enable_camera` (`true`), `camera_device_id` (empty), `enable_patrol` (`true`), `enable_flat_ground` (`true`), `enable_rviz` (`true`).
 <!-- launch 인자: world(기본값 navi_factory.sdf, 경로는 워크스페이스 루트 기준 자동 계산), use_sim_time(true), headless(false), enable_camera(true), camera_device_id(비어 있음), enable_patrol(true), enable_flat_ground(true), enable_rviz(true). -->
@@ -254,8 +254,8 @@ Launch arguments: `world` (defaults to `navi_factory.sdf`, path computed from th
 The ray line segments come from `scan_rays`, which starts and stops with RViz because it is a viewer aid and nothing else reads it. RViz's `LaserScan` display puts a point only where a return came back, so a ray that hit nothing within range draws nothing at all — measured on the 180° scan, 283 of 360 rays were `inf`, leaving most of the fan blank and no way to tell "the sensor does not look there" from "it looked and the space is empty". `scan_rays` republishes the same scan on `<ns>/scan_rays` as two `Marker` line lists, returns in red and misses drawn out to range in cyan. It never rewrites `<ns>/scan` itself: turning `inf` into a range value there would read as a wall at 10 m to the estop node and to Nav2 later.
 <!-- 광선 선분은 scan_rays 가 그리는 것이고, 뷰어 보조용이라 읽는 쪽이 RViz 뿐이어서 RViz 와 함께 뜨고 함께 꺼짐. RViz 의 LaserScan 디스플레이는 반사가 돌아온 자리에만 점을 찍으므로, 사거리 안에서 아무것도 못 맞힌 광선은 아예 안 그려짐 — 180도 스캔에서 실측하니 360개 중 283개가 inf 였고, 부채꼴 대부분이 빈 채로 남아서 "센서가 저쪽을 안 본다"와 "봤는데 비어 있다"를 구분할 수 없었음. scan_rays 는 같은 스캔을 <ns>/scan_rays 에 Marker 선분 목록 두 개로 다시 발행함 — 반사가 온 광선은 빨강, 못 맞힌 광선은 사거리 끝까지 청록. <ns>/scan 자체는 절대 고치지 않음: 거기서 inf 를 거리 값으로 바꾸면 estop 노드와 나중의 Nav2 가 10m 앞에 벽이 있다고 읽게 됨. -->
 
-Two ways it stays shut: `enable_rviz:=false`, or `headless:=true`, which wins over `enable_rviz` because a run asked to have no GUI must not open a window.
-<!-- 안 뜨게 하는 방법은 둘: enable_rviz:=false, 또는 headless:=true. headless 가 enable_rviz 를 이기는데, GUI 없이 돌리라고 시킨 실행이 창을 띄우면 안 되기 때문. -->
+One argument closes it: `enable_rviz:=false`. `headless` does not, because it only closes the `gz sim` window — the two windows are turned off separately, and a run with the simulator window closed still usually wants RViz, since with `gz sim` headless RViz is the only window left that shows anything. Closing every window therefore takes both: `headless:=true enable_rviz:=false`.
+<!-- 안 뜨게 하는 인자는 하나: enable_rviz:=false. headless 는 gz sim 창만 닫으므로 여기 관여하지 않음 — 두 창은 따로 끄고, 시뮬레이터 창을 닫은 실행도 대개는 RViz 를 원함(gz sim 이 헤드리스면 뭔가를 보여 주는 창은 RViz 뿐이라서). 그래서 창을 전부 닫으려면 둘 다 필요함: headless:=true enable_rviz:=false. -->
 
 That config carries no `RobotModel` display: the only link with a visual is `chassis`, and its mesh URI is `model://mecanum_lift/...`, which RViz's resource retriever cannot resolve — it handles `package://`, `file://` and `http://` only.
 <!-- 그 설정에는 RobotModel 디스플레이가 없음 — visual 을 가진 링크가 chassis 하나뿐인데 그 메시 URI 가 model://mecanum_lift/... 이고, RViz 의 resource retriever 는 package://, file://, http:// 만 풀 수 있어서 이걸 못 읽기 때문. -->

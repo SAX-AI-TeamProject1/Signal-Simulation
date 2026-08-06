@@ -160,6 +160,25 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "9. bringup 실행 (Gazebo 창만 없이 — RViz는 그대로)",
+            "detail": "태스크 8과 같은 bringup 을 headless:=true 로 실행합니다 — gz 가 서버만(-s) 돌아 무거운 Gazebo 창만 안 뜹니다. 시뮬레이션·센서·주행은 그대로 돌아가고, RViz2(라이다 스캔·tf 뷰어)와 camera_node 의 수신호 HUD 창은 그대로 뜹니다. 창을 하나도 안 띄우려면 여기에 enable_rviz:=false 를 더하세요. 사전조건: 태스크 1(빌드).",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/run_bringup.sh",
+                "headless:=true"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
         }
     ]
 }
