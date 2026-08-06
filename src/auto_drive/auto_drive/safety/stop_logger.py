@@ -18,21 +18,28 @@
   motion — 실제로 섰는지. odom 의 속도가 임계값 아래면 stop, 위면 move_start.
       명령(cmd_vel)이 아니라 실측을 쓰는 이유는 '얼마나 정지했는지'가 물리
       시간이기 때문이다. 명령만 보면 명령은 갔는데 못 움직인 경우를 놓친다.
-  reason — 정지를 만들 수 있는 소스가 켜져 있는지. estop(라이다·스캔 끊김)과
-      cmd_vel_gesture(수신호 STOP) 둘이다. 서로 독립이라 동시에 켜져 있어도
-      각자 찍힌다 — 우선순위로 하나만 남기면 '라이다가 안 세웠으면 수신호가
-      세웠을' 상황이 기록에서 사라진다.
+  reason — 정지를 만들 수 있는 소스가 켜져 있는지. estop_reason(estop_node 가
+      내는 사유 문자열)과 cmd_vel_gesture(수신호 STOP) 둘이다. 서로 독립이라
+      동시에 켜져 있어도 각자 찍힌다 — 우선순위로 하나만 남기면 '라이다가 안
+      세웠으면 수신호가 세웠을' 상황이 기록에서 사라진다.
+
+      사유는 그것을 아는 노드가 발행하고 여기는 받기만 한다. 스캔이나 위치를
+      다시 구독해 판정을 되풀이하지 않는다 — 판정이 두 곳에 생기면 둘이 어긋날
+      때 어느 쪽이 맞는지 알 수 없고, 여기는 관측 노드라 틀려도 알 방법이 없다.
 
 tick 스트림은 '전환만 남긴다'의 유일한 예외다 — 전환이 없어도 0.5초마다
 생존 신호 한 줄을 남긴다. 이게 없으면 마지막 전환 뒤 조용히 유지된 구간은
 길이가 잘려 나오고(그리는 쪽이 마지막 타임스탬프를 로그의 끝으로 보므로),
 '상태가 그대로였던 것'과 '이 노드가 죽은 것'을 로그만 보고 구분할 수 없다.
 
-라이다 정지와 스캔 끊김은 나누지 않는다. 그림에서 둘 다 'estop 이 로봇을
-붙잡고 있던 구간'으로 똑같이 그려지므로 구분이 결과를 바꾸지 않는다. 나중에
-'스캔이 끊겨서 선 적이 몇 번인가'를 실제로 묻게 되면, estop_node 의
-_last_reason 을 String 으로 발행하고(그 값은 거기 이미 있다) 여기서 그 토픽을
-받으면 된다 — 스캔을 다시 구독해 판정을 되풀이할 일이 아니다.
+라이다 정지와 스캔 끊김은 나눠서 남긴다(estop_detect_collision / estop_scan_timeout).
+예전에는 둘 다 estop 한 레인으로 합쳤는데, '스캔이 끊겨서 선 적이 몇 번인가'를
+실제로 묻게 되면서 갈랐다. 방식은 그때 적어 둔 그대로다 — estop_node 가 이미 갖고
+있던 사유 문자열을 발행하게 하고 여기서 받는다.
+
+레인 이름은 사유 문자열의 첫 토큰이다. estop_node 가 보내는 값에는 반사 개수와
+거리가 함께 붙어 있는데(그건 사람이 읽는 몫이다), 그대로 이름에 쓰면 같은 사유가
+거리마다 다른 레인으로 갈라진다.
 
 시각은 두 벌을 남긴다. t_sim 은 use_sim_time 으로 받는 /clock 기준이라 gz 의
 일시정지·배속과 함께 움직이고, t_wall 은 사람이 '몇 시에 있었던 일'인지
@@ -54,7 +61,7 @@ import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
-from std_msgs.msg import Bool
+from std_msgs.msg import String
 
 # CSV 한 줄 = 상태 전환 한 번. 네 열의 의미:
 #   t_sim  — 시뮬레이션 시각(초, /clock 기준). gz 의 일시정지·배속과 함께
@@ -67,7 +74,7 @@ from std_msgs.msg import Bool
 #            전부 한 파일에 섞어 두고 이 열로 구분한다 — 파일이 하나여야
 #            시간축 정렬이 공짜다.
 #   event  — 줄의 내용. motion 이면 stop/move_start,
-#            reason 이면 estop_on/estop_off/gesture_on/gesture_off,
+#            reason 이면 estop_<사유>_on/off 와 gesture_on/gesture_off,
 #            tick 이면 alive.
 CSV_HEADER = ['t_sim', 't_wall', 'stream', 'event']
 
@@ -121,14 +128,18 @@ class StopLogger(Node):
 
         # None = 아직 판정 전. 첫 메시지에서 정해지고 그때 한 줄이 남는다.
         self._stopped = None
-        self._estop_on = None
+        # _estop_kind 는 None 이 '사유 없음'이기도 하다. estop 이 꺼진 채로
+        # 시작하면 첫 메시지가 빈 문자열이라 상태가 그대로고, 그래서 줄이 안
+        # 남는다 — 예전 Bool 판정은 None != False 라 시작할 때마다 estop_off 를
+        # 한 줄 남겼는데, 그건 전환이 아니라서 로그를 읽는 사람을 헷갈리게 했다.
+        self._estop_kind = None
         self._gesture_on = False
         self._last_gesture_sec = 0.0
 
         # odom 은 ground_truth_tf 가 쓰는 것과 같은 QoS 로 받는다(같은 발행자).
         self.create_subscription(Odometry, 'odom', self._on_odom,
                                  qos_profile_sensor_data)
-        self.create_subscription(Bool, 'estop', self._on_estop, 10)
+        self.create_subscription(String, 'estop_reason', self._on_estop_reason, 10)
         self.create_subscription(Twist, 'cmd_vel_gesture', self._on_gesture, 10)
 
         # 수신호 구간을 닫기 위한 타이머. timeout 보다 촘촘해야 닫히는 시점이
@@ -168,12 +179,21 @@ class StopLogger(Node):
         self._stopped = stopped
         self._write_event('motion', 'stop' if stopped else 'move_start')
 
-    def _on_estop(self, msg):
-        # estop_node 는 True/False 를 20Hz 로 계속 쏜다. 바뀔 때만 한 줄 남긴다.
-        if msg.data == self._estop_on:
+    def _on_estop_reason(self, msg):
+        """비상정지 사유의 전환을 남긴다. 빈 문자열이면 정지 중이 아니다."""
+        # 첫 토큰만 쓴다. estop_node 가 보내는 값은 'detect_collision 3 hits,
+        # nearest 1.24m' 처럼 숫자가 붙어 있어 그대로는 이름이 될 수 없다 —
+        # 같은 사유가 거리마다 다른 레인으로 갈라진다.
+        kind = msg.data.split()[0] if msg.data else None
+        if kind == self._estop_kind:
             return
-        self._estop_on = msg.data
-        self._write_event('reason', 'estop_on' if msg.data else 'estop_off')
+        # 사유가 다른 사유로 곧장 바뀔 수 있다(장애물 정지 중에 스캔이 끊기는 식).
+        # 그때 이전 구간을 닫지 않으면 그리는 쪽에서 두 레인이 겹친 채로 열린다.
+        if self._estop_kind is not None:
+            self._write_event('reason', f'estop_{self._estop_kind}_off')
+        if kind is not None:
+            self._write_event('reason', f'estop_{kind}_on')
+        self._estop_kind = kind
 
     def _on_gesture(self, msg):
         # 지금 수신호 라벨은 STOP 하나뿐이라 항상 0 이지만, 전진 라벨이 다시

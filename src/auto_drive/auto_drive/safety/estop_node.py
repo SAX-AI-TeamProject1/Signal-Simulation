@@ -59,7 +59,7 @@ from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 
 
 class EstopNode(Node):
@@ -116,6 +116,11 @@ class EstopNode(Node):
         self._slow_pub = self.create_publisher(Twist, 'cmd_vel_estop_slow', 1)
         # 왜 멈췄는지 밖에서 보려고 상태도 낸다. 주행에는 쓰이지 않는다.
         self._state_pub = self.create_publisher(Bool, 'estop', 1)
+        # Bool 은 "섰다"까지만 말한다. 무엇 때문인지는 이쪽으로 나간다.
+        # 정지 중이 아니면 빈 문자열 — 받는 쪽은 비었나 아닌가로 구간을 연다.
+        # 사유 문자열이 영어인 이유: 첫 토큰이 stop_logger 의 이벤트 이름이 되고
+        # 그게 plot_stops.py 의 축 라벨까지 간다(matplotlib 기본 폰트에 한글 없음).
+        self._reason_pub = self.create_publisher(String, 'estop_reason', 1)
 
         # 감속 링에서 깎을 원본. 방향(각속도)은 손대지 않고 전진 속도만 깎는다.
         self.create_subscription(Twist, 'cmd_vel_auto', self._on_cmd_auto, 10)
@@ -160,7 +165,7 @@ class EstopNode(Node):
         self._nearest = nearest
 
         if nearest <= stop_distance:
-            self._begin_stop(f'통로 안 {hits}개 반사, 최근접 {nearest:.2f} m')
+            self._begin_stop(f'detect_collision {hits} hits, nearest {nearest:.2f}m')
         elif nearest > clear_distance:
             self._try_release()
         # stop < nearest <= clear 는 히스테리시스 구간: 정지 중이면 정지 유지,
@@ -285,13 +290,17 @@ class EstopNode(Node):
     def _on_timer(self):
         stale = self._scan_is_stale()
         if stale and not self._stopping:
-            self._begin_stop('스캔이 끊겼다')
+            self._begin_stop('scan_timeout')
 
         stopping = self._stopping or stale
 
         state = Bool()
         state.data = stopping
         self._state_pub.publish(state)
+
+        # 정지 중이 아니면 빈 문자열. 해제를 별도 신호로 만들지 않는 건 위 Bool 과
+        # 같은 이유다 — 상태를 매 틱 그대로 쏘면 받는 쪽이 놓칠 자리가 없다.
+        self._reason_pub.publish(String(data=self._last_reason if stopping else ''))
 
         if stopping:
             # 0 속도를 계속 쏘는 동안만 정지가 유지된다. 풀 때는 그냥 멈추면 된다 —
