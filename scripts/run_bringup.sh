@@ -16,6 +16,22 @@ fi
 source /opt/ros/jazzy/setup.bash
 source "$REPO_ROOT/install/setup.bash"
 
+# gz transport 를 루프백으로 고정한다. 이걸 안 주면 gz sim 은 정상적으로 뜨고 월드도
+# 다 읽는데(서비스 23개 광고, 에러 0건) 같은 머신의 다른 프로세스가 그 서버를 전혀
+# 보지 못한다 — ros_gz_sim create 가 "Requesting list of world names" 만 무한 반복하고
+# 로봇이 스폰되지 않으며, ros_gz_bridge 는 브릿지를 만들어 놓고도 /clock 을 한 개도
+# 못 받는다.
+#
+# 2026-08-06 실측(navi_factory 월드, 헤드리스):
+#   GZ_IP 없음 : create 재시도 110회 / 271초 동안 스폰 실패, /clock·/robot2/scan 0건
+#   GZ_IP 지정 : 4초 만에 "Entity creation successful", /clock 100Hz, /robot2/scan 9.8Hz
+# gz sim 단독으로도 같아서 launch·headless 와는 무관하다(gz topic -l 이 각각 0개 / 10개).
+#
+# 원인은 gz transport 의 디스커버리가 UDP 멀티캐스트인데 이 머신에 224.0.0.0/4 라우트가
+# 없다는 것. 이 프로젝트는 전부 한 머신에서 도니 루프백으로 묶으면 충분하다. 여러 대에
+# 나눠 돌릴 일이 생기면 이 줄을 지우고 라우트를 여는 쪽으로 바꿔야 한다.
+export GZ_IP=127.0.0.1
+
 # twist_mux 는 자작 노드가 아니라 apt 설치 패키지다(ros-jazzy-twist-mux). build_workspace.sh는
 # ros2가 이미 PATH에 있는(=이미 한 번 셋업된) 머신에서는 apt install 블록 전체를 건너뛰므로,
 # 이 패키지가 나중에 목록에 추가돼도 기존 머신엔 소급 적용이 안 된다 — 그래서 bringup이
