@@ -43,6 +43,7 @@ from auto_drive.patrol.waypoint_follower import (ANGULAR_DAMPING,
 from geometry_msgs.msg import Pose, Twist
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile
 from std_msgs.msg import String
 import yaml
 
@@ -173,8 +174,31 @@ class MissionFollower(Node):
         self.create_subscription(Pose, 'pose_gt', self._on_pose, 10)
         self.create_subscription(String, 'signal_dispatch', self._on_dispatch, 10)
         self._pub = self.create_publisher(Twist, 'cmd_vel_auto', 10)
+
+        # 지금 무엇을 하고 있는지. 주행에는 안 쓰이고 기록(stop_logger)용이다.
+        #
+        # 이게 필요한 이유: 대기 중에는 cmd_vel_auto 를 아예 발행하지 않으므로,
+        # 밖에서 보면 "수신호석에서 신호를 기다리는 중"과 "아무도 안 띄웠다"가
+        # 똑같이 침묵으로 보인다. 정차(dwelling)도 0 을 쏘는 것뿐이라 estop 이나
+        # 수신호로 선 것과 구분되지 않는다. 사유를 아는 건 이 노드뿐이다.
+        #
+        # 래치(transient_local)인 이유: 전환이 드물어서 기록 노드가 나중에 떠도
+        # 마지막 상태를 받아야 한다. 매 틱 쏘는 estop 쪽과 다른 점이다.
+        self._state_pub = self.create_publisher(
+            String, 'mission_state',
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
+        self._state = None
+        self._set_state('waiting')
+
         self.create_timer(CONTROL_PERIOD_SEC, self._on_timer)
         self.get_logger().info('수신호석 대기 중 — signal_dispatch 를 기다립니다.')
+
+    def _set_state(self, state):
+        """상태가 바뀔 때만 발행한다. 값은 waiting / driving / dwelling."""
+        if state == self._state:
+            return
+        self._state = state
+        self._state_pub.publish(String(data=state))
 
     # ------------------------------------------------------------- 콜백
 
@@ -200,6 +224,7 @@ class MissionFollower(Node):
                 f'{sorted(self._routes)})', throttle_duration_sec=5.0)
             return
         self._route = zone
+        self._set_state('driving')
         # 경로점 0 은 수신호석(지금 서 있는 곳)이므로 목표는 1 부터다.
         self._index = 1
         self._prev_heading_error = None
@@ -221,6 +246,7 @@ class MissionFollower(Node):
             self._dwell_until = None
             self._advance()
             if self._route is not None:
+                self._set_state('driving')
                 self._drive_toward_target()
             return
 
@@ -245,6 +271,7 @@ class MissionFollower(Node):
             self._last_linear_speed = 0.0
             self._last_angular = 0.0
             self._route = None
+            self._set_state('waiting')
             return
 
         if self._index in self._station_indices[self._route]:
@@ -254,6 +281,7 @@ class MissionFollower(Node):
             self._last_linear_speed = 0.0
             self._last_angular = 0.0
             self._dwell_until = time.monotonic() + self._station_dwell_sec
+            self._set_state('dwelling')
             return
 
         self._advance()

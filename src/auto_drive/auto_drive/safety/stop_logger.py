@@ -18,10 +18,11 @@
   motion — 실제로 섰는지. odom 의 속도가 임계값 아래면 stop, 위면 move_start.
       명령(cmd_vel)이 아니라 실측을 쓰는 이유는 '얼마나 정지했는지'가 물리
       시간이기 때문이다. 명령만 보면 명령은 갔는데 못 움직인 경우를 놓친다.
-  reason — 정지를 만들 수 있는 소스가 켜져 있는지. estop_reason(estop_node 가
-      내는 사유 문자열)과 cmd_vel_gesture(수신호 STOP) 둘이다. 서로 독립이라
-      동시에 켜져 있어도 각자 찍힌다 — 우선순위로 하나만 남기면 '라이다가 안
-      세웠으면 수신호가 세웠을' 상황이 기록에서 사라진다.
+  reason — 정지를 만들 수 있는 소스가 켜져 있는지. 셋이다:
+      estop_reason(estop_node 가 내는 사유 문자열), cmd_vel_gesture(수신호 STOP),
+      mission_state(mission_follower 가 대기 중인지 정차 중인지).
+      서로 독립이라 동시에 켜져 있어도 각자 찍힌다 — 우선순위로 하나만 남기면
+      '라이다가 안 세웠으면 수신호가 세웠을' 상황이 기록에서 사라진다.
 
       사유는 그것을 아는 노드가 발행하고 여기는 받기만 한다. 스캔이나 위치를
       다시 구독해 판정을 되풀이하지 않는다 — 판정이 두 곳에 생기면 둘이 어긋날
@@ -60,7 +61,7 @@ from nav_msgs.msg import Odometry
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import DurabilityPolicy, qos_profile_sensor_data, QoSProfile
 from std_msgs.msg import String
 
 # CSV 한 줄 = 상태 전환 한 번. 네 열의 의미:
@@ -74,13 +75,23 @@ from std_msgs.msg import String
 #            전부 한 파일에 섞어 두고 이 열로 구분한다 — 파일이 하나여야
 #            시간축 정렬이 공짜다.
 #   event  — 줄의 내용. motion 이면 stop/move_start,
-#            reason 이면 estop_<사유>_on/off 와 gesture_on/gesture_off,
+#            reason 이면 estop_<사유>_on/off, gesture_on/off,
+#            dispatch_wait_on/off, dwell_on/off,
 #            tick 이면 alive.
 CSV_HEADER = ['t_sim', 't_wall', 'stream', 'event']
 
+# mission_state 값 → 로그에 쓸 이름. driving 은 정지 사유가 아니라서 여기 없고,
+# 여기 없는 값이 오면 직전 구간만 닫히고 새로 열리는 것은 없다.
+#
+# waiting 을 signal_* 로 부르지 않는 이유: 바로 옆 레인이 gesture(수신호 STOP 으로
+# 선 구간)라, 이름에 signal 이 들어가면 "수신호 때문에 섰다"로 읽힌다. 실제로는
+# 수신호석에서 signal_dispatch 가 오기를 기다리는 중이고 아무도 세우지 않았다.
+# 그래서 무엇을 기다리는지를 그대로 이름으로 썼다.
+MISSION_EVENT = {'waiting': 'dispatch_wait', 'dwelling': 'dwell'}
+
 
 class StopLogger(Node):
-    """정지(odom)와 정지 사유(estop·수신호)의 전환 순간을 CSV 에 남긴다."""
+    """정지(odom)와 정지 사유(estop·수신호·임무 상태)의 전환 순간을 CSV 에 남긴다."""
 
     def __init__(self):
         super().__init__('stop_logger')
@@ -128,11 +139,12 @@ class StopLogger(Node):
 
         # None = 아직 판정 전. 첫 메시지에서 정해지고 그때 한 줄이 남는다.
         self._stopped = None
-        # _estop_kind 는 None 이 '사유 없음'이기도 하다. estop 이 꺼진 채로
-        # 시작하면 첫 메시지가 빈 문자열이라 상태가 그대로고, 그래서 줄이 안
-        # 남는다 — 예전 Bool 판정은 None != False 라 시작할 때마다 estop_off 를
-        # 한 줄 남겼는데, 그건 전환이 아니라서 로그를 읽는 사람을 헷갈리게 했다.
+        # 이쪽 둘은 None 이 '사유 없음'이기도 하다. estop 이 꺼진 채로 시작하면
+        # 첫 메시지가 빈 문자열이라 상태가 그대로고, 그래서 줄이 안 남는다 —
+        # 예전 Bool 판정은 None != False 라 시작할 때마다 estop_off 를 한 줄
+        # 남겼는데, 그건 전환이 아니라서 로그를 읽는 사람을 헷갈리게 했다.
         self._estop_kind = None
+        self._mission = None
         self._gesture_on = False
         self._last_gesture_sec = 0.0
 
@@ -141,6 +153,11 @@ class StopLogger(Node):
                                  qos_profile_sensor_data)
         self.create_subscription(String, 'estop_reason', self._on_estop_reason, 10)
         self.create_subscription(Twist, 'cmd_vel_gesture', self._on_gesture, 10)
+        # mission_follower 쪽이 래치로 내므로 이쪽도 같은 durability 여야 한다 —
+        # 안 맞으면 QoS 불일치로 연결 자체가 안 된다(조용히 아무것도 안 온다).
+        self.create_subscription(
+            String, 'mission_state', self._on_mission,
+            QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 
         # 수신호 구간을 닫기 위한 타이머. timeout 보다 촘촘해야 닫히는 시점이
         # timeout 을 한 주기 이상 넘기지 않는다.
@@ -194,6 +211,16 @@ class StopLogger(Node):
         if kind is not None:
             self._write_event('reason', f'estop_{kind}_on')
         self._estop_kind = kind
+
+    def _on_mission(self, msg):
+        """mission_follower 의 상태 전환을 남긴다. driving 은 사유가 아니라 구간을 닫기만 한다."""
+        if msg.data == self._mission:
+            return
+        if self._mission in MISSION_EVENT:
+            self._write_event('reason', f'{MISSION_EVENT[self._mission]}_off')
+        if msg.data in MISSION_EVENT:
+            self._write_event('reason', f'{MISSION_EVENT[msg.data]}_on')
+        self._mission = msg.data
 
     def _on_gesture(self, msg):
         # 지금 수신호 라벨은 STOP 하나뿐이라 항상 0 이지만, 전진 라벨이 다시
