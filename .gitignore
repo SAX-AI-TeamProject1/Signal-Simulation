@@ -239,3 +239,5 @@ log/
 *.venv-infer
 *.venv-perception
 examples/src/pub_test/pub_test/vision/
+# 웹캠 실측 캡처 (개인 촬영본 — 커밋 금지)
+scratch/

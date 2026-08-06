@@ -179,6 +179,43 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "10. bringup + 물체 판별 (박스 그린 영상)",
+            "detail": "태스크 8과 같은 bringup 을 enable_detect:=true 로 실행합니다 — 시뮬 카메라에 잡힌 물체를 YOLO(obstacle_detector.pt)로 판별해 박스를 그려 /robot2/detect_image 로 냅니다. 판별 가능한 6종: PalletJack, Bucket, Cluttering, TrashCan, Person, Vehicle. 영상을 보려면 태스크 11을 함께 실행하세요 — detect_node 는 구독자가 없으면 추론을 건너뛰므로, 뷰어를 닫으면 CPU 도 쓰지 않습니다. 주행 명령에는 관여하지 않습니다(twist_mux 에 끼어들지 않음). 사전조건: 태스크 1 또는 2(빌드).",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/run_bringup.sh",
+                "enable_detect:=true"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "11. 판별 영상 보기 (rqt_image_view)",
+            "detail": "detect_node 가 내는 /robot2/detect_image 를 rqt_image_view 창으로 엽니다 — 박스와 라벨이 그려진 카메라 영상. detect_node 는 이 창이 떠 있는 동안에만 추론하므로(구독자 없으면 건너뜀), 창을 닫으면 추론도 멈춥니다. 사전조건: 태스크 10(또는 enable_detect:=true 로 띄운 bringup).",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/run_detect_view.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
         }
     ]
 }

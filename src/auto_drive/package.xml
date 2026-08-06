@@ -23,7 +23,7 @@
   <exec_depend>vision_msgs</exec_depend>      <!-- Detection2DArray: 클래스+bbox+score 를 그대로 담아 자체 msg 패키지를 안 만든다 -->
   <exec_depend>geometry_msgs</exec_depend>    <!-- Twist: cmd_vel_estop / 서행 명령 -->
   <exec_depend>std_msgs</exec_depend>         <!-- Bool: 정지 상태 표시용(로깅/디버그) -->
-  <exec_depend>cv_bridge</exec_depend>        <!-- Image ↔ numpy 변환. YOLO 노드에서만 사용 -->
+  <exec_depend>cv_bridge</exec_depend>        <!-- Image ↔ numpy 변환. marker_vision 에서만 사용 (detect_node 는 numpy 로 직접 변환 — OpenCV 4.6/5.0 불일치 회피) -->
   <exec_depend>message_filters</exec_depend>  <!-- 카메라 15Hz 와 라이다 10Hz 를 묶는 ApproximateTimeSynchronizer -->
   <exec_depend>visualization_msgs</exec_depend>  <!-- Marker: scan_rays 가 광선을 선분으로 그린다 -->
   <exec_depend>nav_msgs</exec_depend>         <!-- Odometry: ground_truth_tf 가 적산치를 되뺀다 -->
